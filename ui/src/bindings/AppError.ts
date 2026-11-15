@@ -4,13 +4,12 @@
  * A serialisable error the UI can render: a plain message for the user and optional
  * technical details for the log or a "show details" disclosure.
  */
-export type AppError = {
-  /**
-   * Plain-language message safe to show to the user.
-   */
-  message: string;
-  /**
-   * Technical details (never shown by default).
-   */
-  details: string | null;
-};
+export type AppError = { 
+/**
+ * Plain-language message safe to show to the user.
+ */
+message: string, 
+/**
+ * Technical details (never shown by default).
+ */
+details: string | null, };

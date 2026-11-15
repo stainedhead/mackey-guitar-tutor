@@ -48,5 +48,6 @@ None. Open questions that need J (defaults chosen, work not blocked): Q-1, Q-2, 
 
 | Date (UTC) | Activity |
 |------------|----------|
+| 2026-11-15T20:05Z | Walking-skeleton infrastructure (Step 3, infrastructure worker): `ui/` scaffold, `src-tauri` (`mackey-app`) with `AppError` and panic guard, ts-rs bindings with stale check, Makefile UI/app targets, AGENTS.md, CI jobs (`ui`, `e2e`, `bindings`, `mac-app`, `ios-sim`), deny.toml MPL-2.0 exceptions (D-34 to D-41). Scaffold parts of D1, D2, D6, D7, D15, E1 to E7 and E9 done; macOS and iOS jobs written but unrun. Task counts above are updated by the integrating step |
 | 2026-11-15T19:42Z | Step 2 spec review complete; gaps fixed (19 SAC added, command-wrapper generator, revision counter, E9 xtask task, edge cases, non-goals, Q-9 to Q-11); Phases 0 to 4 marked complete |
 | 2026-11-15T19:27Z | Step 1 create-spec: spec directory created from the PRD; all phase files written |
