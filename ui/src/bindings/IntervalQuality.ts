@@ -3,4 +3,4 @@
 /**
  * Interval quality.
  */
-export type IntervalQuality = 'Perfect' | 'Major' | 'Minor' | 'Augmented' | 'Diminished';
+export type IntervalQuality = "Perfect" | "Major" | "Minor" | "Augmented" | "Diminished";

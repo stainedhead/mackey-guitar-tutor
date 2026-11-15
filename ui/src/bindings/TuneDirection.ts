@@ -3,4 +3,4 @@
 /**
  * Which way to turn the peg.
  */
-export type TuneDirection = 'InTune' | 'Tighten' | 'Loosen';
+export type TuneDirection = "InTune" | "Tighten" | "Loosen";

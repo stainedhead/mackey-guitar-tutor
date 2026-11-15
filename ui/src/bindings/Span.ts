@@ -3,13 +3,12 @@
 /**
  * A byte range into the parsed text (`end` exclusive), always on `char` boundaries.
  */
-export type Span = {
-  /**
-   * First byte.
-   */
-  start: number;
-  /**
-   * One past the last byte.
-   */
-  end: number;
-};
+export type Span = { 
+/**
+ * First byte.
+ */
+start: number, 
+/**
+ * One past the last byte.
+ */
+end: number, };

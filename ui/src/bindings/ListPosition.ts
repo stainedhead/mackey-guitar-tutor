@@ -3,17 +3,16 @@
 /**
  * "3 of 7" (FB-9.2).
  */
-export type ListPosition = {
-  /**
-   * "3 of 7".
-   */
-  label: string;
-  /**
-   * 1-based index.
-   */
-  index: number;
-  /**
-   * List length.
-   */
-  count: number;
-};
+export type ListPosition = { 
+/**
+ * "3 of 7".
+ */
+label: string, 
+/**
+ * 1-based index.
+ */
+index: number, 
+/**
+ * List length.
+ */
+count: number, };

@@ -3,4 +3,4 @@
 /**
  * What a string marker is.
  */
-export type MarkerKind = 'Muted';
+export type MarkerKind = "Muted";

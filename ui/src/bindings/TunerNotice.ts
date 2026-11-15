@@ -3,4 +3,4 @@
 /**
  * Something the glue wants the user to know.
  */
-export type TunerNotice = 'DeviceDisconnectedUsingDefault' | 'DeviceChanged' | 'AnalysisStopped';
+export type TunerNotice = "DeviceDisconnectedUsingDefault" | "DeviceChanged" | "AnalysisStopped";

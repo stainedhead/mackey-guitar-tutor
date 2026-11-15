@@ -3,4 +3,4 @@
 /**
  * Which system settings pane to open.
  */
-export type SettingsPane = 'Microphone';
+export type SettingsPane = "Microphone";

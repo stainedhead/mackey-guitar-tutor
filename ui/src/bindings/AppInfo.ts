@@ -3,17 +3,16 @@
 /**
  * Static facts about the running app, shown in the UI shell.
  */
-export type AppInfo = {
-  /**
-   * Product name.
-   */
-  name: string;
-  /**
-   * Crate version of `mackey-app`.
-   */
-  version: string;
-  /**
-   * Operating system the app was built for (`macos`, `ios`, `linux`, ...).
-   */
-  os: string;
-};
+export type AppInfo = { 
+/**
+ * Product name.
+ */
+name: string, 
+/**
+ * Crate version of `mackey-app`.
+ */
+version: string, 
+/**
+ * Operating system the app was built for (`macos`, `ios`, `linux`, ...).
+ */
+os: string, };

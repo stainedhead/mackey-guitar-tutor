@@ -1,48 +1,54 @@
 # Getting started
 
-Mackey Guitar Tutor shows you the guitar neck. Pick a key and the neck lights up every note of it; pick a chord and it shows how to play it. This guide covers what the app does today: **Explore**, the **Tuner** and **Settings**.
+Mackey Guitar Tutor shows you the guitar neck. Pick a key and the neck lights up every note of it; pick a chord and it shows how to play it. Today the app has three screens: [Explore](explorer.md), the [Tuner](tuner.md) and [Settings](settings.md). Practice sessions and songs are not built yet.
 
-## Explore
+![Explore, showing G major on a 22-fret neck](../docs/images/real-explore-g-major.png)
 
-![Explore, G major, on a Mac](../docs/images/explore-g-major-desktop.png)
+*Explore on first launch: every note of G major. Square = root, filled circle = chord tone, ring = other note of the key.*
 
-The neck shows G major. Each note has a shape as well as a colour, so you never need the colour to read it: a **square** is the root, a **filled circle** is a chord tone (third, fifth, seventh) and a **ring** is another note of the key. Hover a note (or tap it on iPad) to see its name and role, and click it to hear it.
+## Install from source on a Mac
 
-- **Key:** choose a tonic and a mode at the top, or step round the circle of fifths with the arrows. "Relative" jumps to the relative major or minor.
-- **Chords in the key:** the row of buttons lists the chords that belong to the key, with Roman numerals. Tick "Sevenths" to see seventh chords. The up and down arrows (or the arrow keys) step through them.
-- **Chord field:** type any chord, such as `Am7`, `D/F#` or a Roman numeral like `vi`. If the app does not understand it, it says so under the field and often suggests the right spelling.
+There is no download yet; you build the app yourself. You need a Mac running macOS 13 or later.
 
-![A C chord with its voicings](../docs/images/explore-c-voicings-desktop.png)
+1. Install the Xcode command line tools: `xcode-select --install`.
+2. Install Rust from [rustup.rs](https://rustup.rs). The right toolchain version is picked up from `rust-toolchain.toml` the first time you build.
+3. Install Node 22 (for example with Homebrew: `brew install node@22`).
+4. Get the code and install the UI dependencies:
 
-- **Voicing view:** shows one way to play the chord and lists the others, with a small diagram for each. Use the arrows beside the name, or Right and Left, to step through them. An `x` above a string means do not play it.
-- **Tuning and capo:** the neck and the chord shapes follow your tuning and capo.
-- **Play:** the Play button (or Space) strums the chord you see.
+   ```sh
+   git clone https://github.com/stainedhead/mackey-guitar-tutor.git
+   cd mackey-guitar-tutor
+   npm ci --prefix ui
+   ```
 
-### Left-handed
+5. Build the app: `make app`. This produces a universal (Apple silicon and Intel) app, ad-hoc signed, under `target/universal-apple-darwin/release/bundle/` (the `.app` is in `macos/`, the `.dmg` in `dmg/`).
 
-Turn on "Left-handed" in Settings and the neck mirrors, with the nut on the right.
+To try the app without installing it, run `npm run tauri dev` from the repository root instead. It opens the app with hot reload.
 
-![The mirrored neck](../docs/images/explore-left-handed-desktop.png)
+### First launch
 
-## Tuner
+The app is signed ad hoc, not with an Apple Developer ID, so macOS blocks it the first time. Open **System Settings > Privacy & Security**, scroll to the message about "Mackey Guitar Tutor" and choose **Open Anyway**. Details are in [troubleshooting](troubleshooting.md#macos-says-the-app-cannot-be-opened).
 
-The first time you open the Tuner it explains that the microphone is used only to hear your guitar, and nothing is recorded or sent anywhere. Then play a string: the big letter is the note, the words say how many cents flat or sharp you are, and the needle shows the same. In "Strings" mode the app compares what you play with the string you are tuning, and ticks each string when it is in tune. The note button beside a string plays a reference tone.
+The first time you open the Tuner, macOS asks for microphone access. The app only listens while the Tuner is open and never records or sends audio anywhere.
 
-![The tuner, string mode, a flat A](../docs/images/tuner-flat-desktop.png)
-![The tuner, A in tune](../docs/images/tuner-in-tune-desktop.png)
+## A five-minute tour
 
-## Settings
+1. **See a key.** Explore opens in G major. Use the Tonic and Mode menus, or the `‹` `›` buttons to walk round the circle of fifths.
+2. **Pick a chord.** Click a chord in the row (I, ii, iii ...), or type one such as `Am7` or `D/F#` into the Chord field and press Enter.
+3. **See how to play it.** Choose **Voicing** in the view buttons. The voicing list on the right shows every shape found, with a small diagram. Press the right arrow key to step through them.
+4. **Hear it.** Press Space, or click any note on the neck.
+5. **Tune up.** Open the **Tuner** in the sidebar, choose Continue and play a string.
 
-Left-handed, tuning, number of frets, note labels, theme (system, light or dark), volume and the tuner's input device. Each group has its own "Reset" button.
+![A C chord shown as the open C voicing, with the voicing list](../docs/images/real-explore-c-voicing.png)
 
-![Settings](../docs/images/settings-desktop.png)
+*The open C chord. `x` over a string means do not play it; a circle means play it open.*
 
 ## On iPad
 
-The same screens, with larger touch targets. Swipe left or right on the neck to move along it, pinch to zoom the fret range, and swipe up or down on the chord row to change chord. In portrait the sidebar becomes a tab bar.
+The same screens with larger touch targets: swipe the neck to move along it, pinch to zoom the fret range, swipe up or down on the chord row to change chord. In portrait the sidebar becomes a tab bar. The iPad build runs in the iOS Simulator today (`make ios-sim`, macOS with Xcode); installing on a real iPad has not been validated yet ([roadmap](../docs/roadmap.md#ipad-device-validation-short-step-when-j-sets-up-a-free-apple-id)).
 
-![Explore on iPad in landscape](../docs/images/explore-g-major-ipad.png)
+![Explore at iPad landscape size (1180 by 820)](../docs/images/real-explore-ipad.png)
 
-## Keyboard
+*Explore at the iPad landscape window size. This is the desktop app in a window of that size, not the iPad app.*
 
-Arrow keys step through chords and voicings; Space plays; the shortcuts are ignored while you type in a text field. Back to [user-docs](README.md).
+Next: [Explore](explorer.md). Back to [user-docs](README.md).

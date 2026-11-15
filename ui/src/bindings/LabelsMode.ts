@@ -3,4 +3,4 @@
 /**
  * What a position's label shows (G-2.2).
  */
-export type LabelsMode = 'NoteName' | 'ScaleDegree' | 'Interval' | 'Finger' | 'None';
+export type LabelsMode = "NoteName" | "ScaleDegree" | "Interval" | "Finger" | "None";

@@ -3,19 +3,12 @@
 /**
  * Which pattern a [`ScalePattern`] is.
  */
-export type PatternKind =
-  | { type: 'FullNeck' }
-  | {
-      type: 'PentatonicBox';
-      /**
-       * The box number.
-       */
-      number: number;
-    }
-  | {
-      type: 'ThreeNps';
-      /**
-       * The pattern number.
-       */
-      number: number;
-    };
+export type PatternKind = { "type": "FullNeck" } | { "type": "PentatonicBox", 
+/**
+ * The box number.
+ */
+number: number, } | { "type": "ThreeNps", 
+/**
+ * The pattern number.
+ */
+number: number, };

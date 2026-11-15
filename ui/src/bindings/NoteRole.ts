@@ -3,5 +3,4 @@
 /**
  * The role of a drawn note (G-2); the UI picks shape and colour.
  */
-export type NoteRole =
-  'Root' | 'Third' | 'Fifth' | 'Seventh' | 'Extension' | 'ScaleTone' | 'SingleNote';
+export type NoteRole = "Root" | "Third" | "Fifth" | "Seventh" | "Extension" | "ScaleTone" | "SingleNote";

@@ -3,4 +3,4 @@
 /**
  * The colour theme.
  */
-export type Theme = 'System' | 'Light' | 'Dark';
+export type Theme = "System" | "Light" | "Dark";

@@ -3,17 +3,16 @@
 /**
  * Options for the voicing search (FB-5.4, FB-5.6).
  */
-export type VoicingOptions = {
-  /**
-   * Allow a span of 5 frets instead of 4.
-   */
-  allow_stretch: boolean;
-  /**
-   * Allow dropping the fifth even where the chord's identity needs it.
-   */
-  allow_omitted_fifth: boolean;
-  /**
-   * The most voicings returned.
-   */
-  max_results: number;
-};
+export type VoicingOptions = { 
+/**
+ * Allow a span of 5 frets instead of 4.
+ */
+allow_stretch: boolean, 
+/**
+ * Allow dropping the fifth even where the chord's identity needs it.
+ */
+allow_omitted_fifth: boolean, 
+/**
+ * The most voicings returned.
+ */
+max_results: number, };

@@ -3,13 +3,4 @@
 /**
  * The nine tuning presets of LH-2.
  */
-export type TuningPreset =
-  | 'Standard'
-  | 'DropD'
-  | 'DoubleDropD'
-  | 'Dadgad'
-  | 'OpenG'
-  | 'OpenD'
-  | 'OpenE'
-  | 'HalfStepDown'
-  | 'WholeStepDown';
+export type TuningPreset = "Standard" | "DropD" | "DoubleDropD" | "Dadgad" | "OpenG" | "OpenD" | "OpenE" | "HalfStepDown" | "WholeStepDown";

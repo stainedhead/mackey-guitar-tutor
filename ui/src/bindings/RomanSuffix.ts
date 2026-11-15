@@ -3,4 +3,4 @@
 /**
  * What follows the numeral.
  */
-export type RomanSuffix = 'None' | 'Dim' | 'HalfDim' | 'Aug' | 'Seventh' | 'Maj7' | 'Dim7';
+export type RomanSuffix = "None" | "Dim" | "HalfDim" | "Aug" | "Seventh" | "Maj7" | "Dim7";

@@ -3,4 +3,4 @@
 /**
  * Upper case (major, augmented) or lower case (minor, diminished).
  */
-export type NumeralCase = 'Upper' | 'Lower';
+export type NumeralCase = "Upper" | "Lower";

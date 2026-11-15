@@ -3,4 +3,4 @@
 /**
  * The five CAGED forms.
  */
-export type CagedShape = 'C' | 'A' | 'G' | 'E' | 'D';
+export type CagedShape = "C" | "A" | "G" | "E" | "D";

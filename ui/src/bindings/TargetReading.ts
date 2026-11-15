@@ -3,13 +3,12 @@
 /**
  * The auto-selected (or locked) target string and the offset from it.
  */
-export type TargetReading = {
-  /**
-   * String number, 1 to 6.
-   */
-  string: number;
-  /**
-   * Smoothed offset from that string's pitch in cents (may exceed 50 when far off).
-   */
-  cents: number;
-};
+export type TargetReading = { 
+/**
+ * String number, 1 to 6.
+ */
+string: number, 
+/**
+ * Smoothed offset from that string's pitch in cents (may exceed 50 when far off).
+ */
+cents: number, };

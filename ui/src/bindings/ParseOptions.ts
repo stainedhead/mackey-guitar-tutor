@@ -3,9 +3,8 @@
 /**
  * Parser settings.
  */
-export type ParseOptions = {
-  /**
-   * Read the German `H` as `B` (default off).
-   */
-  read_h_as_b: boolean;
-};
+export type ParseOptions = { 
+/**
+ * Read the German `H` as `B` (default off).
+ */
+read_h_as_b: boolean, };

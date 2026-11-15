@@ -4,5 +4,4 @@
  * What went wrong, so the UI can branch (show "No audio output" once, offer the microphone
  * settings button) without parsing text. The UI never displays the kind itself.
  */
-export type AppErrorKind =
-  'Invalid' | 'NoAudioOutput' | 'NoInputDevice' | 'MicrophoneDenied' | 'Settings' | 'Internal';
+export type AppErrorKind = "Invalid" | "NoAudioOutput" | "NoInputDevice" | "MicrophoneDenied" | "Settings" | "Internal";

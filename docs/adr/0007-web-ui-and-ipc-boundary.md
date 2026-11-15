@@ -1,6 +1,6 @@
 # ADR 0007: React and SVG UI with a typed, thin IPC boundary
 
-- Status: Proposed
+- Status: Accepted (implemented in the fretboard foundation)
 - Date: 2026-11-15
 
 ## Context
@@ -22,3 +22,12 @@ With a Tauri shell ([ADR 0001](0001-rust-core-tauri-shell.md)), the UI runs in t
 ## Consequences
 - UI logic is testable with Vitest and Playwright in a normal browser against a mocked command layer, as well as end to end with tauri-driver.
 - Contributors need Rust and TypeScript; the boundary keeps each side's work separate.
+
+## Implementation notes (2026-11-15)
+
+- **`ts-rs` was chosen over `tauri-specta`.** `tauri-specta` for Tauri 2 is still a release candidate. `ts-rs` generates types only, so command signatures are written once in a manifest (`src-tauri/src/manifest.rs`: name, argument names and TypeScript types, result type) and `make bindings` generates `ui/src/bindings/commands.ts` from it. A unit test checks that the manifest lists exactly the registered commands and the capability permissions. `make bindings-check` fails CI on any stale generated file. (spec decisions D-05, D-44)
+- **Types are exported by `ts-rs` tests** (`export_bindings_*`); the target folder comes from `TS_RS_EXPORT_DIR` in `.cargo/config.toml`, so any `make test` also rewrites identical files.
+- **The UI mock replays recorded states, not hand-written ones.** `src-tauri/src/bindings.rs` drives the real `AppState` through scripted scenarios and records them as `ui/src/mocks/scenarios.json`, keeping "never re-implement theory in TypeScript" true for the mock too (D-14, D-69). A path the recording does not contain gets an explicit error.
+- **Revisions.** Every snapshot carries a revision; the UI applies a response only if it is newer than the last applied one, so out-of-order replies cannot show a stale neck.
+- Zustand was not needed: a small store with a last-revision-wins rule is enough (`ui/src/state/`).
+

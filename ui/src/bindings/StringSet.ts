@@ -3,4 +3,4 @@
 /**
  * Three adjacent strings for triads (FB-6.1).
  */
-export type StringSet = 'S123' | 'S234' | 'S345' | 'S456';
+export type StringSet = "S123" | "S234" | "S345" | "S456";

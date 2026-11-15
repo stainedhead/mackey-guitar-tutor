@@ -2,7 +2,7 @@
 
 **Feature:** fretboard-foundation
 **Created:** 2026-11-15
-**Last updated:** 2026-11-15T21:40Z
+**Last updated:** 2026-11-15T22:18Z
 **Spec:** [spec.md](spec.md) · **Tasks:** [tasks.md](tasks.md) · **Orchestration dashboard:** [fretboard-foundation-status.md](fretboard-foundation-status.md)
 
 **Update this file after every task and every phase. It is the single source of truth for progress.**
@@ -51,6 +51,7 @@ None. Open questions that need J (defaults chosen, work not blocked): Q-1, Q-2, 
 
 | Date (UTC) | Activity |
 |------------|----------|
+| 2026-11-15T22:18Z | Step 4 documentation: real-app screenshots (`make screenshots`, D-89), edge-arrow overlap fixed (D-90), root README, architecture section 8, ADR 0007 and 0008 notes, roadmap status, traceability test references, user-docs (getting-started, explorer, tuner, settings, troubleshooting), docs/images README |
 | 2026-11-15T21:40Z | Phase D (D1 to D15): `mackey-app` state, 32 commands, settings, tuner event, bindings and recorded mock scenarios; the Explore, Tuner and Settings UI with the shared SVG fretboard; Vitest (91 tests) and Playwright specs (desktop, iPad, iPad portrait, narrow); screenshots in `docs/images/`. D16 waits for a Mac |
 | 2026-11-15T21:30Z | Phase B complete: `mackey-voicing` (instrument, curated and CAGED shapes, search, fingering, triads, arpeggios, patterns, selection, FretboardView, playback plan); about 125 tests incl. properties at 10,000 cases, 94% workspace line coverage, search 0.3 ms, view under 1 ms |
 | 2026-11-15T21:00Z | Phase C complete (mackey-audio worker): MPM detector, tuner state machine, Karplus-Strong synth with allocation-free render, playback plans, cpal glue (`OutputHandle`, `TunerInput`), 94 tests plus doc tests, detector 0.12 ms per window; decisions D-80 to D-88; deny.toml gains BSD-1-Clause (dev-dependency `assert_no_alloc`); Makefile COVER_IGNORE narrowed to the three cpal files |

@@ -4,4 +4,4 @@
  * The job a chord tone does, which decides how the fretboard draws it and which tones a
  * voicing may not drop (G-2, FB-5.4).
  */
-export type ToneRole = 'Root' | 'Third' | 'Fifth' | 'Seventh' | 'Extension';
+export type ToneRole = "Root" | "Third" | "Fifth" | "Seventh" | "Extension";

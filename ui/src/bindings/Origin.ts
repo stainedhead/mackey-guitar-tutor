@@ -3,4 +3,4 @@
 /**
  * Where a voicing came from (LH-4).
  */
-export type Origin = 'Curated' | 'Search';
+export type Origin = "Curated" | "Search";

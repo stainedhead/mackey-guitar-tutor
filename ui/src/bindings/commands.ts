@@ -33,19 +33,12 @@ export interface Commands {
   selectDiatonicChord: (degree: Degree, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   selectChord: (text: string, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   parseChord: (text: string) => Promise<ParseOutcome>;
-  selectNote: (
-    string: number,
-    fret: number,
-    visible?: FretRange | null,
-  ) => Promise<ExplorerSnapshot>;
+  selectNote: (string: number, fret: number, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   selectTuning: (tuning: TuningChoice, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   setCapo: (capo: number, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   setViewType: (view: ViewType, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   setLabelsMode: (labels: LabelsMode, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
-  setScaleOverlay: (
-    overlay: OverlayRequest,
-    visible?: FretRange | null,
-  ) => Promise<ExplorerSnapshot>;
+  setScaleOverlay: (overlay: OverlayRequest, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   setOption: (option: ExplorerOption, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   cycle: (action: CycleAction, visible?: FretRange | null) => Promise<ExplorerSnapshot>;
   voicingsFor: (text: string, options?: VoicingOptions | null) => Promise<VoicingResult>;
@@ -74,33 +67,20 @@ export function createCommands(call: Call): Commands {
   return {
     appInfo: () => call<AppInfo>('app_info'),
     getSnapshot: (visible?) => call<ExplorerSnapshot>('get_snapshot', { visible: visible ?? null }),
-    fretboardView: (visible?) =>
-      call<FretboardView>('fretboard_view', { visible: visible ?? null }),
-    selectKey: (tonic, mode, visible?) =>
-      call<ExplorerSnapshot>('select_key', { tonic, mode, visible: visible ?? null }),
-    selectDiatonicChord: (degree, visible?) =>
-      call<ExplorerSnapshot>('select_diatonic_chord', { degree, visible: visible ?? null }),
-    selectChord: (text, visible?) =>
-      call<ExplorerSnapshot>('select_chord', { text, visible: visible ?? null }),
+    fretboardView: (visible?) => call<FretboardView>('fretboard_view', { visible: visible ?? null }),
+    selectKey: (tonic, mode, visible?) => call<ExplorerSnapshot>('select_key', { tonic, mode, visible: visible ?? null }),
+    selectDiatonicChord: (degree, visible?) => call<ExplorerSnapshot>('select_diatonic_chord', { degree, visible: visible ?? null }),
+    selectChord: (text, visible?) => call<ExplorerSnapshot>('select_chord', { text, visible: visible ?? null }),
     parseChord: (text) => call<ParseOutcome>('parse_chord', { text }),
-    selectNote: (string, fret, visible?) =>
-      call<ExplorerSnapshot>('select_note', { string, fret, visible: visible ?? null }),
-    selectTuning: (tuning, visible?) =>
-      call<ExplorerSnapshot>('select_tuning', { tuning, visible: visible ?? null }),
-    setCapo: (capo, visible?) =>
-      call<ExplorerSnapshot>('set_capo', { capo, visible: visible ?? null }),
-    setViewType: (view, visible?) =>
-      call<ExplorerSnapshot>('set_view_type', { view, visible: visible ?? null }),
-    setLabelsMode: (labels, visible?) =>
-      call<ExplorerSnapshot>('set_labels_mode', { labels, visible: visible ?? null }),
-    setScaleOverlay: (overlay, visible?) =>
-      call<ExplorerSnapshot>('set_scale_overlay', { overlay, visible: visible ?? null }),
-    setOption: (option, visible?) =>
-      call<ExplorerSnapshot>('set_option', { option, visible: visible ?? null }),
-    cycle: (action, visible?) =>
-      call<ExplorerSnapshot>('cycle', { action, visible: visible ?? null }),
-    voicingsFor: (text, options?) =>
-      call<VoicingResult>('voicings_for', { text, options: options ?? null }),
+    selectNote: (string, fret, visible?) => call<ExplorerSnapshot>('select_note', { string, fret, visible: visible ?? null }),
+    selectTuning: (tuning, visible?) => call<ExplorerSnapshot>('select_tuning', { tuning, visible: visible ?? null }),
+    setCapo: (capo, visible?) => call<ExplorerSnapshot>('set_capo', { capo, visible: visible ?? null }),
+    setViewType: (view, visible?) => call<ExplorerSnapshot>('set_view_type', { view, visible: visible ?? null }),
+    setLabelsMode: (labels, visible?) => call<ExplorerSnapshot>('set_labels_mode', { labels, visible: visible ?? null }),
+    setScaleOverlay: (overlay, visible?) => call<ExplorerSnapshot>('set_scale_overlay', { overlay, visible: visible ?? null }),
+    setOption: (option, visible?) => call<ExplorerSnapshot>('set_option', { option, visible: visible ?? null }),
+    cycle: (action, visible?) => call<ExplorerSnapshot>('cycle', { action, visible: visible ?? null }),
+    voicingsFor: (text, options?) => call<VoicingResult>('voicings_for', { text, options: options ?? null }),
     fitSelection: () => call<FretRange>('fit_selection'),
     playSelection: (visible?) => call<void>('play_selection', { visible: visible ?? null }),
     playNote: (string, fret) => call<void>('play_note', { string, fret }),

@@ -3,4 +3,4 @@
 /**
  * Which accidentals to use for a pitch class nothing else spells (G-1.5).
  */
-export type AccidentalPreference = 'Sharps' | 'Flats';
+export type AccidentalPreference = "Sharps" | "Flats";
