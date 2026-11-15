@@ -1,7 +1,7 @@
 # Fretboard Foundation: Auto Review Fixes PRD
 
 **Created:** 2026-11-15
-**Status:** Draft
+**Status:** Reviewed (see Review Log)
 **Source:** Step 5 (Code and Design Review) of `implm-frm-prd` on branch `claude/project-thread-e8va25`, reviewing `git diff main...HEAD` against `specs/261115-fretboard-foundation/` and `AGENTS.md`.
 **Reviewer method:** read of the core, shell and audio paths; executable probes of the theory/voicing engine (since removed); `cargo test` of `mackey-theory` and `mackey-voicing`; `xtask doccheck` and `archcheck`.
 
@@ -17,7 +17,7 @@ Three real defects were found, two of which the orchestrator suspected:
 
 The rest are medium findings: tuner glue excluded from coverage, a CSP allowance, and doc drift.
 
-Verdict: **not ready to merge until FR-001 to FR-003 are fixed**. Counts: P0 = 2, P1 = 1, P2 = 4.
+Verdict: **not ready to merge until FR-001 to FR-003 are fixed**. Counts: P0 = 3, P1 = 0, P2 = 4. FR-003 is P0 because INTENT.md ranks a wrong note or name as top severity, and a triad labelled with the wrong inversion teaches a wrong voicing.
 
 ## Problem Statement
 
@@ -76,7 +76,7 @@ The foundation passes its automated gates, yet a user opening the Explore screen
 - Given the ALSA null device on Linux, when the tuner is opened, then CPU stays below 25% of one core and the window stays responsive (manual check recorded in `implementation-notes.md`).
 - The loop logic is moved out of the coverage-excluded `input.rs` into a testable function, or the exclusion is narrowed to the cpal calls only.
 
-### FR-003 (P1): Triad placements with an open string at fret 12 or higher have the wrong bass
+### FR-003 (P0): Triad placements with an open string at fret 12 or higher have the wrong bass
 
 **Evidence.** `crates/mackey-voicing/src/triads.rs:70-125`. The tones are assigned to the set's low, middle and top strings, and every fret on each string that has the right pitch class is combined (`:98-113`), with only a span check on pressed frets. Open strings (including at the "capo" fret) are excluded from the span, and nothing checks that the three pitches ascend. A probe over 13 chords, 2 tunings, 4 string sets and 3 inversions found 90 of 716 placements whose lowest note was not the inversion's bass. Examples: C Standard S345 Root placement 1 `x(15)(14)0xx` (bass G, not C); Am Standard S123 Root placement 1 `xxx(14)(13)0` (bass E, not A); F#m S456 Root placement 0 `(14)0(10)xxx` (bass A, not F#); G7 Standard S123 Root placement 2 `xxx(12)0(10)` (bass B, not G).
 
@@ -93,7 +93,7 @@ The foundation passes its automated gates, yet a user opening the Explore screen
 **Evidence.** `specs/261115-fretboard-foundation/spec.md:218` maps AC-SC-3.1 to `mackey-voicing/tests/scale_patterns.rs`, which does not exist (the test is `tests/patterns.rs`). Nothing covers `step_pattern`, the "n of m" label or the announcement, which is how FR-001 shipped.
 
 **Acceptance criteria.**
-- Given the traceability tables (`spec.md`, `docs/prd/09-traceability.md`), when read, then every test path named exists (checked by a small `xtask doccheck` rule or a documented review).
+- Given the traceability tables (`spec.md`, `docs/prd/09-traceability.md`), when they are read, then every test path they name exists (checked by a documented review, or a small `xtask doccheck` rule if cheap).
 - Given the new FR-001 tests, when `make test` runs, then AC-SC-3.1 is covered end to end (core, selection, view, announcement) and the e2e mock agrees with the Rust label format.
 
 ### FR-005 (P2): Audio glue with real logic is excluded from coverage
@@ -104,15 +104,15 @@ The foundation passes its automated gates, yet a user opening the Explore screen
 
 **Acceptance criteria.**
 - Given the worker loop, when its decision logic (command handling, stream-failure fallback, silent-stream notice, yield policy) is moved behind a function that takes a fake ring and fake clock, then it is unit tested and `input.rs` is removed from `COVER_IGNORE` or reduced to the cpal build calls.
-- Given `make cover`, when run, then the overall line coverage is still at least 80% and AGENTS.md describes the narrower exclusion.
+- Given `make cover` runs in CI, when it finishes, then overall line coverage is still at least 80% and AGENTS.md describes the narrower exclusion.
 
 ### FR-006 (P2): CSP allows inline styles
 
 **Evidence.** `src-tauri/tauri.conf.json:26` has `style-src 'self' 'unsafe-inline'` in the production CSP. Scripts are `'self'` only, `object-src 'none'`, `connect-src` is limited to IPC, and capabilities are `core:default`, so the risk is low.
 
 **Acceptance criteria.**
-- Given the production build, when the UI is loaded, then the CSP has no `'unsafe-inline'` for styles, or an ADR records why React inline `style` attributes need it and what bounds the risk.
-- Given any rendered screen, when loaded in the app, then there are no CSP violations in the console.
+- Given the production build, when the UI is loaded, then the CSP has no `'unsafe-inline'` for styles, or a documented decision (ADR or note) records why React inline `style` attributes need it and what bounds the risk (scripts stay `'self'` only).
+- Given any rendered screen, when it is loaded in the app, then there are no CSP violations in the console.
 
 ### FR-007 (P2): Documentation drift to correct alongside the fixes
 
@@ -120,6 +120,7 @@ The foundation passes its automated gates, yet a user opening the Explore screen
 
 **Acceptance criteria.**
 - Given FR-001 to FR-006 are merged, when `make doccheck` runs and the docs are read, then no document describes the old behaviour, D-91 is marked resolved with the fix, the Explore screenshot is regenerated, and the root README and `user-docs/` links still resolve.
+- Given the spec and PRD traceability tables, when read, then each names the new regression tests.
 
 ## Non-Functional Requirements
 
@@ -140,10 +141,10 @@ The foundation passes its automated gates, yet a user opening the Explore screen
 
 ## Open Questions
 
-1. Should the stepper list patterns in box-number order (1 to 5) or in neck order starting at the lowest box? This PRD assumes box-number order starting at box 1, as AC-SC-3.1 reads.
-2. Is a triad with an open string and a fret of 12 or more ever wanted (it is playable)? This PRD assumes it should be listed only under the inversion it truly is.
-3. What should the tuner show for an unpaced device: a notice, or fall back to the next input device automatically?
-4. Is `'unsafe-inline'` for styles acceptable if documented in an ADR, or must the UI move to class-based styles only?
+1. (Decided in review: box-number order.) Should the stepper list patterns in box-number order (1 to 5) or in neck order starting at the lowest box? This PRD assumes box-number order starting at box 1, as AC-SC-3.1 reads.
+2. (Decided in review: list only under its true inversion; do not offer a wrong label.) Is a triad with an open string and a fret of 12 or more ever wanted (it is playable)? This PRD assumes it should be listed only under the inversion it truly is.
+3. (Decided in review: show the notice only; no automatic device fallback.) What should the tuner show for an unpaced device: a notice, or fall back to the next input device automatically?
+4. (Decided in review: remove it if feasible; if React inline styles need it, keep it with a documented rationale.) Is `'unsafe-inline'` for styles acceptable if documented, or must the UI move to class-based styles only?
 
 ## How to Implement
 
@@ -153,3 +154,26 @@ The foundation passes its automated gates, yet a user opening the Explore screen
 - **Git worktrees.** Create one worktree per workstream from the review branch (`git worktree add ../mackey-fr-a -b fix/261115-pattern-stepper`, and similar for B and C) so they proceed in parallel; merge them back one at a time, running `make check` after each merge. Workstreams A and B touch disjoint files; C is independent of both.
 - Run `make check` (plus `make e2e` and `make bindings-check` for FR-001) before each commit, and `make screenshots` at the end for FR-001 and FR-007. Do not run `make cover` on small disks; CI does.
 - Update `specs/261115-fretboard-foundation/fretboard-foundation-status.md` after each task, and mark D-91 resolved in `implementation-notes.md`.
+
+## Review Log
+
+`/review-prd` run on 2026-11-15 (dev-flow Step 6).
+
+| Dimension | Status | Note |
+|---|---|---|
+| Problem clarity | Pass | Three user-visible defects named with evidence (file and line) |
+| Scope definition | Pass | Goals and non-goals explicit |
+| Functional completeness | Pass | FR-001 to FR-007 atomic, each linked to a goal |
+| NFR coverage | Pass | Correctness, real-time safety, responsiveness, performance, accessibility, docs |
+| Acceptance criteria | Pass after edit | Every FR has Given/When/Then criteria; FR-004 to FR-007 wording tightened |
+| Dependency identification | Pass | Bindings, mock, shared audio files, snapshots, persisted settings named |
+| Open questions | Pass | Four questions, each now answered with a default decision |
+
+Changes made in review:
+- FR-003 raised from P1 to P0 (orchestrator decision): INTENT.md makes a wrong note or name the top severity. Counts are now P0 = 3, P1 = 0, P2 = 4.
+- P0 check: FR-001 (wrong box number and pattern), FR-002 (frozen UI) and FR-003 (wrong inversion label) are true blockers; FR-004 to FR-007 are correctly P2.
+- Acceptance criteria for FR-004 to FR-007 reworded as Given/When/Then; FR-007 gained a traceability criterion; the FR-005 coverage criterion now names CI as the place `make cover` runs.
+- Open questions recorded with defaults so implementation is not blocked.
+- Confirmed the PRD carries TDD, per-fix code review, agent teammates and git worktree guidance (How to Implement).
+
+Verdict: **Ready for spec.**
