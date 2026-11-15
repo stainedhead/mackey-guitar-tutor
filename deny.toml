@@ -5,6 +5,12 @@ all-features = true
 [advisories]
 version = 2
 yanked = "deny"
+ignore = [
+  # proc-macro-error is unmaintained and comes only from glib-macros (the GTK3 bindings that
+  # Tauri uses on Linux through wry). Linux is not a shipping target (macOS and iPad are), no
+  # safe upgrade exists and it is a compile-time macro. Revisit when glib drops it.
+  { id = "RUSTSEC-2024-0370", reason = "unmaintained build-time macro, Linux-only GTK3 dependency of Tauri" },
+]
 
 [licenses]
 version = 2
@@ -23,6 +29,20 @@ allow = [
 confidence-threshold = 0.9
 # The list is the policy, not an inventory; licences not yet used are fine.
 unused-allowed-license = "allow"
+
+# MPL-2.0 is file-level weak copyleft, not permissive. These five crates arrive only through
+# Tauri (tauri-utils' HTML and CSS handling, the `dirs` family) and cannot be avoided while the
+# app uses Tauri 2. We use them unmodified from crates.io, which satisfies MPL-2.0 (the covered
+# source stays available and nothing of ours is relicensed), so each is allowed by name
+# instead of adding MPL-2.0 to the global list. Anything new with MPL-2.0 fails make deny.
+# Recorded as D-34 in the fretboard-foundation implementation notes, for J to confirm.
+exceptions = [
+  { allow = ["MPL-2.0"], crate = "cssparser" },
+  { allow = ["MPL-2.0"], crate = "cssparser-macros" },
+  { allow = ["MPL-2.0"], crate = "dtoa-short" },
+  { allow = ["MPL-2.0"], crate = "option-ext" },
+  { allow = ["MPL-2.0"], crate = "selectors" },
+]
 
 [bans]
 multiple-versions = "warn"

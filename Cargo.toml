@@ -3,7 +3,7 @@ resolver = "3"
 # Domain crates live in crates/<name>/ (mackey-theory, mackey-voicing, ...) and the Tauri
 # shell in src-tauri/ (crate mackey-app). Add each one here when you create it, and to the
 # layer table in xtask/src/archcheck.rs and AGENTS.md.
-members = ["xtask"]
+members = ["xtask", "src-tauri"]
 
 [workspace.package]
 edition = "2024"
@@ -18,6 +18,14 @@ publish = false
 # Add an entry when the first crate needs it (cargo warns about unused ones). Standard
 # picks (AGENTS.md): thiserror 2, serde 1 (derive), proptest 1, insta 1 (yaml), criterion.
 serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+tracing = "0.1"
+# Tauri 2 stable line (3.x is alpha); tauri-build must match tauri's major.
+tauri = { version = "2", features = [] }
+tauri-build = { version = "2", features = [] }
+# Generates the TypeScript bindings in ui/src/bindings (export dir set in .cargo/config.toml).
+ts-rs = "12"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
