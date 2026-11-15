@@ -16,9 +16,9 @@ key G; G > Em >> C > D x4 @changes 60s
 G major. Cycle G, Em, C, D four times. The Em to C change is a focus transition. Method: one-minute changes.
 
 ```text
-key C; I > vi > IV > V @ladder 60-100 +5
+key C; I > vi > IV > V @ladder 60-100 +5 pass drums:pop
 ```
-Roman numerals, resolved in the key (C, Am, F, G). Tempo ladder from 60 to 100 bpm in steps of 5.
+Roman numerals, resolved in the key (C, Am, F, G). Speed trainer from 60 to 100 bpm, up 5 after each clean pass, over a pop drum groove.
 
 ```text
 key A minor; Am:tri str123 > Dm:tri str123 inv1 > E:tri str123 inv2 @loop
@@ -65,10 +65,15 @@ modifier    = "str" digits                        (* string set, e.g. str123 = s
             | "open" | "barre" | "caged:" ( "C" | "A" | "G" | "E" | "D" )
             | "up" | "down" | "updown" ;          (* arpeggio direction *)
 
-method      = "@" methodname { ws param } ;
+method      = "@" methodname { ws param } { ws backing } ;
 methodname  = "changes" | "ladder" | "loop" | "random" | "name" | "strum" ;
-param       = int "s" | int "bpm" | int "-" int | "+" int | "8ths" | "16ths" | "triplets" | pattern ;
+param       = int "s" | int "bpm" | int "-" int | "+" int | "-" int "miss" | advance | subdivision | pattern ;
 pattern     = { "D" | "U" | "-" | "x" } ;
+advance     = "pass" | "clean" | int "bars" ;          (* speed-trainer advance rule, default clean *)
+backing     = "click" [ ws subdivision ] [ ws "gap:" int ]
+            | "drums:" style [ "/" variation ] [ ws "fills:" int ]
+            | "nodrums" | "noclick" ;
+subdivision = "4ths" | "8ths" | "16ths" | "triplets" | "swing" ;
 ```
 
 Notes on the grammar:
@@ -76,6 +81,7 @@ Notes on the grammar:
 - Whitespace is free, keywords are case-insensitive, chord symbols are case-sensitive (`Em` vs `EM` is ambiguous, so `EM` gives a warning).
 - Chord symbols use the same `ChordSymbolParser` as songs, so anything a song chart accepts is valid here.
 - `>>` marks the transition *into* the next step as a focus change.
+- Backing defaults to a click at the session tempo. `drums:` styles and variations are listed in [rhythm.md §3](rhythm.md#3-drum-backing).
 - Unknown tokens never block. They are underlined with a hint and the rest of the session still runs (the parser recovers at the next `>`).
 
 ### 2.3 Editor experience
@@ -90,7 +96,7 @@ Notes on the grammar:
 | Method | Notation | How the run works | What we record |
 |--------|----------|-------------------|----------------|
 | One-minute changes | `@changes 60s` | Alternate between the two chords of each transition (focus ones first) for N seconds; player taps Space on each clean change, or count manually | Changes per minute per transition, trend over time |
-| Tempo ladder | `@ladder 60-100 +5` | Play the full sequence at the start tempo; after each clean pass (self-reported) increase by the step until target | Highest clean tempo |
+| Speed trainer | `@ladder 60-100 +5 pass` | Start slow; raise tempo by the step every pass, every N bars, or on each clean pass (Return), until target. `-5 miss` steps back on a miss. Click and drums follow | Highest clean tempo, tempo over time |
 | Loop | `@loop` / `@loop 8` | Repeat the sequence with metronome and count-in | Minutes practised |
 | Random order | `@random` | Items in shuffled order; next item revealed one bar early | Minutes practised, self-rating |
 | Name the note | `@name` | App shows a fret, player names the note, or app names a note and player clicks all its positions | Accuracy, response time |
@@ -116,10 +122,10 @@ stateDiagram-v2
 Screen during a run:
 
 - Fretboard shows the **current** item in full colour and the **next** item ghosted, with fingers that stay put marked as anchors ("keep finger 3 on the 3rd fret").
-- Beat grid with a playhead, current/next chips, timer, and tempo control (Up/Down arrows, ±5 bpm).
+- Beat grid with a playhead, current/next chips, timer, tempo control (Up/Down arrows, ±5 bpm, T to tap), speed-trainer progress ("72 of 96 bpm"), and click/drums toggle (D).
 - Shortcuts: Space play/pause, Return mark a clean change, ←/→ step, R restart, Esc exit.
 
-Timing comes from an `AVAudioEngine` scheduler. The UI follows the audio clock rather than a UI timer, so the visual change lines up with the click.
+Timing comes from the shared `TransportClock` in `RhythmKit` ([rhythm.md §5.1](rhythm.md#51-one-clock-many-listeners)). The UI follows the audio clock rather than a UI timer, so the visual change lines up with the click.
 
 ## 5. From songs and the explorer
 
@@ -134,4 +140,5 @@ Timing comes from an `AVAudioEngine` scheduler. The UI follows the audio clock r
 | `key C; ii > V > I` | Dm, G, C |
 | `key F; IV` | Bb (spelled Bb, not A#) |
 | `C:tri str234 inv1` | Notes E-G-C on strings 4-3-2 at frets 2-0-1 |
+| `key G; G > C @ladder 60-90 +5 clean drums:rock/chorus` | Speed trainer 60 to 90 step 5 on clean pass, rock chorus groove |
 | `G > Hm7 > C` | Warning on `Hm7` (unknown chord), session still runs with G and C |

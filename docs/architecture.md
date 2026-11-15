@@ -10,7 +10,7 @@ Status: Draft v0.1 (2026-11-15)
 | Fretboard rendering | SwiftUI `Canvas` | Fast immediate-mode drawing, easy hit-testing | 0001 |
 | Modularity | Local Swift packages, one per domain | Pure, testable core with no UI or I/O | [0002](adr/0002-pure-music-theory-core.md) |
 | Persistence | SwiftData, plus plain-text source of truth for sessions and songs | Sessions are notation text, songs are ChordPro, so data is portable | [0003](adr/0003-text-first-persistence.md) |
-| Audio | AVAudioEngine + `AVAudioUnitSampler` with a small SoundFont; sample-accurate metronome | No dependencies, low latency | |
+| Audio and rhythm | AVAudioEngine + `AVAudioUnitSampler` (guitar and General MIDI drum SoundFonts); one sample-accurate transport clock for metronome, drums and visuals | No dependencies, low latency, clean sound at any tempo | [0005](adr/0005-sequenced-drums.md) |
 | Song content | Local-only, user-initiated import; no scraping service | Legal and App Review risk | [0004](adr/0004-user-initiated-song-import.md) |
 | Testing | Swift Testing for packages, XCUITest for smoke flows | | |
 
@@ -24,7 +24,7 @@ flowchart TD
     Songs[SongKit<br/>ChordPro + chords-over-lyrics parsers, chart model, transposer]
     Voicing[VoicingEngine<br/>voicing search, positions, voice-leading]
     Theory[MusicTheory<br/>notes, intervals, scales, chords, keys, chord-symbol parser]
-    Audio[AudioKit-lite<br/>sampler, metronome, scheduler]
+    Audio[RhythmKit<br/>transport clock, metronome, drum sequencer, speed trainer, sampler]
     Store[Persistence<br/>SwiftData models, import/export]
     Search[SongSourceKit<br/>SongSource protocol, web search, URL fetch, providers]
 
@@ -34,6 +34,8 @@ flowchart TD
     Songs --> Theory
     Songs --> Voicing
     Search --> Songs
+    Practice --> Audio
+    Songs --> Audio
     Store --> Practice & Songs
 ```
 
@@ -42,6 +44,7 @@ Rules:
 - `MusicTheory` and `VoicingEngine` are pure Swift: no SwiftUI, no Foundation I/O, deterministic, value types. They are the most heavily tested code.
 - `PracticeKit` and `SongKit` depend on the theory layer only, never on UI. Their parsers are pure functions from `String` to a result with diagnostics.
 - Only `SongSourceKit` touches the network.
+- `RhythmKit` owns the audio engine and the `TransportClock`. Features subscribe to clock positions; nothing else keeps its own timer. Design in [rhythm.md](rhythm.md).
 
 ## 3. Domain model
 
@@ -89,11 +92,12 @@ struct PracticeSession {
     var transitions: [Transition]      // items[i] -> items[i+1], with focus flag
     var method: PracticeMethod
     var tempo: Tempo?                  // bpm + time signature
+    var backing: BackingSettings?      // click or drum pattern, see rhythm.md
 }
 enum PracticeItemKind { case chord, triad(inversion: Int?, strings: StringSet?), arpeggio(direction: Direction, position: Int?), note }
 struct PracticeItem { let kind: PracticeItemKind; let target: Chord /* or Note */; let duration: Duration; let voicingHint: VoicingHint? }
 struct Transition { let from: Int; let to: Int; let isFocus: Bool }
-enum PracticeMethod { case oneMinuteChanges(seconds: Int), tempoLadder(start: Int, step: Int, target: Int, reps: Int), loop(times: Int?), random, nameTheNote, strum(pattern: String) }
+enum PracticeMethod { case oneMinuteChanges(seconds: Int), speedTrainer(SpeedTrainer), loop(times: Int?), random, nameTheNote, strum(pattern: String) }
 struct PracticeRun { let sessionID: UUID; let date: Date; let tempoReached: Int?; let changesPerMinute: [TransitionKey: Int]; let rating: Int? }
 ```
 
@@ -102,7 +106,8 @@ struct PracticeRun { let sessionID: UUID; let date: Date; let tempoReached: Int?
 ```swift
 struct Song {
     var id: UUID; var title: String; var artist: String?
-    var key: Key?; var capo: Int; var tempo: Int?
+    var key: Key?; var capo: Int; var tempo: Int?; var meter: Meter?
+    var lastCleanTempo: Int?           // from the speed trainer
     var sections: [Section]            // verse, chorus, bridge, or unnamed
     var provenance: Provenance         // .pasted, .file(URL), .web(url, fetchedAt), .provider(name, id)
     var chordPro: String               // canonical serialised form
@@ -114,7 +119,7 @@ struct ChordAnchor { let offset: Int; let symbol: String; let chord: Chord? }  /
 
 ### 3.5 Persistence
 
-SwiftData entities wrap the text sources: `SessionRecord(id, name, source, createdAt, updatedAt)`, `RunRecord(...)`, `SongRecord(id, title, artist, chordPro, provenance, voicingOverrides)`. Parsed models are rebuilt on load. Upgrading the parser upgrades every stored session without a migration. Export is a folder of `.mackey` (notation) and `.cho` files.
+SwiftData entities wrap the text sources: `SessionRecord(id, name, source, createdAt, updatedAt)`, `RunRecord(sessionID, date, startTempo, endTempo, cleanTempo, changesPerMinute, rating)`, `SongRecord(id, title, artist, chordPro, provenance, voicingOverrides)`. Parsed models are rebuilt on load. Upgrading the parser upgrades every stored session without a migration. Export is a folder of `.mackey` (notation) and `.cho` files.
 
 ## 4. Key algorithms
 
@@ -147,7 +152,7 @@ Score each of the 24 major/minor keys by how many song chords are diatonic, weig
 flowchart LR
     Sidebar[Sidebar<br/>Explore / Sessions / Songs] --> Main
     Main[Main pane<br/>Explorer controls / Session editor / Song chart] --- Neck[Fretboard pane<br/>always visible, follows the selection]
-    Main --- Transport[Transport bar<br/>tempo, metronome, play, timer]
+    Main --- Transport[Transport bar<br/>tempo, tap, click/drums, speed trainer, play, timer]
 ```
 
 The fretboard is one shared view model (`FretboardState`: instrument, key, highlighted positions, ghost positions, labels mode). Every feature drives it through the same API, so it behaves identically in explorer, practice and song views.

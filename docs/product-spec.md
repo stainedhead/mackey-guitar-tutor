@@ -18,7 +18,7 @@ Beginners can memorize a few open chords but get lost on the rest of the neck. M
 
 In scope for v1: macOS desktop app, standard 6-string guitar, right- and left-handed views, standard tuning plus a small set of alternate tunings, local storage.
 
-Out of scope for v1: audio pitch detection / "listen and grade", cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
+Out of scope for v1: recorded (non-synthesized) backing tracks, audio pitch detection / "listen and grade", cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
 
 ## 4. Feature area A: Fretboard explorer (foundation)
 
@@ -43,8 +43,8 @@ A practice session is a short, named routine: a sequence of items (notes, chords
 | PS-1 | Create a session by typing one line of **quick-entry notation**, e.g. `key G; G > Em >> C > D x4 @ changes 60s`. A live preview shows the parsed result and any errors as you type. |
 | PS-2 | Items can be chords (`Em7`), degrees (`vi`), triads (`C:tri inv1 str123`), arpeggios (`Am:arp pos5`), or single notes (`n:F#`). |
 | PS-3 | Mark specific **transitions** as focus changes (`>>`) so the drill spends extra time on them. |
-| PS-4 | Choose a **method** from presets (one-minute changes, tempo ladder, loop, random order, name-the-note, strum pattern) with parameters. |
-| PS-5 | Run mode: fretboard shows the current and the *next* item (ghosted), metronome, count-in, timer, and progress through the sequence. |
+| PS-4 | Choose a **method** from presets (one-minute changes, speed trainer, loop, random order, name-the-note, strum pattern) with parameters. |
+| PS-5 | Run mode: fretboard shows the current and the *next* item (ghosted), metronome or drum backing, count-in, timer, and progress through the sequence. |
 | PS-6 | Log each run (date, tempo reached, changes per minute, self-rating). Show simple history per session and per transition. |
 | PS-7 | Sessions are plain text under the hood, so they can be copied, pasted and shared. |
 | PS-8 | Generate a session from a song (Feature C) or from the current fretboard selection. |
@@ -62,11 +62,23 @@ Full design and legal analysis in [song-import.md](song-import.md).
 | SG-5 | Display the song as a chart: lyrics with chords aligned above, sections (verse, chorus), and a chord palette of every chord used. |
 | SG-6 | Click any chord to see it on the fretboard. The app suggests a **voicing set** that minimises hand movement between consecutive chords. |
 | SG-7 | Transpose, set capo (with "capo to play in open shapes" suggestion), and detect the likely key so Roman numerals can be shown. |
-| SG-8 | Auto-scroll at a set tempo; current line and current chord highlighted, with the fretboard following along. |
+| SG-8 | Auto-scroll at the song's tempo (or the speed trainer's current tempo), with optional drum backing that follows the sections; current line and current chord highlighted, with the fretboard following along. |
 | SG-9 | One click "Practice this song": builds a practice session from the song's chord progression, flagging its hardest transitions as focus changes. |
 | SG-10 | Users can edit an imported song (fix a mis-parsed chord, move a chord) before saving. |
 
-## 7. Non-functional requirements
+## 7. Feature area D: Rhythm (metronome, drum backing, speed trainer)
+
+Players need to practise in cadence. A metronome and drum backing run at an adjustable tempo so the player can start slow and work up to the right speed. Full design in [rhythm.md](rhythm.md).
+
+| ID | Requirement |
+|----|-------------|
+| RH-1 to RH-7 | Metronome: 30 to 250 bpm, tap tempo, time signatures and accents, subdivisions and swing, click sounds, count-in, visual pulse, gap click. |
+| DR-1 to DR-7 | Drum backing: style library with variations, follows tempo with no pitch change, fills, intensity, mixer and part mutes, follows song sections; user patterns later. |
+| ST-1 to ST-5 | Speed trainer: start, target and step tempo; advance every N bars, every pass or on a clean pass; step back on a miss; progress and last clean tempo remembered. |
+
+Rhythm is available everywhere: in the explorer (for arpeggio and scale drills), in practice sessions (`@ladder 60-96 +4 drums:rock`), and in song view, where the target tempo is the song's tempo.
+
+## 8. Non-functional requirements
 
 | ID | Requirement |
 |----|-------------|
@@ -76,9 +88,10 @@ Full design and legal analysis in [song-import.md](song-import.md).
 | NF-4 | Keyboard-first: every cycling and run-mode action has a shortcut. |
 | NF-5 | Accessibility: VoiceOver labels for fretboard positions, colour-blind-safe palette, Dynamic Type where it applies. |
 | NF-6 | Music theory engine at 95%+ line coverage; parsers covered by a fixture corpus of real-world chord sheets. |
+| NF-8 | Rhythm timing is sample-accurate: under 1 ms drift over 10 minutes, tempo changes land on bar lines. |
 | NF-7 | No song content leaves the device; no telemetry without opt-in. |
 
-## 8. Open questions
+## 9. Open questions
 
 1. **Platform reach.** macOS only (per README), or plan for iPad from the start? SwiftUI keeps this cheap if decided early.
 2. **Distribution and money.** Mac App Store, direct download, free, or paid? This matters for licensing song content (paid apps have less room under fair use and stricter provider terms).
