@@ -31,9 +31,9 @@ From the dashboard (`fretboard-foundation-status.md`), cross-checked with git.
 | 8 | Review-fix spec | 22:25 | 22:25 | 1 | nested review spec |
 | 9 | Implement fixes | n/a | 22:36 | n/a | FR-001 to FR-007 (FR-005 partial); dashboard start time (22:52) is after the end, so it is a recording error; git shows fixes from 22:29 to 22:36 |
 | 10 | Archive fixes spec | 22:37 | 22:38 | 1 | nested into the archive |
-| 11 | Final quality pass | see dashboard | | | `make check`, e2e, props, cover all green |
-| 12 | This report | see dashboard | | | |
-| 13 | Archive confirmation | see dashboard | | | |
+| 11 | Final quality pass | 22:40 | 22:49 | 9 | `make check`, e2e, props, cover all green |
+| 12 | This report | 22:49 | 22:52 | 3 | |
+| 13 | Archive confirmation | 22:52 | 22:53 | 1 | |
 
 **Observations:**
 - Step 3 was 60% of the runtime. Steps 5-10 together took about 15 minutes because the review was automated and the fixes were small.
@@ -92,7 +92,7 @@ Exact token counts are unavailable. The orchestrator ran the steps sequentially 
 
 ### What worked well
 - Spec-first with a PRD and a spec review gave a stable task list; the architecture rules (archcheck) held with no dependency violations.
-- Table-driven, property and snapshot tests plus `make check` kept 14 crates' worth of changes green; final line coverage is 93.8% overall (target 80%).
+- Table-driven, property and snapshot tests plus `make check` kept the workspace green; final line coverage is 93.8% overall (target 80%).
 - The review step is cheap and found real defects; the whole review-to-fix loop took about 15 minutes.
 - Recording decisions (D-1 to D-77) as the work went made the docs step quick.
 
