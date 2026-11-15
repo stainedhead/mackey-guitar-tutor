@@ -1,5 +1,17 @@
 import { expect, test, type Page } from '@playwright/test';
 
+/**
+ * Gives the page keyboard focus without landing on a control: blur whatever has focus, so
+ * single-key shortcuts reach the app (UX-6 ignores them inside text fields). Clicking a fixed
+ * coordinate broke when the layout moved (the edge-arrow row pushed the neck down).
+ */
+async function focusPage(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+  });
+}
+
 async function openExplore(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.getByTestId('neck')).toBeVisible();
@@ -66,8 +78,7 @@ test.describe('Explore', () => {
     await page.keyboard.press('ArrowDown');
     await page.waitForTimeout(150);
     expect(await label()).toBe(start);
-    await page.getByRole('heading', { name: 'Mackey' }).click();
-    await page.locator('body').click({ position: { x: 700, y: 700 } });
+    await focusPage(page);
     await page.keyboard.press('ArrowDown');
     await expect.poll(label).not.toBe(start);
   });
@@ -75,7 +86,7 @@ test.describe('Explore', () => {
   test('AC-FB-9.1c: cycling announces the change in the live region', async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop', 'keyboard shortcuts');
     await openExplore(page);
-    await page.locator('body').click({ position: { x: 700, y: 700 } });
+    await focusPage(page);
     await page.keyboard.press('ArrowDown');
     await expect(page.getByTestId('live-region')).not.toHaveText('');
   });
@@ -87,7 +98,7 @@ test.describe('Explore', () => {
     await page.getByRole('button', { name: 'Show chord' }).click();
     await page.getByRole('radio', { name: 'Voicing' }).click();
     await expect(page.locator('.voicing-list li').first()).toBeVisible();
-    await page.locator('body').click({ position: { x: 700, y: 700 } });
+    await focusPage(page);
 
     const timings = await page.evaluate(async () => {
       const neck = document.querySelector('[data-testid="neck"]');
