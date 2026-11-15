@@ -28,6 +28,15 @@ export default defineConfig({
       name: 'ipad',
       use: { ...browser, viewport: { width: 1180, height: 820 }, hasTouch: true },
     },
+    {
+      name: 'ipad-portrait',
+      use: { ...browser, viewport: { width: 820, height: 1180 }, hasTouch: true },
+    },
+    {
+      // Split View at one third of an iPad, or a narrow Mac window (E-FB-9).
+      name: 'narrow',
+      use: { ...browser, viewport: { width: 420, height: 800 }, hasTouch: true },
+    },
   ],
   webServer: {
     command: 'npx vite --mode mock',

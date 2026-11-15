@@ -5,3 +5,4 @@ test-results
 playwright-report
 package-lock.json
 src/bindings
+src/mocks/scenarios.json

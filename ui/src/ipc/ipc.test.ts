@@ -1,17 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { insideTauri, selectCommands, toAppError } from './index';
-import { mockCommands } from './mock';
-import { tauriCommands } from './tauri';
+import { insideTauri, selectCommands, selectTunerEvents, toAppError } from './index';
+import { mockCommands } from '../mocks/mockCommands';
+import { mockTunerEvents } from '../mocks/mockTuner';
+import { tauriCommands, tauriTunerEvents } from './tauri';
 
 describe('selectCommands', () => {
   const cases = [
-    { label: 'mock mode outside Tauri', mode: 'mock', inTauri: false, want: mockCommands },
-    { label: 'mock mode inside Tauri', mode: 'mock', inTauri: true, want: mockCommands },
-    { label: 'plain browser build', mode: 'production', inTauri: false, want: mockCommands },
-    { label: 'the app', mode: 'production', inTauri: true, want: tauriCommands },
+    { label: 'mock mode outside Tauri', mode: 'mock', inTauri: false, mock: true },
+    { label: 'mock mode inside Tauri', mode: 'mock', inTauri: true, mock: true },
+    { label: 'plain browser build', mode: 'production', inTauri: false, mock: true },
+    { label: 'the app', mode: 'production', inTauri: true, mock: false },
   ];
-  it.each(cases)('$label', ({ mode, inTauri, want }) => {
-    expect(selectCommands(mode, inTauri)).toBe(want);
+  it.each(cases)('$label', ({ mode, inTauri, mock }) => {
+    expect(selectCommands(mode, inTauri)).toBe(mock ? mockCommands : tauriCommands);
+    expect(selectTunerEvents(mode, inTauri)).toBe(mock ? mockTunerEvents : tauriTunerEvents);
   });
 });
 
@@ -24,20 +26,31 @@ describe('insideTauri', () => {
 
 describe('toAppError', () => {
   it('keeps a serialised AppError', () => {
-    expect(toAppError({ message: 'No audio output', details: 'x' })).toEqual({
-      message: 'No audio output',
-      details: 'x',
+    expect(toAppError({ kind: 'NoAudioOutput', message: 'No audio output', details: 'x' })).toEqual(
+      {
+        kind: 'NoAudioOutput',
+        message: 'No audio output',
+        details: 'x',
+      },
+    );
+    expect(toAppError({ message: 'Hi' })).toEqual({
+      kind: 'Internal',
+      message: 'Hi',
+      details: null,
     });
-    expect(toAppError({ message: 'Hi' })).toEqual({ message: 'Hi', details: null });
   });
   it('wraps anything else in the plain message', () => {
-    expect(toAppError('boom')).toEqual({ message: 'Something went wrong', details: 'boom' });
-    expect(toAppError(42)).toEqual({ message: 'Something went wrong', details: null });
+    expect(toAppError('boom')).toEqual({
+      kind: 'Internal',
+      message: 'Something went wrong',
+      details: 'boom',
+    });
+    expect(toAppError(42).details).toBeNull();
   });
 });
 
 describe('mockCommands', () => {
-  it('answers app_info with canned data', async () => {
+  it('answers app_info', async () => {
     const info = await mockCommands.appInfo();
     expect(info.name).toBe('Mackey Guitar Tutor');
   });
