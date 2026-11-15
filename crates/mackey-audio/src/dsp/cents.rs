@@ -86,8 +86,8 @@ mod tests {
 
     #[test]
     fn nearest_rounds_and_bounds() {
-        let a4 = ReferencePitch::default();
         const CASES: &[(f64, i32)] = &[(440.0, 69), (73.42, 38), (82.41, 40), (261.63, 60)];
+        let a4 = ReferencePitch::default();
         for &(f, midi) in CASES {
             let (pitch, cents) = nearest_pitch(f, a4).unwrap();
             assert_eq!(pitch.midi(), midi, "{f}");

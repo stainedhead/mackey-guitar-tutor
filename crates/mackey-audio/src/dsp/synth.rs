@@ -175,7 +175,7 @@ impl Voice {
                 continue;
             }
             let x = self.buf[self.idx];
-            let avg = 0.5 * (x + self.prev) * self.gain;
+            let avg = f32::midpoint(x, self.prev) * self.gain;
             self.prev = x;
             let y = self.eta * avg + self.ap_in - self.eta * self.ap_out;
             self.ap_in = avg;
@@ -447,7 +447,7 @@ mod tests {
             let out = render(&mut s, 5000);
             let first = out.iter().position(|v| v.abs() > 0.0).expect("sounds");
             assert!(
-                (first as i64 - i64::from(delay)).abs() <= 1,
+                first.abs_diff(delay as usize) <= 1,
                 "delay {delay}: {first}"
             );
         }
@@ -510,7 +510,7 @@ mod tests {
         for i in 0..16 {
             s.apply(SynthCommand::NoteOn {
                 id: i,
-                frequency_hz: 82.41 * 1.2_f32.powi(i as i32 % 12),
+                frequency_hz: 82.41 * 1.2_f32.powi(i32::try_from(i % 12).unwrap()),
                 velocity: 1.0,
                 delay_samples: 0,
             });

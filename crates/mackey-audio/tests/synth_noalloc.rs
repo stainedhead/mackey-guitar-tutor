@@ -33,7 +33,7 @@ fn nf_8_1_render_and_apply_do_not_allocate() {
         for i in 0..40_u32 {
             synth.apply(SynthCommand::NoteOn {
                 id: 1000 + i,
-                frequency_hz: 82.41 + i as f32 * 11.0,
+                frequency_hz: 82.41 + f32::from(u16::try_from(i).unwrap()) * 11.0,
                 velocity: 1.0,
                 delay_samples: i * 97,
             });

@@ -40,8 +40,10 @@ fmt-check:
 
 # Line coverage with cargo-llvm-cov; fails under 80% of lines overall (AGENTS.md).
 # Excluded as thin glue that needs a window system or the Tauri runtime (D-16): the desktop
-# entry point, the build script and the runtime builder.
-COVER_IGNORE := src-tauri/(src/main|src/runtime|build)\.rs
+# entry point, the build script and the runtime builder; and the cpal glue of mackey-audio that
+# needs a sound card (device listing, output and input streams and their threads, D-86). The
+# decisions inside that glue live in io/select.rs and io/pump.rs, which stay measured.
+COVER_IGNORE := src-tauri/(src/main|src/runtime|build)\.rs|crates/mackey-audio/src/io/(devices|input|output)\.rs
 cover: $(UI_STUB)
 	cargo llvm-cov --workspace --fail-under-lines 80 --summary-only --ignore-filename-regex '$(COVER_IGNORE)'
 

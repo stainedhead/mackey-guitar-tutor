@@ -1,6 +1,15 @@
 //! Synth behaviour measured through the pitch detector and the playback-plan builder
 //! (FR-024, AC-FB-9.1 timings of the audio side).
 
+#![allow(
+    clippy::unwrap_used,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
+    clippy::cast_sign_loss,
+    reason = "signal maths casts freely; clippy.toml only relaxes unwrap inside #[test] functions"
+)]
+
 use mackey_audio::dsp::{
     DetectorConfig, PitchDetector, PlaybackPlan, STRUM_GAP_MS, Synth, SynthCommand,
 };

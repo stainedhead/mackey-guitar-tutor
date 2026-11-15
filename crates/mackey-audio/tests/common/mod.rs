@@ -11,14 +11,14 @@ use std::f64::consts::PI;
 use mackey_audio::dsp::{DetectorConfig, PitchDetector, Tuner, TunerConfig, TunerReading};
 
 /// Seeded white-noise source (xorshift), uniform in `-1.0..1.0`.
-pub struct Noise(u32);
+pub(crate) struct Noise(u32);
 
 impl Noise {
-    pub fn new(seed: u32) -> Self {
+    pub(crate) fn new(seed: u32) -> Self {
         Self(seed.max(1))
     }
 
-    pub fn next(&mut self) -> f32 {
+    pub(crate) fn next(&mut self) -> f32 {
         self.0 ^= self.0 << 13;
         self.0 ^= self.0 >> 17;
         self.0 ^= self.0 << 5;
@@ -27,7 +27,7 @@ impl Noise {
 }
 
 /// A pure sine of `amp` at `hz`.
-pub fn sine(hz: f64, sr: u32, n: usize, amp: f32) -> Vec<f32> {
+pub(crate) fn sine(hz: f64, sr: u32, n: usize, amp: f32) -> Vec<f32> {
     (0..n)
         .map(|i| amp * (2.0 * PI * hz * i as f64 / f64::from(sr)).sin() as f32)
         .collect()
@@ -36,7 +36,7 @@ pub fn sine(hz: f64, sr: u32, n: usize, amp: f32) -> Vec<f32> {
 /// A guitar-like tone: fundamental plus six harmonics at 1/n amplitude with a little
 /// inharmonicity (`f_n = n f0 sqrt(1 + B n^2)`, B = 1e-4), exponential decay (time constant
 /// 1.5 s) and white noise at -50 dBFS RMS.
-pub fn guitar_tone(f0: f64, sr: u32, n: usize, amp: f32, seed: u32) -> Vec<f32> {
+pub(crate) fn guitar_tone(f0: f64, sr: u32, n: usize, amp: f32, seed: u32) -> Vec<f32> {
     let mut noise = Noise::new(seed);
     // Uniform noise of amplitude A has RMS A / sqrt(3); -50 dBFS RMS is 0.003162.
     let noise_amp = 0.003_162_f32 * 3.0_f32.sqrt();
@@ -56,12 +56,12 @@ pub fn guitar_tone(f0: f64, sr: u32, n: usize, amp: f32, seed: u32) -> Vec<f32> 
 }
 
 /// `hz` moved by `cents`.
-pub fn detuned(hz: f64, cents: f64) -> f64 {
+pub(crate) fn detuned(hz: f64, cents: f64) -> f64 {
     hz * 2f64.powf(cents / 1200.0)
 }
 
 /// A tuner for `sr` with the default detector.
-pub fn tuner(cfg: TunerConfig, sr: u32) -> Tuner {
+pub(crate) fn tuner(cfg: TunerConfig, sr: u32) -> Tuner {
     Tuner::new(
         cfg,
         PitchDetector::new(DetectorConfig::new(sr).unwrap()).unwrap(),
@@ -69,14 +69,14 @@ pub fn tuner(cfg: TunerConfig, sr: u32) -> Tuner {
 }
 
 /// A reading with the time at which the block that produced it ended.
-pub struct Fed {
-    pub reading: TunerReading,
-    pub delivered_ms: f64,
+pub(crate) struct Fed {
+    pub(crate) reading: TunerReading,
+    pub(crate) delivered_ms: f64,
 }
 
 /// Feeds `signal` in blocks of `block` samples and records when each reading was delivered
 /// (the end of its block), as a device with that buffer size would.
-pub fn feed(tuner: &mut Tuner, signal: &[f32], block: usize, sr: u32) -> Vec<Fed> {
+pub(crate) fn feed(tuner: &mut Tuner, signal: &[f32], block: usize, sr: u32) -> Vec<Fed> {
     let mut out = Vec::new();
     let mut fed = 0usize;
     for chunk in signal.chunks(block) {

@@ -61,7 +61,7 @@ Use the `Makefile`; do not invent ad-hoc invocations. The toolchain comes from `
 | `make lint` | `cargo clippy --workspace --all-targets --all-features -- -D warnings` (lint levels in `[workspace.lints]`, test allowances in `clippy.toml`) |
 | `make fmt` | `cargo fmt --all` (config in `rustfmt.toml`) |
 | `make fmt-check` | `cargo fmt --all --check`, as CI runs it |
-| `make cover` | Line coverage with `cargo llvm-cov`; target **≥ 80%** overall, new code fully covered. Excludes only thin Tauri-runtime glue (`src-tauri/src/main.rs`, `src-tauri/src/runtime.rs`, `src-tauri/build.rs`; regex `COVER_IGNORE` in the `Makefile`) |
+| `make cover` | Line coverage with `cargo llvm-cov`; target **≥ 80%** overall, new code fully covered. Excludes only thin glue that needs a window system, the Tauri runtime or a sound card (`src-tauri/src/main.rs`, `src-tauri/src/runtime.rs`, `src-tauri/build.rs`, `crates/mackey-audio/src/io/{devices,input,output}.rs`; regex `COVER_IGNORE` in the `Makefile`) |
 | `make archcheck` | Check the crate layer rules above (`cargo xtask archcheck`) |
 | `make doccheck` | Check that every `.PHONY` target has a row in this table and every folder has a `README.md` (`cargo xtask doccheck`) |
 | `make deny` | `cargo deny check`: licences (permissive only), advisories, bans, sources (`deny.toml`) |

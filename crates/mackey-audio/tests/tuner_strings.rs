@@ -1,5 +1,16 @@
 //! String-mode acceptance tests (AC-TU-2.1, AC-TU-5.1, SAC-15 string rules).
 
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
+    clippy::cast_sign_loss,
+    reason = "test helpers may panic on bad fixtures and signal maths casts freely; clippy.toml only relaxes the lints inside #[test] functions"
+)]
+
 mod common;
 
 use common::{feed, guitar_tone, tuner};

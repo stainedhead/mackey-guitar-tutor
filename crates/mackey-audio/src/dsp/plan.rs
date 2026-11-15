@@ -195,9 +195,9 @@ mod tests {
     #[test]
     fn empty_plan_is_empty() {
         let p = PlaybackPlan::strum(&[]).unwrap();
-        assert!(p.notes.is_empty());
+        assert_eq!(p.notes.len(), 0);
         assert_eq!(p.duration_ms, 0.0);
-        assert!(p.commands(48_000, ReferencePitch::default(), 0).is_empty());
+        assert_eq!(p.commands(48_000, ReferencePitch::default(), 0).len(), 0);
     }
 
     #[test]

@@ -1,4 +1,4 @@
-//! McLeod Pitch Method (MPM) detector.
+//! `McLeod` Pitch Method (MPM) detector.
 //!
 //! The normalised square difference function (NSDF) of a window is computed directly (about
 //! 1.6 million multiply-adds for a 2048-sample window at 48 kHz, well under the 2 ms budget when
@@ -70,9 +70,8 @@ impl DetectorConfig {
         if !(self.min_hz > 0.0 && self.min_hz < self.max_hz) {
             return bad("frequency range must satisfy 0 < min < max");
         }
-        if !(self.clarity_threshold > 0.0 && self.clarity_threshold <= 1.0)
-            || !(self.k > 0.0 && self.k <= 1.0)
-        {
+        let unit = |v: f32| v > 0.0 && v <= 1.0;
+        if !unit(self.clarity_threshold) || !unit(self.k) {
             return bad("clarity threshold and k must be in (0, 1]");
         }
         if (self.window as f32) < 1.5 * self.sample_rate as f32 / self.min_hz {
@@ -141,18 +140,18 @@ impl PitchDetector {
     /// `None` when there is no key maximum in range). The tuner uses the clarity to tell a
     /// clean string from two strings ringing together.
     pub fn analyse(&mut self, samples: &[f32]) -> Option<PitchEstimate> {
-        let n = self.cfg.window;
-        if samples.len() < n {
+        let len = self.cfg.window;
+        if samples.len() < len {
             return None;
         }
-        let x = &samples[samples.len() - n..];
-        if x.iter().any(|s| !s.is_finite()) {
+        let recent = &samples[samples.len() - len..];
+        if recent.iter().any(|s| !s.is_finite()) {
             return None;
         }
-        let mean = x.iter().map(|&s| f64::from(s)).sum::<f64>() / n as f64;
+        let mean = recent.iter().map(|&s| f64::from(s)).sum::<f64>() / len as f64;
         let mean = mean as f32;
-        for (d, &s) in self.scratch.iter_mut().zip(x) {
-            *d = s - mean;
+        for (dst, &src) in self.scratch.iter_mut().zip(recent) {
+            *dst = src - mean;
         }
         let energy: f64 = self
             .scratch
@@ -161,11 +160,11 @@ impl PitchDetector {
             .sum();
         // Below -100 dBFS RMS there is nothing to analyse; a non-finite energy means the
         // samples were absurdly large (the mean or the sum overflowed).
-        if !energy.is_finite() || energy / (n as f64) < 1e-10 {
+        if !energy.is_finite() || energy / (len as f64) < 1e-10 {
             return None;
         }
         // The NSDF is scale free: normalise to a peak of 1 so f32 products cannot overflow.
-        let peak = self.scratch.iter().fold(0.0_f32, |m, s| m.max(s.abs()));
+        let peak = self.scratch.iter().fold(0.0_f32, |acc, s| acc.max(s.abs()));
         let inv = 1.0 / peak;
         for s in &mut self.scratch {
             *s *= inv;
@@ -177,20 +176,16 @@ impl PitchDetector {
             .sum();
         self.compute_nsdf(energy);
         let (tau, clarity) = self.pick_peak()?;
-        let tau = tau as f32;
-        let (a, b, c) = (
-            self.nsdf[tau as usize - 1],
-            self.nsdf[tau as usize],
-            self.nsdf[tau as usize + 1],
-        );
-        let denom = a - 2.0 * b + c;
-        let (delta, height) = if denom < 0.0 {
-            let d = 0.5 * (a - c) / denom;
-            (d, b - 0.25 * (a - c) * d)
+        // Parabola through the peak and its neighbours: sub-sample period and refined height.
+        let (before, at, after) = (self.nsdf[tau - 1], self.nsdf[tau], self.nsdf[tau + 1]);
+        let curvature = before - 2.0 * at + after;
+        let (delta, height) = if curvature < 0.0 {
+            let offset = 0.5 * (before - after) / curvature;
+            (offset, at - 0.25 * (before - after) * offset)
         } else {
             (0.0, clarity)
         };
-        let period = tau + delta;
+        let period = tau as f32 + delta;
         let frequency_hz = f64::from(self.cfg.sample_rate) / f64::from(period);
         if !(f64::from(self.cfg.min_hz)..=f64::from(self.cfg.max_hz)).contains(&frequency_hz) {
             return None;
@@ -203,13 +198,17 @@ impl PitchDetector {
 
     fn compute_nsdf(&mut self, energy: f64) {
         let x = &self.scratch;
-        let n = x.len();
-        let mut m = 2.0 * energy;
+        let len = x.len();
+        let mut norm = 2.0 * energy;
         self.nsdf[0] = 1.0;
         for tau in 1..self.nsdf.len() {
-            m -= f64::from(x[tau - 1]).powi(2) + f64::from(x[n - tau]).powi(2);
-            let r = dot(&x[..n - tau], &x[tau..]);
-            self.nsdf[tau] = if m > 1e-12 { (2.0 * r / m) as f32 } else { 0.0 };
+            norm -= f64::from(x[tau - 1]).powi(2) + f64::from(x[len - tau]).powi(2);
+            let corr = dot(&x[..len - tau], &x[tau..]);
+            self.nsdf[tau] = if norm > 1e-12 {
+                (2.0 * corr / norm) as f32
+            } else {
+                0.0
+            };
         }
     }
 
@@ -218,23 +217,24 @@ impl PitchDetector {
         self.peaks.clear();
         let last = self.max_tau;
         let nsdf = &self.nsdf;
+        // Written as a closure so a NaN counts as "not positive" and can never stall a scan.
+        let positive = |v: f32| v > 0.0;
         let mut pos = 1;
-        while pos <= last && nsdf[pos] > 0.0 {
+        while pos <= last && positive(nsdf[pos]) {
             pos += 1;
         }
         while pos <= last {
-            // `!(x > 0)` rather than `x <= 0` so a NaN can never stall the scan.
-            while pos <= last && !(nsdf[pos] > 0.0) {
+            while pos <= last && !positive(nsdf[pos]) {
                 pos += 1;
             }
             let mut best = pos;
-            while pos <= last && nsdf[pos] > 0.0 {
+            while pos <= last && positive(nsdf[pos]) {
                 if nsdf[pos] > nsdf[best] {
                     best = pos;
                 }
                 pos += 1;
             }
-            if best >= self.min_tau && best <= last && nsdf[best] > 0.0 {
+            if best >= self.min_tau && best <= last && positive(nsdf[best]) {
                 self.peaks.push((best, nsdf[best]));
             }
         }
@@ -245,21 +245,17 @@ impl PitchDetector {
 }
 
 /// Dot product with eight independent accumulators so the compiler vectorises it.
-fn dot(a: &[f32], b: &[f32]) -> f64 {
+fn dot(lhs: &[f32], rhs: &[f32]) -> f64 {
     let mut lanes = [0.0_f32; 8];
-    let (ca, cb) = (a.chunks_exact(8), b.chunks_exact(8));
-    let tail: f32 = ca
-        .remainder()
-        .iter()
-        .zip(cb.remainder())
-        .map(|(x, y)| x * y)
-        .sum();
-    for (xa, xb) in ca.zip(cb) {
-        for i in 0..8 {
-            lanes[i] += xa[i] * xb[i];
+    let (lhs_chunks, lhs_rest) = lhs.as_chunks::<8>();
+    let (rhs_chunks, rhs_rest) = rhs.as_chunks::<8>();
+    let rest: f32 = lhs_rest.iter().zip(rhs_rest).map(|(x, y)| x * y).sum();
+    for (xs, ys) in lhs_chunks.iter().zip(rhs_chunks) {
+        for ((lane, x), y) in lanes.iter_mut().zip(xs).zip(ys) {
+            *lane += x * y;
         }
     }
-    f64::from(lanes.iter().sum::<f32>() + tail)
+    f64::from(lanes.iter().sum::<f32>() + rest)
 }
 
 #[cfg(test)]

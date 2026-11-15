@@ -244,7 +244,7 @@ impl Median3 {
         }
         let m = match self.len {
             1 => self.vals[0],
-            2 => 0.5 * (self.vals[0] + self.vals[1]),
+            2 => f32::midpoint(self.vals[0], self.vals[1]),
             _ => {
                 let [a, b, c] = self.vals;
                 a.max(b).min(a.min(b).max(c))
@@ -414,9 +414,9 @@ impl Tuner {
     }
 
     fn analyse(&mut self) -> TunerReading {
-        let (head, tail) = self.ring.split_at(self.write);
-        self.linear[..tail.len()].copy_from_slice(tail);
-        self.linear[tail.len()..].copy_from_slice(head);
+        let (newest, oldest) = self.ring.split_at(self.write);
+        self.linear[..oldest.len()].copy_from_slice(oldest);
+        self.linear[oldest.len()..].copy_from_slice(newest);
 
         let t = self.total;
         let advance = t - self.prev_analysis;
@@ -454,13 +454,13 @@ impl Tuner {
 
         let silent_for = self.last_pitch.map_or(t, |p| t - p);
         if silent_for < self.ms_to_samples(NO_PITCH_MS) {
-            let held = self.held.clone();
-            let status = if held.is_some() {
+            let shown = self.held.clone();
+            let status = if shown.is_some() {
                 TunerStatus::Pitch
             } else {
                 TunerStatus::Listening
             };
-            return self.reading(status, level, confidence, held, t);
+            return self.reading(status, level, confidence, shown, t);
         }
         self.held = None;
         self.restart_smoothing();
@@ -483,22 +483,23 @@ impl Tuner {
         let mut far = false;
         let mut band = cents;
         let mut key_changed = false;
-        if let TunerMode::Strings { locked } = self.cfg.mode {
-            if let Some(chosen) = self.choose_target(freq, locked) {
-                let raw_t = cents_between(freq, chosen.frequency_hz)?;
-                let (smoothed, changed) = self
-                    .target_median
-                    .push(i64::from(chosen.string), raw_t as f32);
-                key_changed = changed;
-                band = smoothed;
-                target = Some(TargetReading {
-                    string: chosen.string,
-                    cents: smoothed,
-                });
-                far = self.cfg.targets.iter().all(|c| {
+        if let TunerMode::Strings { locked } = self.cfg.mode
+            && let Some(chosen) = self.choose_target(freq, locked)
+        {
+            let raw_t = cents_between(freq, chosen.frequency_hz)?;
+            let (smoothed, changed) = self
+                .target_median
+                .push(i64::from(chosen.string), raw_t as f32);
+            key_changed = changed;
+            band = smoothed;
+            target = Some(TargetReading {
+                string: chosen.string,
+                cents: smoothed,
+            });
+            far =
+                self.cfg.targets.iter().all(|c| {
                     cents_between(freq, c.frequency_hz).is_none_or(|x| x.abs() > FAR_CENTS)
                 });
-            }
         }
         if key_changed || band.abs() > IN_TUNE_CENTS {
             self.in_tune_since = None;
@@ -525,10 +526,10 @@ impl Tuner {
     }
 
     fn choose_target(&self, freq: f64, locked: Option<u8>) -> Option<TunerTarget> {
-        if let Some(s) = locked {
-            if let Some(t) = self.cfg.targets.iter().find(|t| t.string == s) {
-                return Some(*t);
-            }
+        if let Some(s) = locked
+            && let Some(t) = self.cfg.targets.iter().find(|t| t.string == s)
+        {
+            return Some(*t);
         }
         self.cfg
             .targets
@@ -546,16 +547,15 @@ impl Tuner {
         held: Option<Held>,
         t: u64,
     ) -> TunerReading {
-        let hold = self.ms_to_samples(IN_TUNE_HOLD_MS);
+        let hold_samples = self.ms_to_samples(IN_TUNE_HOLD_MS);
         let in_tune = held.is_some()
-            && self.in_tune_since.is_some_and(|s| t - s >= hold)
+            && self.in_tune_since.is_some_and(|s| t - s >= hold_samples)
             && status == TunerStatus::Pitch;
-        if in_tune {
-            if let Some(tr) = held.as_ref().and_then(|h| h.target) {
-                if let Err(pos) = self.ticks.binary_search(&tr.string) {
-                    self.ticks.insert(pos, tr.string);
-                }
-            }
+        if in_tune
+            && let Some(tr) = held.as_ref().and_then(|h| h.target)
+            && let Err(pos) = self.ticks.binary_search(&tr.string)
+        {
+            self.ticks.insert(pos, tr.string);
         }
         let t_ms = self.samples_to_ms(t);
         let notice = self.pending_notice.take();
@@ -644,7 +644,7 @@ mod tests {
     #[test]
     fn first_reading_arrives_when_the_window_is_full() {
         let mut t = tuner(TunerConfig::chromatic(ReferencePitch::default()));
-        assert!(t.push_block(&sine(440.0, 0.5, 2047)).is_empty());
+        assert_eq!(t.push_block(&sine(440.0, 0.5, 2047)).len(), 0);
         let r = t.push_block(&sine(440.0, 0.5, 1));
         assert_eq!(r.len(), 1);
         assert!((r[0].t_ms - 2048.0 * 1000.0 / 48_000.0).abs() < 1e-9);
@@ -796,7 +796,7 @@ mod tests {
         let r = last(&mut t, &sine(110.0 * 1.05, 0.5, 4096));
         assert!(!r.in_tune && r.ticks == [1, 5]);
         t.reset_ticks();
-        assert!(last(&mut t, &sine(110.0 * 1.05, 0.5, 512)).ticks.is_empty());
+        assert_eq!(last(&mut t, &sine(110.0 * 1.05, 0.5, 512)).ticks.len(), 0);
     }
 
     #[test]
@@ -862,7 +862,7 @@ mod tests {
         assert_eq!(last(&mut t, &sine(110.0, 0.5, 4096)).ticks, [5]);
         cfg.targets.truncate(3);
         t.set_config(cfg);
-        assert!(last(&mut t, &sine(110.0, 0.5, 4096)).ticks.is_empty());
+        assert_eq!(last(&mut t, &sine(110.0, 0.5, 4096)).ticks.len(), 0);
     }
 
     #[test]
