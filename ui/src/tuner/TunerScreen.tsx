@@ -20,6 +20,8 @@ function notice(reading: TunerReading | null): string | null {
       return 'The input device was unplugged. Using the default input.';
     case 'DeviceChanged':
       return 'The input device changed.';
+    case 'InputNotPaced':
+      return 'This input is not delivering audio at a normal rate. Choose another input.';
     case 'AnalysisStopped':
       return 'The tuner stopped unexpectedly. Close and reopen it.';
     default:

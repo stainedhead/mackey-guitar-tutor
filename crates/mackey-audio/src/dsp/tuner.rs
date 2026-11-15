@@ -153,6 +153,9 @@ pub enum TunerNotice {
     DeviceChanged,
     /// The analysis thread panicked and stopped.
     AnalysisStopped,
+    /// The input delivers audio far faster than real time (an unpaced virtual device), so
+    /// analysis was stopped instead of spinning.
+    InputNotPaced,
 }
 
 /// One tuner update, emitted per hop.

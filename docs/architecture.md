@@ -241,7 +241,7 @@ Status: built 2026-11-15 on branch `claude/project-thread-e8va25` ([spec](../spe
 | Tuner | `list_input_devices`, `tuner_targets`, `tuner_start`, `tuner_stop`, `tuner_set_mode`, `tuner_reference_tone`, `open_system_settings` |
 | Settings | `get_settings`, `set_settings`, `reset_settings`, `take_settings_notice` |
 
-Commands take an optional `visible` fret range so the core can count notes beyond the view. One event, `tuner_reading` (about 30 Hz, from the analysis thread through a throttle), carries a `TunerReading`. Each snapshot has a revision number; the UI drops a response older than the last one it applied, so out-of-order replies never show a stale neck.
+Commands take an optional `visible` fret range so the core can count notes beyond the view. One event, `tuner_reading` (about 30 Hz, from the analysis thread through a throttle that limits on stream and wall-clock time; an unpaced input gets an `InputNotPaced` notice and analysis stops), carries a `TunerReading`. Each snapshot has a revision number; the UI drops a response older than the last one it applied, so out-of-order replies never show a stale neck.
 
 State: the explorer (selection, instrument, handedness, voicing cache), settings and audio sit behind three mutexes, always locked in that order and never by the audio thread. Every command body runs under `catch_unwind`; a panic becomes an `AppError` and the app keeps running.
 

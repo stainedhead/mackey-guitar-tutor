@@ -390,7 +390,9 @@ fn tuner_start_builds_targets_with_the_capo_and_stops_playback_first() {
             .unwrap();
         assert!(stop < start, "playback stops before the tuner starts");
     }
-    // About 94 readings per second in; about 30 per second out.
+    // 10 s of readings delivered in a burst (an unpaced source): the wall-clock throttle lets
+    // through the first and at most a handful more (FR-002); the stream-time rate is tested in
+    // `tuner.rs`.
     {
         let sink = r.sink.lock().unwrap();
         let sink = sink.as_ref().unwrap();
@@ -400,8 +402,8 @@ fn tuner_start_builds_targets_with_the_capo_and_stops_playback_first() {
     }
     let emitted = count.load(Ordering::SeqCst);
     assert!(
-        (290..=330).contains(&emitted),
-        "{emitted} emitted for 10 s of input"
+        (1..=35).contains(&emitted),
+        "{emitted} emitted for a burst of 10 s of input"
     );
 }
 

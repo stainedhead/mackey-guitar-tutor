@@ -379,8 +379,10 @@ impl AppState {
             };
             // Only the analysis thread touches this mutex; it is not app state.
             let throttle = Mutex::new(Throttle::default());
+            let clock = std::time::Instant::now();
             let sink: crate::ports::ReadingSink = Box::new(move |reading| {
-                if lock(&throttle).accept(&reading) {
+                let wall_ms = clock.elapsed().as_secs_f64() * 1000.0;
+                if lock(&throttle).accept(&reading, wall_ms) {
                     emit(&reading);
                 }
             });

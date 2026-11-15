@@ -21,6 +21,15 @@ Update after each fix with the decision, edge cases and a brief self-review (cod
 - Existing snapshots and doc tests unchanged.
 - Self-review: one added filter in the existing triple loop, no new API; search cost unchanged (the filter is cheaper than building a voicing). Criterion bench not re-run locally (disk); the loop only gets shorter.
 
+### FR-002 tuner pacing (P0)
+
+- `src-tauri/src/tuner.rs`: `Throttle::accept(reading, wall_ms)` requires 30 ms on the stream clock and the wall clock (injected, so tests use a fake clock); notices and status changes still pass at once. `AppState::tuner_start` supplies `Instant`-based milliseconds.
+- `mackey-audio/src/io/pump.rs`: `pump_input` takes a sample bound; new `Analyzer::step` (bounded to about 100 ms of audio, returns the wait: 2 ms idle, 1 ms yield after a full step, 100 ms once unpaced) and `PaceGuard` (over a 1 s wall window, more than 2.5x the nominal rate means unpaced; a stalled second of backlog stays below it). `input.rs` just calls `step` and sleeps for `step.wait`. New `TunerNotice::InputNotPaced`, shown by `TunerScreen` instead of "Too quiet"; bindings regenerated.
+- Decision (PRD Q3): notice only, no automatic fallback to another device. Exact-zero streams keep the existing `ZeroWatch` path (permission denied message).
+- Tests: `fr002_a_fast_source_is_limited_in_wall_clock_time` (50x source, at most 35 emits per wall second), `fr002_a_step_is_bounded_and_yields_however_fast_the_producer_is`, `fr002_unpaced_input_is_detected_announced_once_and_stops_analysing`, `fr002_a_paced_input_and_a_one_second_burst_are_not_flagged`. The old state test that expected 290 to 330 emits for a burst delivered in zero wall time was changed to expect the wall-clock limit. The new `pump.rs` tests were written together with the new API (no earlier API to fail against); each was checked to exercise a real branch.
+- Not done: the manual ALSA null-device CPU check (no audio hardware path in this container); covered by the fake clock tests. D-91 marked resolved in the archived notes.
+- Self-review: no allocation or lock added to cpal callbacks (only the worker changed); no new dependency; policy is pure and device-free. FR-005 is partly met here (see its task).
+
 ## Edge Cases and Solutions
 
 ## Deviations from Plan

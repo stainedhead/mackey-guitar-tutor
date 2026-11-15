@@ -11,20 +11,18 @@ use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::thread::{self, JoinHandle};
-use std::time::Duration;
+use std::time::Instant;
 
 use cpal::traits::{DeviceTrait, StreamTrait};
 use cpal::{FromSample, SampleFormat, SizedSample, Stream, StreamConfig};
 use rtrb::{Consumer, Producer, RingBuffer};
 
 use super::devices::{input_config, open_input_device};
-use super::pump::{ZeroWatch, mixdown, pump_input};
+use super::pump::{Analyzer, mixdown};
 use super::select::{InputDevice, MicPermission, map_cpal_error};
 use crate::dsp::{DetectorConfig, PitchDetector, Tuner, TunerConfig, TunerNotice, TunerReading};
 use crate::error::AudioError;
 
-/// How long the worker sleeps when the ring is empty.
-const IDLE_SLEEP: Duration = Duration::from_millis(2);
 /// Samples handled per pump iteration.
 const SCRATCH: usize = 2048;
 
@@ -280,8 +278,8 @@ impl Worker {
             tuner.queue_notice(TunerNotice::DeviceChanged);
         }
         let _ = ready.send(Ok(session.info.clone()));
-        let mut zero = ZeroWatch::new(session.info.sample_rate);
-        let mut scratch = vec![0.0_f32; SCRATCH];
+        let mut analyzer = Analyzer::new(session.info.sample_rate, SCRATCH);
+        let clock = Instant::now();
         let mut session_slot = Some(session);
 
         while !self.shared.stop.load(Ordering::Acquire) {
@@ -301,7 +299,7 @@ impl Worker {
                 }) {
                     Ok((s, mut t)) => {
                         t.queue_notice(TunerNotice::DeviceDisconnectedUsingDefault);
-                        zero = ZeroWatch::new(s.info.sample_rate);
+                        analyzer = Analyzer::new(s.info.sample_rate, SCRATCH);
                         tuner = t;
                         session_slot = Some(s);
                     }
@@ -318,22 +316,25 @@ impl Worker {
             let Some(live) = session_slot.as_mut() else {
                 return;
             };
-            let (n, silent) = pump_input(
+            let step = analyzer.step(
                 &mut live.ring,
-                &mut scratch,
                 &mut tuner,
-                &mut zero,
+                clock.elapsed(),
                 &*self.on_reading,
             );
-            if silent {
+            if step.newly_unpaced {
+                tracing::warn!("input is not paced by a real clock; analysis stopped");
+                (self.on_reading)(TunerReading::notice_only(TunerNotice::InputNotPaced, 0.0));
+            }
+            if step.silent {
                 self.shared.permission_denied.store(true, Ordering::Relaxed);
-            } else if n > 0 {
+            } else if step.consumed > 0 {
                 self.shared
                     .permission_denied
                     .store(false, Ordering::Relaxed);
             }
-            if n == 0 {
-                thread::sleep(IDLE_SLEEP);
+            if !step.wait.is_zero() {
+                thread::sleep(step.wait);
             }
         }
         tracing::info!("tuner input closed");

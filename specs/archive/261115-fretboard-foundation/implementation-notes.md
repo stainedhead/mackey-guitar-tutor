@@ -99,6 +99,8 @@
 | D-90 | **Edge arrows sit in a bar above the neck.** The off-range indicator (`▶ 23`) was positioned absolutely at the vertical middle of the neck frame, so on the real app at 1280 wide it covered notes on the G string near fret 15. It now lives in an `.edge-bar` row above the neck (`order: -1` in a flex column), so it never overlaps strings or markers. Regression test: `ui/src/fretboard/EdgeArrows.test.tsx` (the arrows are in the bar, and no edge-arrow rule uses `position: absolute`). The mocked data never has an off-range count above zero, so Playwright could not catch it; the real-app G major screenshot is the visual check. | Found while taking the real screenshots. | |
 | D-91 | **Tuner on a machine with no microphone.** On a Linux box with only the ALSA null input, `tuner_start` succeeds and the app used 260% CPU and the UI stopped responding to clicks (the null device appears not to be paced by a clock, so the analysis thread spins); the screen reads "Too quiet". The null device is not paced by a clock. Not changed here (macOS and iPad always have a paced input); noted for the device-validation step. | Observed in the screenshot run. | A paced read or a stream-error path for unpaced devices. |
 
+**D-91 resolved** by the auto review (FR-002): wall-clock throttle, bounded and yielding analysis loop, and an `InputNotPaced` notice; see the review spec's implementation notes.
+
 ## Edge Cases and Solutions
 
 Seeded from the PRD (E-FB-*, E-TU-*) and from design analysis. Implementers add what they find.

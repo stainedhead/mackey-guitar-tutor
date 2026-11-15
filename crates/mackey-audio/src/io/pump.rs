@@ -2,6 +2,8 @@
 //! and synth, and what the analysis thread does with the input ring. They take plain
 //! `rtrb` rings and slices, so tests drive them with fakes.
 
+use std::time::Duration;
+
 use cpal::{FromSample, Sample};
 use rtrb::{Consumer, PopError};
 
@@ -101,11 +103,14 @@ impl ZeroWatch {
     }
 }
 
-/// Moves everything waiting in `ring` through `tuner` (in pieces of at most `scratch.len()`),
-/// passing each reading to `on_reading`. Returns the number of samples consumed.
+/// Moves what is waiting in `ring` through `tuner` (in pieces of at most `scratch.len()`),
+/// passing each reading to `on_reading`. Stops once `max_samples` have been consumed, so one
+/// call never runs for more than about that much audio however fast the producer is (FR-002).
+/// Returns the number of samples consumed and whether the stream looks silent.
 pub(crate) fn pump_input(
     ring: &mut Consumer<f32>,
     scratch: &mut [f32],
+    max_samples: usize,
     tuner: &mut Tuner,
     zero: &mut ZeroWatch,
     on_reading: &dyn Fn(TunerReading),
@@ -131,11 +136,146 @@ pub(crate) fn pump_input(
             on_reading(reading);
         }
         total += n;
-        if n < scratch.len() {
+        if n < scratch.len() || total >= max_samples {
             break;
         }
     }
     (total, silent)
+}
+
+/// How long the worker sleeps when the ring is empty.
+pub(crate) const IDLE_WAIT: Duration = Duration::from_millis(2);
+/// How long it yields after a full, bounded step, so a producer that never stops cannot make
+/// the thread spin.
+pub(crate) const YIELD_WAIT: Duration = Duration::from_millis(1);
+/// How long it sleeps once the input is judged not to be paced by a real clock.
+pub(crate) const UNPACED_WAIT: Duration = Duration::from_millis(100);
+
+/// Detects an input that delivers audio much faster than real time (an unpaced virtual or null
+/// device). Wall-clock time comes from the caller, so tests use a fake clock.
+#[derive(Debug)]
+pub(crate) struct PaceGuard {
+    rate: f64,
+    window_start: Option<Duration>,
+    samples: usize,
+}
+
+impl PaceGuard {
+    /// Judged over windows of one second.
+    const WINDOW: Duration = Duration::from_secs(1);
+    /// More than this multiple of the nominal rate is "not paced". A device that bursts out
+    /// a stalled second of backlog stays under it.
+    const LIMIT: f64 = 2.5;
+
+    pub(crate) fn new(sample_rate: u32) -> Self {
+        Self {
+            rate: f64::from(sample_rate),
+            window_start: None,
+            samples: 0,
+        }
+    }
+
+    /// Counts `n` samples seen at wall time `now`; true when the finished window ran too fast.
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "sample counts stay far below 2^52"
+    )]
+    pub(crate) fn feed(&mut self, n: usize, now: Duration) -> bool {
+        let start = *self.window_start.get_or_insert(now);
+        self.samples = self.samples.saturating_add(n);
+        let elapsed = now.saturating_sub(start);
+        if elapsed < Self::WINDOW {
+            return false;
+        }
+        let too_fast = self.samples as f64 > Self::LIMIT * self.rate * elapsed.as_secs_f64();
+        self.window_start = Some(now);
+        self.samples = 0;
+        too_fast
+    }
+}
+
+/// What one analysis step did and how long the worker should wait before the next.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Step {
+    /// Samples consumed.
+    pub(crate) consumed: usize,
+    /// The stream has been exact zeros for a second.
+    pub(crate) silent: bool,
+    /// The input was just judged not paced; the worker tells the user once.
+    pub(crate) newly_unpaced: bool,
+    /// Sleep before the next step. Never zero after a step that hit the bound.
+    pub(crate) wait: Duration,
+}
+
+/// The analysis loop's decisions, apart from the device: bounded work per step, the yield
+/// policy and the unpaced-input guard (FR-002, FR-005).
+#[derive(Debug)]
+pub(crate) struct Analyzer {
+    scratch: Vec<f32>,
+    max_per_step: usize,
+    zero: ZeroWatch,
+    pace: PaceGuard,
+    unpaced: bool,
+}
+
+impl Analyzer {
+    /// `scratch_len` samples per piece; a step handles about 100 ms of audio at most.
+    pub(crate) fn new(sample_rate: u32, scratch_len: usize) -> Self {
+        Self {
+            scratch: vec![0.0; scratch_len.max(1)],
+            max_per_step: (sample_rate as usize / 10).max(1),
+            zero: ZeroWatch::new(sample_rate),
+            pace: PaceGuard::new(sample_rate),
+            unpaced: false,
+        }
+    }
+
+    /// True once the input was judged not paced; analysis is then off.
+    #[cfg(test)]
+    pub(crate) fn is_unpaced(&self) -> bool {
+        self.unpaced
+    }
+
+    /// One bounded pump at wall time `now`.
+    pub(crate) fn step(
+        &mut self,
+        ring: &mut Consumer<f32>,
+        tuner: &mut Tuner,
+        now: Duration,
+        on_reading: &dyn Fn(TunerReading),
+    ) -> Step {
+        if self.unpaced {
+            return Step {
+                consumed: 0,
+                silent: false,
+                newly_unpaced: false,
+                wait: UNPACED_WAIT,
+            };
+        }
+        let (consumed, silent) = pump_input(
+            ring,
+            &mut self.scratch,
+            self.max_per_step,
+            tuner,
+            &mut self.zero,
+            on_reading,
+        );
+        let newly_unpaced = self.pace.feed(consumed, now);
+        self.unpaced |= newly_unpaced;
+        let wait = if consumed == 0 {
+            IDLE_WAIT
+        } else if consumed >= self.max_per_step {
+            YIELD_WAIT
+        } else {
+            Duration::ZERO
+        };
+        Step {
+            consumed,
+            silent,
+            newly_unpaced,
+            wait,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -234,7 +374,14 @@ mod tests {
                 as f32;
             tx.push(s).unwrap();
         }
-        let (n, silent) = pump_input(&mut rx, &mut scratch, &mut tuner, &mut zero, &on_reading);
+        let (n, silent) = pump_input(
+            &mut rx,
+            &mut scratch,
+            usize::MAX,
+            &mut tuner,
+            &mut zero,
+            &on_reading,
+        );
         assert_eq!(n, 4096);
         assert!(!silent);
         let got = got.borrow();
@@ -243,13 +390,28 @@ mod tests {
         drop(got);
         // An empty ring does nothing; an exact multiple of the scratch size terminates.
         assert_eq!(
-            pump_input(&mut rx, &mut scratch, &mut tuner, &mut zero, &on_reading).0,
+            pump_input(
+                &mut rx,
+                &mut scratch,
+                usize::MAX,
+                &mut tuner,
+                &mut zero,
+                &on_reading
+            )
+            .0,
             0
         );
         for _ in 0..2000 {
             tx.push(0.0).unwrap();
         }
-        let (n, _) = pump_input(&mut rx, &mut scratch, &mut tuner, &mut zero, &on_reading);
+        let (n, _) = pump_input(
+            &mut rx,
+            &mut scratch,
+            usize::MAX,
+            &mut tuner,
+            &mut zero,
+            &on_reading,
+        );
         assert_eq!(n, 2000);
     }
 
@@ -266,7 +428,92 @@ mod tests {
             tx.push(0.0).unwrap();
         }
         let mut scratch = vec![0.0; 256];
-        let (_, silent) = pump_input(&mut rx, &mut scratch, &mut tuner, &mut zero, &|_| {});
+        let (_, silent) = pump_input(
+            &mut rx,
+            &mut scratch,
+            usize::MAX,
+            &mut tuner,
+            &mut zero,
+            &|_| {},
+        );
         assert!(silent);
+    }
+
+    fn fresh_tuner(sr: u32) -> Tuner {
+        Tuner::new(
+            TunerConfig::chromatic(ReferencePitch::default()),
+            PitchDetector::new(DetectorConfig::new(sr).unwrap()).unwrap(),
+        )
+    }
+
+    #[test]
+    fn fr002_a_step_is_bounded_and_yields_however_fast_the_producer_is() {
+        let sr = 48_000;
+        let (mut tx, mut rx) = RingBuffer::new(sr as usize);
+        let mut tuner = fresh_tuner(sr);
+        let mut a = Analyzer::new(sr, 1024);
+        while tx.push(0.1).is_ok() {}
+        let step = a.step(&mut rx, &mut tuner, Duration::ZERO, &|_| {});
+        // About 100 ms (4800 samples), rounded up to a scratch piece.
+        assert!(
+            step.consumed >= 4800 && step.consumed < 4800 + 1024,
+            "{}",
+            step.consumed
+        );
+        assert_eq!(step.wait, YIELD_WAIT);
+        let empty = {
+            while rx.pop().is_ok() {}
+            a.step(&mut rx, &mut tuner, Duration::ZERO, &|_| {})
+        };
+        assert_eq!((empty.consumed, empty.wait), (0, IDLE_WAIT));
+    }
+
+    /// A source at 50x real time with a fake clock: the guard trips within about a second of
+    /// wall time, announces it once, and every step before that waited.
+    #[test]
+    fn fr002_unpaced_input_is_detected_announced_once_and_stops_analysing() {
+        let sr = 48_000_u32;
+        let (mut tx, mut rx) = RingBuffer::new(sr as usize);
+        let mut tuner = fresh_tuner(sr);
+        let mut a = Analyzer::new(sr, 1024);
+        let readings = RefCell::new(0_usize);
+        let on_reading = |_r: TunerReading| *readings.borrow_mut() += 1;
+        let mut announced = 0;
+        let mut waits_zero_after_full_step = 0;
+        // Each loop turn is 1 ms of wall time; the fake device adds 50 ms of audio per turn.
+        for ms in 0..1500_u64 {
+            for _ in 0..(sr as usize * 50 / 1000) {
+                let _ = tx.push(0.2);
+            }
+            let step = a.step(&mut rx, &mut tuner, Duration::from_millis(ms), &on_reading);
+            announced += usize::from(step.newly_unpaced);
+            if step.consumed >= 4800 && step.wait.is_zero() {
+                waits_zero_after_full_step += 1;
+            }
+            if a.is_unpaced() && !step.newly_unpaced {
+                assert_eq!(step.consumed, 0, "no analysis once unpaced");
+                assert!(step.wait >= UNPACED_WAIT);
+            }
+        }
+        assert_eq!(announced, 1);
+        assert!(a.is_unpaced());
+        assert_eq!(waits_zero_after_full_step, 0, "a full step always yields");
+    }
+
+    #[test]
+    fn fr002_a_paced_input_and_a_one_second_burst_are_not_flagged() {
+        let sr = 48_000_u32;
+        let (mut tx, mut rx) = RingBuffer::new(sr as usize);
+        let mut tuner = fresh_tuner(sr);
+        let mut a = Analyzer::new(sr, 1024);
+        // A stalled second arrives at once, then audio flows at the nominal rate.
+        while tx.push(0.1).is_ok() {}
+        for ms in 0..3000_u64 {
+            for _ in 0..(sr as usize / 1000) {
+                let _ = tx.push(0.1);
+            }
+            let step = a.step(&mut rx, &mut tuner, Duration::from_millis(ms), &|_| {});
+            assert!(!step.newly_unpaced, "flagged at {ms} ms");
+        }
     }
 }
