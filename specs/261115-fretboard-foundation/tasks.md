@@ -7,16 +7,16 @@
 
 ## Progress Summary
 
-0/61 tasks complete. Update this file and `status.md` after every task (mandatory).
+5/61 tasks complete. Update this file and `status.md` after every task (mandatory).
 
 | Phase | Tasks | Done |
 |-------|-------|------|
-| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 0 |
+| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 5 |
 | B `mackey-voicing` | B1 to B16 (16) | 0 |
 | C `mackey-audio` | C1 to C9 (9) | 0 |
 | D `src-tauri` and `ui/` | D1 to D16 (16) | 0 |
 | E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
-| Total | 61 | 0 |
+| Total | 61 | 5 |
 
 ## Conventions
 
@@ -31,6 +31,7 @@
 ## Phase A: Workspace scaffold and `mackey-theory`
 
 ### A1. Cargo scaffold for the three crates and the app crate stub
+- **Status:** Done
 - **Depends on:** none · **Est:** M · **FR:** FR-001
 - **Files:** `Cargo.toml` (members, `[workspace.dependencies]`: `serde`, `thiserror`, `proptest`, `insta`, `criterion`, `ts-rs`; `[profile.dev.package.proptest|insta|similar] opt-level = 3`), `crates/mackey-theory/{Cargo.toml,src/lib.rs,README.md}`, `crates/mackey-voicing/...`, `crates/mackey-audio/...` (each lib with crate docs, `[lints] workspace = true`, feature `ts`), `crates/README.md` (crate table), root `README.md`.
 - **Do not add** `src-tauri` to `members` yet (D1 does it, so Phase A–C CI stays green without Tauri system packages).
@@ -38,24 +39,28 @@
 - **Tests:** none beyond the existing xtask tests; a doc test in each `lib.rs`.
 
 ### A2. `mackey-theory`: pitch classes, notes, pitches
+- **Status:** Done
 - **Depends on:** A1 · **Est:** M · **FR:** FR-007
 - **Files:** `src/pitch.rs`, `src/error.rs`, `tests/properties.rs` (start).
 - **Acceptance:** `PitchClass`, `Letter`, `Accidental`, `Note` (`FromStr` accepts "F#", "Bb", "C##", rejects "H", "", "Fb#b"), `Pitch` (MIDI both ways, A4 = 69, C4 = 60, B#3 = 60, Cb4 = 59; frequency with a reference A4; octave and MIDI range errors), `ReferencePitch` (415..=466), `AccidentalPreference`. All constructors validate.
 - **Tests:** table-driven `CASES` for names, MIDI and frequency (A4 440 → 440.0, C4 → 261.6256, A4 442 case); proptest: `Pitch::from_midi(m).midi() == m`; `PitchClass::transpose(n).transpose(-n)` is identity.
 
 ### A3. `mackey-theory`: intervals
+- **Status:** Done
 - **Depends on:** A2 · **Est:** M · **FR:** FR-007
 - **Files:** `src/interval.rs`.
 - **Acceptance:** `Interval::new` rejects invalid quality/number pairs; `semitones`, `apply` (letter stepping), `between`, `invert`, `degree_label` ("R", "b3", "3", "5", "b7"); applying M3 to Db gives F, to F# gives A#, d5 to B gives F.
 - **Tests:** table of (note, interval, expected note) including double accidentals; proptest (AC-P0-3): `apply(i)` then `apply(i.invert())` of the octave complement returns the start pitch class; for any note and any valid interval the semitone distance equals `semitones()`.
 
 ### A4. `mackey-theory`: scales and modes
+- **Status:** Done
 - **Depends on:** A3 · **Est:** M · **FR:** FR-008
 - **Files:** `src/scale.rs`.
 - **Acceptance:** all 11 modes in `Mode`, degrees spelled for any offered tonic (G Dorian = G A Bb C D E F; F Lydian = F G A B C D E; E harmonic minor = E F# G A B C D#; blues = C Eb F Gb G Bb); `degree_of`, `contains`.
 - **Tests:** `CASES` of (tonic, mode, expected spelling) for every mode in at least 5 tonics (sharp, flat and natural); property: degrees of a 7-note scale use each letter exactly once; pentatonic and blues use distinct letters.
 
 ### A5. `mackey-theory`: keys, signatures, circle of fifths
+- **Status:** Done
 - **Depends on:** A4 · **Est:** L · **FR:** FR-009 · **SAC-05**
 - **Files:** `src/key.rs`.
 - **Acceptance:** offered major tonics C G D A E B F#/Gb F Bb Eb Ab Db and minor tonics A E B F# C# G# D#/Eb D G C F Bb (G-1.2, G-1.3); C# major and Cb major rejected; `Key::new_normalised` maps D# Dorian → Eb Dorian with a notice (G-1.4); `signature`; `next_fifth`/`prev_fifth` wrap through all 12 for major and minor honouring the chosen F#/Gb spelling; `relative` (major ↔ natural minor, `None` otherwise); `enharmonic_alternative` is `Some` only for keys with 6 accidentals (E-FB-7); `degree_of`.

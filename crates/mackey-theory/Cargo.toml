@@ -1,0 +1,32 @@
+[package]
+name = "mackey-theory"
+version = "0.1.0"
+description = "Pure music theory for Mackey Guitar Tutor: notes, intervals, scales, keys, chords and the chord-symbol parser"
+readme = "README.md"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+# Generate TypeScript bindings for the boundary types (`cargo test -p mackey-theory --features ts`).
+ts = ["dep:ts-rs"]
+
+[dependencies]
+serde = { workspace = true }
+thiserror = { workspace = true }
+ts-rs = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+insta = { workspace = true }
+criterion = { workspace = true }
+serde_json = { workspace = true }
+
+[[bench]]
+name = "parser"
+harness = false
+
+[lints]
+workspace = true

@@ -9,6 +9,9 @@ lcov.info
 *.snap.new
 *.pending-snap
 
+# ts-rs output when exporting bindings from a crate (the UI copy lives in ui/src/bindings/)
+/crates/*/bindings/
+
 # Node / UI
 node_modules/
 /ui/dist/

@@ -20,6 +20,9 @@ const SKIP_DIRS: &[&str] = &[
     "examples",
     "snapshots",
     "proptest-regressions",
+    // Generated TypeScript bindings and agent worktrees are tool output, not documentation.
+    "bindings",
+    "worktrees",
     "workflows",
     "adr",
 ];

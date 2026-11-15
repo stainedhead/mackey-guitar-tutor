@@ -7,6 +7,10 @@ Product spec, architecture and roadmap live in [docs/](docs/README.md): a fretbo
 
 Start with [INTENT.md](INTENT.md) for purpose and scope, then the PRD in [docs/prd/](docs/prd/README.md).
 
+## Core crates
+
+The Rust core is built crate by crate ([crates/](crates/README.md)). So far: `mackey-theory` (notes, intervals, scales, keys, chords, chord-symbol parser, Roman numerals and analysis, spelling).
+
 ## Contributing
 
 Rules for people and AI agents are in [AGENTS.md](AGENTS.md): crate layer rules, TDD with proptest and insta, Rust error handling, docs and the dev-flow spec workflow (`specs/`).
