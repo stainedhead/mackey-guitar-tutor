@@ -57,6 +57,10 @@ All timing-critical audio (metronome, drums, guitar tones, tuner, looper) runs o
 - VoiceOver on both: each fretboard position is an element labelled like "String 3, fret 2, A, root"; the transport and run state are announced.
 - Respects system text size and Reduce Motion.
 
-## 7. Open decision
+## 7. iPad signing and validation (decided)
 
-**iPad signing route:** free Apple ID (reinstall every 7 days) or the Apple Developer Program at $99/year (1-year installs, TestFlight, and it unlocks a signed Mac build, iCloud sync and the App Store later). Recommendation: start on the free route for P0 and P1, and join the Program when you start using the iPad day to day or want iCloud.
+J's decision (2026-11-15): use a **free Apple ID** first and move to the **Apple Developer Program** later. No accounts are set up yet; the focus is on building.
+
+- Until then, the iPad app is validated in **CI and the iOS Simulator** only: `tauri ios build` for the simulator on every push, Playwright UI tests in an iPad viewport, and manual runs in the Simulator (which uses the Mac's speakers and microphone).
+- The Simulator does not reproduce real iPad audio latency, `AVAudioSession` interruptions or touch feel. Those are checked in a short **device validation** step once a free Apple ID is set up (see [roadmap.md](roadmap.md)); timing figures are not claimed for iPad until then.
+- The Developer Program comes later, when daily iPad use, TestFlight, iCloud sync or the App Store is wanted.

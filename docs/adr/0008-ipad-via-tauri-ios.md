@@ -18,7 +18,7 @@ Build the iPad app from the same workspace with Tauri 2's iOS target. Same core 
 |------|------------|
 | Tauri's iOS support is younger than its desktop support, and fewer plugins work on mobile | P0 walking skeleton runs on iPad in week 1; keep plugin use minimal; anything missing becomes a small in-repo Swift plugin |
 | cpal does not configure `AVAudioSession` | Own Swift plugin for session category, mode, buffer size, interruptions and route changes |
-| iPad apps cannot be unsigned | Free Apple ID (7-day installs) to start; Developer Program when daily use or iCloud starts ([platforms.md §7](../platforms.md#7-open-decision)) |
+| iPad apps cannot be unsigned | Build and test in CI and the iOS Simulator first; free Apple ID for device installs later; Developer Program after that ([platforms.md §7](../platforms.md#7-ipad-signing-and-validation-decided)) |
 | Hover-based interactions do not exist on touch | UI rule: every hover action has a tap equivalent; Playwright runs UI tests in a touch-emulated iPad viewport |
 | No WebDriver for WKWebView, so tauri-driver cannot drive the real app on Mac or iPad | UI tests run in Playwright's WebKit against a mocked command layer; a short manual smoke checklist on both devices per release |
 

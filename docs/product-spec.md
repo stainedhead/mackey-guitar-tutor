@@ -120,8 +120,8 @@ Decided (J, 2026-11-15):
 - **Audio and storage:** all audio on the native Rust thread; local storage, optional iCloud sync later.
 - **Sound assets:** open-source or licence-free only (CC0, public domain, MIT).
 - **Accessibility:** colour-blind-safe colours, keyboard control and VoiceOver.
+- **iPad signing:** build and test in CI and the iOS Simulator first; free Apple ID for device installs later, Developer Program after that.
 
 Still open:
 
-1. **iPad signing route:** free Apple ID (reinstall every 7 days) or the Apple Developer Program ($99/year). See [platforms.md §7](platforms.md#7-open-decision).
-2. **Sharing:** are teacher-to-student shared sessions in scope (files only, or a service)?
+1. **Sharing:** are teacher-to-student shared sessions in scope (files only, or a service)?
