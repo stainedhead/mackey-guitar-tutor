@@ -78,7 +78,8 @@ UI and app targets (they need Node 22 and, for `e2e`, WebKit via `npx --prefix u
 | `make bindings` | Regenerate the TypeScript types in `ui/src/bindings/` from the Rust types (`ts-rs`) |
 | `make bindings-check` | Regenerate, then fail if `ui/src/bindings/` differs from what is committed (stale bindings) |
 | `make app` | `tauri build`: universal (arm64 + x86_64) ad-hoc signed `.app`/`.dmg` on macOS; a host binary without a bundle elsewhere |
-| `make ios-sim` | `tauri ios init` (first run) then an unsigned debug build for the iOS Simulator (`aarch64-sim`); macOS with Xcode only
+| `make ios-sim` | `tauri ios init` (first run) then an unsigned debug build for the iOS Simulator (`aarch64-sim`); macOS with Xcode only |
+| `make screenshots` | Linux only, optional (not in `make check` or CI): builds the UI and the app, runs it under Xvfb and captures the real Explore, Tuner and Settings screens to `docs/images/real-*.png` (`scripts/screenshots/`; needs `xvfb xdotool imagemagick openbox`) |
 
 ## Development: TDD
 

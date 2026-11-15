@@ -1,4 +1,4 @@
-.PHONY: build test props lint fmt fmt-check cover archcheck doccheck deny tools check ui-lint ui-test e2e bindings bindings-check app ios-sim
+.PHONY: build test props lint fmt fmt-check cover archcheck doccheck deny tools check ui-lint ui-test e2e bindings bindings-check app ios-sim screenshots
 
 # Toolchain comes from rust-toolchain.toml; every cargo call below uses it.
 
@@ -115,5 +115,13 @@ endif
 ios-sim: ui/node_modules
 	test -d src-tauri/gen/apple || $(TAURI) ios init --ci
 	$(TAURI) ios build --debug --target aarch64-sim --ci $(APP_ARGS)
+
+# Screenshots of the real app (Rust core, WebKit webview) under Xvfb: Linux only, optional, not part
+# of make check or CI. Needs xvfb, xdotool, imagemagick and openbox (see scripts/screenshots/).
+# Writes docs/images/real-*.png.
+screenshots: ui/node_modules
+	npm --prefix ui run build
+	cargo build -p mackey-app --features tauri/custom-protocol
+	scripts/screenshots/capture.sh
 
 check: fmt lint archcheck doccheck deny test ui-lint ui-test bindings-check
