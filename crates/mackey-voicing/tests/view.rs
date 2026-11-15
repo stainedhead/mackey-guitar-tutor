@@ -343,7 +343,7 @@ fn fb_5_x_muted_strings_are_marked_and_the_nut_barre_is_drawn() {
     assert_eq!(v.markers.len(), 1);
     assert_eq!(v.markers[0].string.number(), 6);
     assert_eq!(v.markers[0].kind, MarkerKind::Muted);
-    assert!(v.barres.is_empty());
+    assert_eq!((v.barres).len(), 0);
     // The F barre (133211) draws one bar.
     let mut f = sel("C", Mode::Major, Some("F"), ViewType::Voicing);
     f.voicing_index = 0;
@@ -376,11 +376,11 @@ fn g_2_every_position_has_an_a11y_label_a_role_and_a_shape_cue() {
         let v = build(&sel("G", Mode::Major, Some("Em"), view), &ins);
         assert!(!v.positions.is_empty(), "{view:?}");
         for p in &v.positions {
-            assert!(!p.a11y_label.is_empty());
+            assert_ne!((p.a11y_label).len(), 0);
             assert!(p.a11y_label.starts_with("String "), "{}", p.a11y_label);
-            assert!(!p.tooltip.role.is_empty());
+            assert_ne!((p.tooltip.role).len(), 0);
         }
-        assert!(!v.announcement.is_empty());
+        assert_ne!((v.announcement).len(), 0);
     }
     // Root, third, fifth and extension read differently (shape cue) via distinct roles.
     let v = build(
@@ -418,7 +418,7 @@ fn e_fb_3_no_playable_voicing_is_reported_never_drawn() {
     let (tuning, _) = Tuning::custom([e3; 6]).unwrap();
     let ins = Instrument::with_tuning(tuning);
     let v = build(&sel("C", Mode::Major, Some("C"), ViewType::Voicing), &ins);
-    assert!(v.voicing_list.is_empty());
+    assert_eq!((v.voicing_list).len(), 0);
     let none = v.no_voicing.expect("the none-found result is carried");
     assert_eq!(
         none.none_message(),

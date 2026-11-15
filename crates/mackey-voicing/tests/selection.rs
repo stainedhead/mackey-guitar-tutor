@@ -40,7 +40,7 @@ fn key(tonic: &str, mode: Mode) -> Key {
 }
 
 fn symbol(sel: &Selection) -> String {
-    sel.chord.map(|c| c.symbol()).unwrap_or_default()
+    sel.chord.map_or_else(String::new, |c| c.symbol())
 }
 
 #[test]
@@ -290,7 +290,7 @@ fn fb_4_4_roman_numerals_select_and_invalid_input_changes_nothing() {
         bad.selection, v7.selection,
         "an invalid numeral changes nothing"
     );
-    assert!(!bad.announcement.is_empty());
+    assert_ne!((bad.announcement).len(), 0);
 }
 
 #[test]
@@ -346,7 +346,7 @@ fn g_3_4_an_unchanged_voicing_keeps_its_index_without_a_notice() {
         },
     );
     assert_eq!(r.selection.voicing_index, 1);
-    assert!(r.notices.is_empty());
+    assert_eq!((r.notices).len(), 0);
 }
 
 #[test]
@@ -447,11 +447,11 @@ fn fb_9_property_any_action_sequence_keeps_the_selection_valid() {
             13 => Action::KeyNext,
             14 => Action::KeyPrev,
             15 => Action::RelativeToggle,
-            16 => Action::SetFollowChords(step % 2 == 0),
-            17 => Action::SetShowSevenths(step % 3 == 0),
-            18 => Action::SetShowAllOnSet(step % 2 == 0),
-            19 => Action::SetShowOrder(step % 2 == 1),
-            20 => Action::SetAllowStretch(step % 2 == 0),
+            16 => Action::SetFollowChords(step.is_multiple_of(2)),
+            17 => Action::SetShowSevenths(step.is_multiple_of(3)),
+            18 => Action::SetShowAllOnSet(step.is_multiple_of(2)),
+            19 => Action::SetShowOrder(!step.is_multiple_of(2)),
+            20 => Action::SetAllowStretch(step.is_multiple_of(2)),
             21 => Action::SetAllowOmittedFifth(step % 3 == 1),
             22 => Action::SelectChord(parse_chord_symbol(chord).unwrap()),
             23 => Action::ClearFocus,

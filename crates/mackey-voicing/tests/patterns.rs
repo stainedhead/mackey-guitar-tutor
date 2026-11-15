@@ -202,8 +202,8 @@ fn sc_3_full_neck_holds_every_scale_note_from_the_capo_up() {
 #[test]
 fn sc_3_scales_without_positions_use_the_full_neck() {
     let ins = Instrument::default();
-    assert!(scale_patterns(&scale("A", Mode::Blues), &ins).is_empty());
-    assert!(scale_patterns(&scale("A", Mode::HarmonicMinor), &ins).is_empty());
+    assert_eq!(scale_patterns(&scale("A", Mode::Blues), &ins), []);
+    assert_eq!(scale_patterns(&scale("A", Mode::HarmonicMinor), &ins), []);
 }
 
 #[test]
