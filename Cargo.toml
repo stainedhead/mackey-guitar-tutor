@@ -3,7 +3,7 @@ resolver = "3"
 # Domain crates live in crates/<name>/ (mackey-theory, mackey-voicing, ...) and the Tauri
 # shell in src-tauri/ (crate mackey-app). Add each one here when you create it, and to the
 # layer table in xtask/src/archcheck.rs and AGENTS.md.
-members = ["crates/mackey-theory", "src-tauri", "xtask"]
+members = ["crates/mackey-theory", "crates/mackey-audio", "src-tauri", "xtask"]
 
 [workspace.package]
 edition = "2024"
@@ -25,6 +25,9 @@ proptest = "1"
 insta = { version = "1", features = ["yaml"] }
 criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
 tracing = "0.1"
+cpal = "0.18"
+rtrb = "0.4"
+assert_no_alloc = "1"
 # Tauri 2 stable line (3.x is alpha); tauri-build must match tauri's major.
 tauri = { version = "2", features = [] }
 tauri-build = { version = "2", features = [] }
@@ -56,6 +59,10 @@ lto = "thin"
 codegen-units = 1
 
 # Property tests and snapshot diffs run much faster with optimised dependencies.
+# The pitch detector and synth are number crunching; unoptimised they make the audio tests slow.
+[profile.dev.package.mackey-audio]
+opt-level = 3
+
 [profile.dev.package.proptest]
 opt-level = 3
 
