@@ -82,3 +82,4 @@ The earlier product spec's IDs are all kept: FB-1 to FB-9, PS-1 to PS-8, SG-1 to
 | Legal review of web import | J | Start of P5 |
 | Confirm each sound asset's licence at source | Build | P1b |
 | FB-8.2 instrument choice deferred to P1b; v1 foundation ships one synthesised voice (default, pending J) | J | P1b |
+| Follow-up (auto-review FR-005): `crates/mackey-audio/src/io/input.rs` stays in `COVER_IGNORE`; its loop decision logic is tested in `pump.rs`, but command handling and stream-loss fallback need a live cpal session. Narrow the exclusion once they sit behind a fake stream | Build | P1b |
