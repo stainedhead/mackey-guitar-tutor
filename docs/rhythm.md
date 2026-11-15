@@ -1,6 +1,6 @@
 # Rhythm: Metronome, Drum Backing and Speed Trainer
 
-Status: Draft v0.1 (2026-11-15)
+Status: Draft v0.2 (2026-11-15). Requirements are specified in full in [PRD 03](prd/03-rhythm.md); the tables below summarise them for design context. If they differ, the PRD wins.
 
 ## 1. Goal
 
@@ -10,8 +10,8 @@ Help the player lock into a steady cadence. Both the metronome and the drum back
 
 | ID | Requirement |
 |----|-------------|
-| RH-1 | Tempo 30 to 250 bpm, adjustable by slider, ±1/±5 keys, typed value, and **tap tempo**. |
-| RH-2 | Time signatures 2/4, 3/4, 4/4, 5/4, 6/8, 7/8, 12/8, with accent on beat 1 and configurable accents (e.g. 2+2+3 for 7/8). |
+| RH-1 | Tempo 30 to 250 bpm, adjustable by slider, ±1/±5 keys, typed value, and **tap tempo** (mean of the last 4 taps). |
+| RH-2 | Time signatures 2/4, 3/4, 4/4, 5/4, 6/8, 7/8, 9/8, 12/8, with accent on beat 1 and configurable groupings (e.g. 2+2+3 for 7/8). |
 | RH-3 | Subdivisions: quarters, 8ths, triplets, 16ths, swing 8ths (swing amount adjustable). |
 | RH-4 | Click sounds (wood block, beep, cowbell, voice count "1, 2, 3, 4"), separate volume for accent and subdivision. |
 | RH-5 | Count-in of 1 or 2 bars before any run. |

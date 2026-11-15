@@ -1,6 +1,6 @@
 # Songs: Search, Import and Parsing
 
-Status: Draft v0.1 (2026-11-15)
+Status: Draft v0.2 (2026-11-15). Requirements, edge cases and acceptance criteria are in [PRD 05](prd/05-songs.md); this doc holds the legal analysis and parser design. If they differ, the PRD wins.
 
 ## 1. Goal
 

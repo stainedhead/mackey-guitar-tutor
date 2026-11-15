@@ -1,6 +1,6 @@
 # Roadmap
 
-Status: Draft v0.2 (2026-11-15). Targets macOS and iPad; every exit criterion applies to both (the iPad in the iOS Simulator until device validation). Windows, Linux, iPhone and Android are deferred to "Later". Phases are sized for one developer working with coding agents; each phase ends in a usable build.
+Status: Draft v0.2 (2026-11-15). Targets macOS and iPad; every exit criterion applies to both (the iPad in the iOS Simulator until device validation). Windows, Linux, iPhone and Android are deferred to "Later". Phases are sized for one developer working with coding agents; each phase ends in a usable build. Each phase is done when the PRD requirements for that phase pass their acceptance criteria ([PRD traceability](prd/09-traceability.md)), in addition to the exit criteria below.
 
 ```mermaid
 gantt

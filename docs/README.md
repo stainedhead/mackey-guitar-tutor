@@ -1,10 +1,11 @@
 # Mackey Guitar Tutor: Design Docs
 
-Mackey Guitar Tutor is an app for macOS and iPad (Rust core, Tauri shell) that helps beginner and intermediate guitarists learn the fretboard and play real songs. This folder holds the product spec, architecture and phased plan. Nothing is implemented yet; these docs are the starting point for the first build.
+Mackey Guitar Tutor is an app for macOS and iPad (Rust core, Tauri shell) that helps beginner and intermediate guitarists learn the fretboard and play real songs. This folder holds the product requirements (PRD), architecture, design docs and phased plan. Order of authority: [INTENT.md](../INTENT.md), then the [PRD](prd/README.md), then the design docs. Nothing is implemented yet; these docs are the starting point for the first build.
 
 | Doc | What it covers |
 |-----|----------------|
-| [product-spec.md](product-spec.md) | Vision, users, the three feature areas, numbered requirements |
+| [../INTENT.md](../INTENT.md) | Why the product exists, who it is for, principles, what success looks like |
+| [prd/](prd/README.md) | **Product requirements in full detail:** user stories, functional requirements, edge cases, acceptance criteria, UX flows, NFRs, traceability |
 | [architecture.md](architecture.md) | Module layout, domain model, persistence, key algorithms |
 | [practice-sessions.md](practice-sessions.md) | Practice session design and the quick-entry notation |
 | [rhythm.md](rhythm.md) | Metronome, drum backing and the speed trainer |

@@ -1,6 +1,6 @@
 # Practice Sessions
 
-Status: Draft v0.1 (2026-11-15)
+Status: Draft v0.2 (2026-11-15). Requirements, defaults and error messages are in [PRD 04](prd/04-practice.md); this doc holds the design and the grammar. If they differ, the PRD wins.
 
 ## 1. Goal
 
@@ -45,8 +45,8 @@ Labelled groups, bar separator, strum pattern.
 ```ebnf
 session     = [ header ";" ] sequence [ method ] ;
 header      = "key" ws keyname { ";" setting } ;
-keyname     = note [ ws mode ] ;                 (* "G", "A minor", "D dorian" *)
-setting     = "capo" int | "tempo" int | "time" int "/" int | "tuning" word ;
+keyname     = note [ "m" ] [ ws mode ] ;         (* "G", "Em", "A minor", "D dorian", "A harmonic minor" *)
+setting     = "capo" int | "tempo" int | "time" int "/" int | "tuning" word ;   (* tuning names in PRD 04 PS-1.3 *)
 
 sequence    = step { transition step } ;
 transition  = ">" | ">>" | "|" ;                 (* normal, focus change, bar line (normal) *)
@@ -57,7 +57,9 @@ repeat      = "x" int ;
 duration    = int ( "b" | "bar" | "bars" ) ;     (* beats or bars on this item, default 1 bar *)
 
 item        = target [ ":" kind ] { ws modifier } ;
-target      = chordsymbol | roman | "n:" note ;
+target      = chordsymbol | roman | "n:" note [ int ] ;     (* n:A = every A, n:A2 = one pitch *)
+roman       = [ "b" | "#" ] numeral [ "°" | "o" | "ø" | "+" | "7" | "maj7" | "m7" ] [ "/" roman ] ;
+numeral     = "I" | "II" | "III" | "IV" | "V" | "VI" | "VII" | "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii" ;
 kind        = "chord" | "tri" | "arp" ;           (* default chord *)
 modifier    = "str" digits                        (* string set, e.g. str123 = strings 1-3, 1 = high E *)
             | "inv" ( "0" | "1" | "2" | "3" )
@@ -67,7 +69,8 @@ modifier    = "str" digits                        (* string set, e.g. str123 = s
 
 method      = "@" methodname { ws param } { ws backing } ;
 methodname  = "changes" | "ladder" | "loop" | "random" | "name" | "strum" ;
-param       = int "s" | int "bpm" | int "-" int | "+" int | "-" int "miss" | advance | subdivision | pattern ;
+param       = int "s" | int "bpm" | int "-" int | "+" int | "-" int "miss" | advance | subdivision | pattern
+            | "show" | "find" | "random" ;                (* name-the-note options *)
 pattern     = { "D" | "U" | "-" | "x" } ;
 advance     = "pass" | "clean" | int "bars" ;          (* speed-trainer advance rule, default clean *)
 backing     = "click" [ ws subdivision ] [ ws "gap:" int ]

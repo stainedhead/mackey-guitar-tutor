@@ -1,6 +1,6 @@
 # Learning Features
 
-Status: Draft v0.1 (2026-11-15)
+Status: Draft v0.2 (2026-11-15). Requirements are specified in full in [PRD 01](prd/01-fretboard.md) (scales, tunings), [PRD 02](prd/02-tuner.md) (tuner) and [PRD 06](prd/06-later-features.md) (later features); this doc holds the design notes. If they differ, the PRD wins.
 
 These features build on the fretboard, practice, song and rhythm layers. Agreed phasing: the **tuner**, the **scales and modes overlay** and **left-handed mode with alternate tunings** ship in v1; the rest follow in later phases (see [roadmap.md](roadmap.md)).
 
