@@ -12,10 +12,10 @@ This is an engineering risk assessment, not legal advice. It should get a proper
 
 | Risk | Detail | Design response |
 |------|--------|-----------------|
-| **Lyrics are copyrighted** | Almost all popular song lyrics are owned by music publishers. Copying, storing or displaying them at scale without a licence is infringement. Publishers have taken action against unlicensed lyric and tab sites before. | The app never hosts, caches centrally or redistributes lyrics. Content enters only by the user's own action and stays on their Mac. |
+| **Lyrics are copyrighted** | Almost all popular song lyrics are owned by music publishers. Copying, storing or displaying them at scale without a licence is infringement. Publishers have taken action against unlicensed lyric and tab sites before. | The app never hosts, caches centrally or redistributes lyrics. Content enters only by the user's own action and stays on their computer. |
 | **Chord sheets are user transcriptions** | Chord progressions alone are generally not protected, but a chord sheet usually reproduces the full lyrics, so it carries the lyric risk. The transcription may also be the site's or contributor's content under the site's terms. | Same as above. Chord-only views (no lyrics) are the lowest-risk mode and are always available. |
 | **Site terms forbid scraping** | The large chord/tab sites' terms generally prohibit automated access, bots and reuse of content outside the site, and many sit behind bot protection. | No crawler, no background fetching, no bundled site-specific scrapers for sites whose terms forbid it. Import from a page happens only on an explicit user action on a page they opened. |
-| **App Store review** | Apps that pull third-party copyrighted content can be rejected (App Review guideline 5.2, intellectual property). | Ship v1 with paste/file import only. Web import ships behind a review of the risk, possibly direct-download builds only. |
+| **Store review and distribution** | v1 ships as a notarized direct download, but if we later use the Mac App Store, apps that pull third-party copyrighted content can be rejected (App Review guideline 5.2, intellectual property). | Ship v1 with paste/file import only. Web import ships behind a review of the risk. |
 | **Licensed sources cost money and carry display rules** | Licensed lyric APIs (for example LyricFind or Musixmatch) and licensed chord/tab services exist, but they have commercial terms, attribution and display limits (some free tiers only allow partial lyrics). | `SongSource` provider interface so a licensed provider can be added later without touching the parser or chart UI. |
 
 **Recommendation:** treat the app like a word processor for songs. The user brings the text, the app parses and teaches. Licensed providers are an add-on once the product has users and a business model.
@@ -27,16 +27,16 @@ This is an engineering risk assessment, not legal advice. It should get a proper
 | **Paste text** | 1 | Paste a chords-over-lyrics sheet or inline `[C]ChordPro` text into the import window; preview and fix before saving | Low: user-supplied |
 | **Open / drop a file** | 1 | `.cho`, `.chopro`, `.crd`, `.chordpro`, `.txt`, `.pro` | Low |
 | **Write your own** | 1 | Chart editor with chord palette; good for teachers and original songs | None |
-| **Share extension / "Import page"** | 3 | From Safari (or any app that shares a URL or selected text), send the selection or page to Mackey. The app extracts the chord sheet locally | Medium: gate on legal review; selection-based import is preferred to full-page fetch |
-| **Search** | 3 | Search box queries a web search API for "<title> <artist> chords"; results open in the user's browser; import then happens via the Share extension | Low for search itself; import risk as above |
-| **Licensed provider** | Later | `SongSource` adapter for a licensed catalogue; content displayed per provider terms | Contractual |
+| **Drag, drop and "Import page"** | 3 | Drag selected text or a URL from the browser onto Mackey, or use "Import from clipboard". A `mackey://import` deep link lets a later browser extension or a small macOS Share extension (a native app extension bundled with the Tauri app) send a selection. The app extracts the chord sheet locally | Medium: gate on legal review; selection-based import is preferred to full-page fetch |
+| **Search** | 3 | Search box queries a web search API for "<title> <artist> chords"; results open in the user's browser; import then happens by drag and drop or the clipboard | Low for search itself; import risk as above |
+| **Licensed provider** | Later | `SongSource` trait implementation for a licensed catalogue; content displayed per provider terms | Contractual |
 | **Public domain / openly licensed library** | 2 | Bundle a starter set of public-domain songs (traditional folk, hymns, early blues) written as ChordPro by the project | None |
 
 ```mermaid
 flowchart LR
     Paste[Paste text] --> Detect
     File[ChordPro / txt file] --> Detect
-    Share[Share extension<br/>selected text or page] --> Extract[Local HTML to text extraction] --> Detect
+    Share[Drag and drop, clipboard, deep link<br/>selected text or page] --> Extract[Local HTML to text extraction] --> Detect
     Provider[Licensed provider] --> Norm
     Detect{Format detection} -->|ChordPro| CP[ChordPro parser]
     Detect -->|chords over lyrics| COL[Chord-line classifier + aligner]
@@ -105,7 +105,7 @@ Robustness details from real sheets:
 
 ## 6. Test strategy
 
-- Fixture corpus in `Packages/SongKit/Tests/Fixtures/`: sheets written for the project and public-domain songs, covering each classifier rule and each symbol variant. **No copyrighted lyrics in the repository.**
+- Fixture corpus in `crates/mackey-songs/tests/fixtures/`: sheets written for the project and public-domain songs, covering each classifier rule and each symbol variant. **No copyrighted lyrics in the repository.**
 - Golden-file tests: input text to expected ChordPro output.
 - Round-trip property: `parse(serialize(song)) == song` for ChordPro.
 - Fuzz the chord-symbol parser with random tokens; it must never crash and must never classify common English words such as `A` or `Am` (as in "I Am") as chords without line context.

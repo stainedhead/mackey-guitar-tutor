@@ -7,9 +7,10 @@
 Practice sessions are typed in a compact notation and songs arrive as text. Users and teachers want to copy, share and back them up. Parsers will improve over time.
 
 ## Decision
-Store a session's notation string and a song's ChordPro text as the canonical data. SwiftData records hold that text plus metadata (dates, run logs, voicing overrides). Parsed models are derived on load.
+Store a session's notation string and a song's ChordPro text as the canonical data. A local SQLite database (rusqlite, bundled, in the OS app-data folder) holds that text plus metadata (dates, run logs, voicing overrides). Parsed models are derived on load.
 
 ## Consequences
+- Storage needs no server, and SQLite works unchanged on any platform added later.
 - Parser upgrades apply to all stored data with no migration.
 - Export/import is just files (`.mackey`, `.cho`).
 - Small cost of re-parsing on load, negligible at expected library sizes.

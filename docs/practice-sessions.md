@@ -125,7 +125,7 @@ Screen during a run:
 - Beat grid with a playhead, current/next chips, timer, tempo control (Up/Down arrows, ±5 bpm, T to tap), speed-trainer progress ("72 of 96 bpm"), and click/drums toggle (D).
 - Shortcuts: Space play/pause, Return mark a clean change, ←/→ step, R restart, Esc exit.
 
-Timing comes from the shared `TransportClock` in `RhythmKit` ([rhythm.md §5.1](rhythm.md#51-one-clock-many-listeners)). The UI follows the audio clock rather than a UI timer, so the visual change lines up with the click.
+Timing comes from the shared `TransportClock` in `mackey-rhythm` ([rhythm.md §5.1](rhythm.md#51-one-clock-many-listeners)). The UI follows the audio clock rather than a UI timer, so the visual change lines up with the click.
 
 ## 5. From songs and the explorer
 

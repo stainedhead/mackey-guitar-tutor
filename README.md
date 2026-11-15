@@ -1,5 +1,5 @@
 # mackey-guitar-tutor
-macos application that helps guitarists learn the neck and play songs
+macos application that helps guitarists learn the neck and play songs (Rust core, Tauri shell; macOS first)
 
 ## Design
 

@@ -16,9 +16,9 @@ Beginners can memorize a few open chords but get lost on the rest of the neck. M
 
 ## 3. Scope
 
-In scope for v1: macOS desktop app, 6-string guitar, right- and left-handed views, standard and alternate tunings (Drop D, DADGAD, open G and others) with capo, scale and mode overlays, a built-in tuner (microphone input for single-note pitch only), local storage.
+In scope for v1: macOS desktop app (Rust core in a Tauri shell; Windows, Linux and mobile deferred), 6-string guitar, right- and left-handed views, standard and alternate tunings (Drop D, DADGAD, open G and others) with capo, scale and mode overlays, a built-in tuner (microphone input for single-note pitch only), local storage.
 
-Out of scope for v1, planned for later phases: CAGED maps, theory tips, progress and streaks, ear training, looper and record-yourself, chord recognition by microphone ("listen and grade"). Not planned: recorded (non-synthesized) backing tracks, cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
+Out of scope for v1, planned for later phases: CAGED maps, theory tips, progress and streaks, ear training, looper and record-yourself, chord recognition by microphone ("listen and grade"). Not planned for now: Windows and Linux builds, recorded (non-synthesized) backing tracks, cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
 
 ## 4. Feature area A: Fretboard explorer (foundation)
 
@@ -57,7 +57,7 @@ Full design and legal analysis in [song-import.md](song-import.md).
 |----|-------------|
 | SG-1 | Import by **pasting text** in the common "chords over lyrics" layout; auto-detect chord lines vs lyric lines. |
 | SG-2 | Import **ChordPro** (`.cho`, `.chopro`, `.crd`) files and inline `[G]lyrics` text; export to ChordPro. |
-| SG-3 | Import from a web page the user is viewing, via a macOS **Share extension** or a "paste URL" action, user-initiated, one page at a time, stored only locally. |
+| SG-3 | Import from a web page the user is viewing, via drag and drop, the clipboard, or a "paste URL" action (a browser extension or macOS Share extension can feed the same path later), user-initiated, one page at a time, stored only locally. |
 | SG-4 | **Search** for songs: show web search results that open in the user's browser; import happens only through SG-1 to SG-3. Licensed providers can plug in later behind the same interface. |
 | SG-5 | Display the song as a chart: lyrics with chords aligned above, sections (verse, chorus), and a chord palette of every chord used. |
 | SG-6 | Click any chord to see it on the fretboard. The app suggests a **voicing set** that minimises hand movement between consecutive chords. |
@@ -102,7 +102,7 @@ Full design in [learning-features.md](learning-features.md).
 | NF-2 | Quick-entry parse and preview under 50 ms per keystroke. |
 | NF-3 | Fully usable offline; network only for search and URL import. |
 | NF-4 | Keyboard-first: every cycling and run-mode action has a shortcut. |
-| NF-5 | Accessibility: VoiceOver labels for fretboard positions, colour-blind-safe palette, Dynamic Type where it applies. |
+| NF-5 | Accessibility: VoiceOver labels (ARIA) for fretboard positions, full keyboard navigation, colour-blind-safe palette, respects the macOS text size and reduced-motion settings. |
 | NF-6 | Music theory engine at 95%+ line coverage; parsers covered by a fixture corpus of real-world chord sheets. |
 | NF-8 | Rhythm timing is sample-accurate: under 1 ms drift over 10 minutes, tempo changes land on bar lines. |
 | NF-7 | No song content or audio leaves the device; no telemetry without opt-in. |
@@ -110,7 +110,7 @@ Full design in [learning-features.md](learning-features.md).
 
 ## 10. Open questions
 
-1. **Platform reach.** macOS only (per README), or plan for iPad from the start? SwiftUI keeps this cheap if decided early.
-2. **Distribution and money.** Mac App Store, direct download, free, or paid? This matters for licensing song content (paid apps have less room under fair use and stricter provider terms).
-3. **Audio interfaces.** Should we test and document specific USB interfaces for electric players (tuner, looper, recognition), or rely on whatever macOS exposes?
+1. **Platform reach.** Decided: macOS first with Rust and Tauri; Windows, Linux and mobile deferred. Open: is there a rough timeframe for the next platform, so we know how strictly to guard portability?
+2. **Distribution and money.** v1 is planned as a notarized direct download. Mac App Store later? Free or paid? This matters for licensing song content (paid apps have less room under fair use and stricter provider terms).
+3. **Audio interfaces.** Should we test and document specific USB interfaces for electric players (tuner, looper, recognition), or rely on whatever CoreAudio exposes?
 4. **Sharing.** Are teacher-to-student shared sessions in scope (files only, or a service)?

@@ -7,10 +7,11 @@
 Players need to start slow and build up to full speed, so drum backing must play at any tempo from very slow to fast, stay in time with the metronome and practice visuals, and follow song sections.
 
 ## Decision
-Represent drum grooves as step patterns (JSON) and play them through a General MIDI drum SoundFont on `AVAudioUnitSampler`, scheduled from the shared `TransportClock`.
+Represent drum grooves as step patterns (JSON) and play them through a General MIDI drum SoundFont with rustysynth (a pure-Rust SoundFont synthesizer) inside the cpal audio callback, scheduled from the shared `TransportClock`. The bundled SoundFont must have a licence that allows redistribution in the app (checked before P1b ships).
 
 ## Alternatives
 - **Recorded audio loops with time-stretching:** more realistic at the native tempo, but artefacts at large stretch ratios (e.g. 50% speed), larger app size, and loops must be licensed or recorded.
+- **Web Audio in the UI:** convenient, but timing would depend on the web view, which is throttled when the window is hidden and would differ again on other platforms' web views later.
 - **Third-party drum engine:** adds a dependency and licensing for a feature that a small sequencer covers.
 
 ## Consequences

@@ -20,13 +20,13 @@ These features build on the fretboard, practice, song and rhythm layers. Agreed 
 
 | ID | Requirement |
 |----|-------------|
-| TU-1 | Chromatic tuner from the Mac's microphone or an audio interface input: detected note, octave, cents offset (needle and numeric), in tune within ±3 cents. |
+| TU-1 | Chromatic tuner from the Mac's built-in microphone or a CoreAudio audio interface input: detected note, octave, cents offset (needle and numeric), in tune within ±3 cents. |
 | TU-2 | Tuning-aware string mode: shows the target string for the current tuning (standard, Drop D, DADGAD, open G, custom) and auto-selects the nearest string. |
 | TU-3 | Reference pitch A4 adjustable 415 to 466 Hz (default 440). |
 | TU-4 | Reference tones: play each open string through the sampler to tune by ear. |
 | TU-5 | Capo aware: with a capo set, shows the sounding notes. |
 
-Design: pitch detection with the McLeod Pitch Method (or YIN) on an `AVAudioEngine` input tap, 2048-sample window, smoothing over about 3 frames. Runs entirely on device. The microphone permission prompt appears only when the user first opens the tuner. See [ADR 0006](adr/0006-on-device-audio-analysis.md).
+Design: pitch detection with the McLeod Pitch Method (or YIN) on a cpal input stream (CoreAudio) feeding an analysis thread, 2048-sample window, smoothing over about 3 frames. Runs entirely on device. The microphone permission prompt appears only when the user first opens the tuner. See [ADR 0006](adr/0006-on-device-audio-analysis.md).
 
 ## 2. Scales and modes overlay (v1)
 
@@ -38,7 +38,7 @@ Design: pitch detection with the McLeod Pitch Method (or YIN) on an `AVAudioEngi
 | SC-4 | "Follow the chords" mode in song and practice views: the overlay switches with each chord (e.g. A minor pentatonic over Am, with the chord's tones lit). |
 | SC-5 | Labels by note name, scale degree or interval, using the existing labels toggle. |
 
-The theory engine already models scales and modes; this adds pentatonic, blues and harmonic minor to `Mode`, plus a `ScalePattern` library in `VoicingEngine` for boxes.
+The theory engine already models scales and modes; this adds pentatonic, blues and harmonic minor to `Mode` in `mackey-theory`, plus a `ScalePattern` library in `mackey-voicing` for boxes.
 
 ## 3. Left-handed mode and alternate tunings (v1)
 
@@ -69,7 +69,7 @@ The theory engine already models scales and modes; this adds pentatonic, blues a
 | TT-3 | Common substitutions: relative minor/major, sus and add colours, 7ths, tritone substitution for advanced players, with "hear it" and "see it" buttons. |
 | TT-4 | Tips are short (one or two sentences) and shown in a side panel, never blocking. Beginners can turn them off. |
 
-Implementation: rules in `MusicTheory` (harmonic function and substitution tables) produce structured facts; a small template layer turns facts into sentences. No network or LLM dependency in v1, which keeps it offline and consistent.
+Implementation: rules in `mackey-theory` (harmonic function and substitution tables) produce structured facts; a small template layer turns facts into sentences. No network or LLM dependency in v1, which keeps it offline and consistent.
 
 ## 6. Progress, streaks and drill suggestions (P6)
 
@@ -116,4 +116,4 @@ Design: an input tap writes to a ring buffer; the transport clock time-stamps th
 | MR-3 | Works with acoustic (built-in mic) and electric (audio interface); a calibration step sets input level and noise floor. |
 | MR-4 | Never required: every feature still works by self-report. |
 
-Design: monophonic notes reuse the tuner's pitch detector. Chords use a constant-Q / chroma feature compared with templates for the expected chord and its likely confusions; because the app knows what *should* be played, this is verification of an expected chord, which is much more reliable than open-ended chord recognition. A Core ML model trained on guitar recordings is the upgrade path if template matching is not accurate enough.
+Design: monophonic notes reuse the tuner's pitch detector. Chords use a constant-Q / chroma feature compared with templates for the expected chord and its likely confusions; because the app knows what *should* be played, this is verification of an expected chord, which is much more reliable than open-ended chord recognition. An ONNX model trained on guitar recordings, run with ONNX Runtime, is the upgrade path if template matching is not accurate enough.

@@ -50,21 +50,21 @@ This replaces the earlier standalone tempo-ladder method: `@ladder` in practice 
 
 ```mermaid
 flowchart LR
-    Clock[TransportClock<br/>AVAudioEngine sample time<br/>tempo, meter, bar/beat position] --> Click[Metronome voice]
+    Clock[TransportClock<br/>cpal output callback sample time<br/>tempo, meter, bar/beat position] --> Click[Metronome voice]
     Clock --> Drums[Drum sequencer]
     Clock --> Practice[Practice run engine<br/>item advance, next-item ghost]
     Clock --> Chart[Song chart<br/>auto-scroll, current chord]
     Trainer[Speed trainer] -->|set tempo at bar boundary| Clock
 ```
 
-- `TransportClock` lives in a new `RhythmKit` package. It schedules events a short lookahead (about 100 ms) ahead on the audio render timeline, so clicks and drum hits are sample-accurate whatever the UI is doing.
+- `TransportClock` lives in the `mackey-rhythm` crate and is advanced by the audio callback in `mackey-audio` (Rust, on CoreAudio via cpal). It schedules events with sample-accurate offsets inside each audio buffer, so clicks and drum hits are sample-accurate whatever the UI is doing.
 - Tempo changes apply on the next bar line, so a step-up never lands mid-bar.
-- UI listeners (fretboard, chart) are driven from the clock's published position, not from their own timers, so what you see and what you hear stay together.
-- Output latency compensation: a user setting (and an automatic estimate from the audio device) shifts visuals to match what the player hears, which matters with Bluetooth headphones.
+- UI listeners (fretboard, chart) in the web UI are driven from the clock position the core streams to them (with tempo and latency), extrapolated per animation frame, not from their own timers, so what you see and what you hear stay together. See [architecture.md §6](architecture.md#6-real-time-audio-design).
+- Output latency compensation: a user setting (and an automatic estimate from the audio device) shifts visuals to match what the player hears, which matters with Bluetooth headphones (AirPods add well over 100 ms).
 
 ### 5.2 Drum patterns are data, not audio loops
 
-Patterns are step sequences played through a drum-kit SoundFont on `AVAudioUnitSampler` (General MIDI drum map). Because hits are synthesized, any tempo from 30 to 250 bpm sounds clean: no time-stretching artefacts. See [ADR 0005](adr/0005-sequenced-drums.md).
+Patterns are step sequences played through a drum-kit SoundFont (General MIDI drum map) by rustysynth, a pure-Rust synthesizer running inside the audio callback. Because hits are synthesized, any tempo from 30 to 250 bpm sounds clean: no time-stretching artefacts. See [ADR 0005](adr/0005-sequenced-drums.md).
 
 Pattern definition (bundled as JSON, also the user-pattern format later):
 
@@ -80,13 +80,15 @@ Step values: `x` normal, `X` accent, `g` ghost note, `.` rest. Velocity humanisa
 
 ### 5.3 Model
 
-```swift
-struct Tempo { var bpm: Double; var meter: Meter; var subdivision: Subdivision; var swing: Double }
-struct MetronomeSettings { var sound: ClickSound; var accentVolume: Float; var subdivisionVolume: Float; var countInBars: Int; var gapBars: GapPattern? }
-struct DrumPattern { let id: String; let style: Style; let variation: String; let meter: Meter; let steps: Int; let tracks: [DrumVoice: [Step]]; let fill: FillRule? }
-struct BackingSettings { var pattern: DrumPattern.ID?; var intensity: Intensity; var fillsEvery: Int?; var mutes: Set<DrumVoice>; var clickOverDrums: Bool }
-struct SpeedTrainer { var start: Int; var target: Int; var step: Int; var advance: AdvanceRule; var stepBackOnMiss: Bool }
-enum AdvanceRule { case everyBars(Int), everyPass, onCleanPass }
+```rust
+pub struct Tempo { pub bpm: f64, pub meter: Meter, pub subdivision: Subdivision, pub swing: f32 }
+pub struct MetronomeSettings { pub sound: ClickSound, pub accent_volume: f32, pub subdivision_volume: f32, pub count_in_bars: u8, pub gap: Option<GapPattern> }
+pub struct DrumPattern { pub id: String, pub style: Style, pub variation: String, pub meter: Meter, pub steps: u8,
+                         pub tracks: BTreeMap<DrumVoice, Vec<Step>>, pub fill: Option<FillRule> }
+pub struct BackingSettings { pub pattern: Option<String>, pub intensity: Intensity, pub fills_every: Option<u8>,
+                             pub mutes: BTreeSet<DrumVoice>, pub click_over_drums: bool }
+pub struct SpeedTrainer { pub start: u16, pub target: u16, pub step: u16, pub advance: AdvanceRule, pub step_back_on_miss: bool }
+pub enum AdvanceRule { EveryBars(u16), EveryPass, OnCleanPass }
 ```
 
 Songs store `tempo`, `meter` and an optional per-section `drumVariation` as ChordPro metadata (`{tempo: 96}`, `{time: 4/4}`, plus a custom `{x_mackey_drums: rock/chorus}` directive, which other ChordPro tools ignore safely).

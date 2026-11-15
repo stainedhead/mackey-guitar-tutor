@@ -1,6 +1,6 @@
 # Mackey Guitar Tutor: Design Docs
 
-Mackey Guitar Tutor is a macOS application that helps beginner and intermediate guitarists learn the fretboard and play real songs. This folder holds the product spec, architecture and phased plan. Nothing is implemented yet; these docs are the starting point for the first build.
+Mackey Guitar Tutor is a desktop application for macOS (Rust core, Tauri shell) that helps beginner and intermediate guitarists learn the fretboard and play real songs. This folder holds the product spec, architecture and phased plan. Nothing is implemented yet; these docs are the starting point for the first build.
 
 | Doc | What it covers |
 |-----|----------------|
@@ -11,7 +11,7 @@ Mackey Guitar Tutor is a macOS application that helps beginner and intermediate 
 | [learning-features.md](learning-features.md) | Tuner, scales overlay, left-handed and tunings, CAGED maps, theory tips, progress, ear training, looper, mic recognition |
 | [song-import.md](song-import.md) | Finding, importing and parsing songs, plus legal/ToS constraints |
 | [roadmap.md](roadmap.md) | Phased delivery plan with exit criteria |
-| [adr/](adr/) | Architecture Decision Records |
+| [adr/](adr/) | Architecture Decision Records (0001: Rust core with a Tauri shell, macOS first) |
 
 ## Feature areas at a glance
 
