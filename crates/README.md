@@ -12,5 +12,6 @@ To add a crate:
 | Crate | Purpose |
 |---|---|
 | [`mackey-theory`](mackey-theory/README.md) | Notes, intervals, scales, keys, chords, chord-symbol parser, Roman numerals, spelling (pure) |
+| [`mackey-voicing`](mackey-voicing/README.md) | Tunings, capo, voicings, fingering, triads, arpeggios, scale patterns, selection model, `FretboardView` (pure) |
 
 Back to the [root README](../README.md).
