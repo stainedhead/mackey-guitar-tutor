@@ -81,6 +81,17 @@ Parser grammar (informal, for task A7): `symbol := root quality? ("/" bassnote)?
 
 `TheoryError` (`thiserror`): `PitchClassOutOfRange(i32)`, `InvalidInterval { quality, number }`, `MidiOutOfRange(i32)`, `ReferencePitchOutOfRange(f64)`, `InvalidDegree(u8)`, `Key(KeyError)` (`#[from]`). `KeyError`: `TonicNotOffered { tonic: Note, mode: Mode }`, `UnsupportedMode`.
 
+### 1.7 Implementation refinements (Phase A, as built)
+
+The crate follows the tables above except for these changes (reasons in [implementation-notes.md](implementation-notes.md), D-34 to D-39):
+
+- `Interval`, `Pitch` and `Key` have private fields and accessors (`quality()`, `number()`, `note()`, `octave()`, `tonic()`, `mode()`); deserialising validates. `Interval::apply`, `apply_down`, `between` and `invert` return `Result<_, TheoryError>`; `Interval` consts are named `P1, MIN2, MAJ2, MIN3, MAJ3, P4, AUG4, DIM5, P5, AUG5, MIN6, MAJ6, DIM7, MIN7, MAJ7, P8, MAJ9, P11, MAJ13`.
+- `Accidental::symbol()` shows a double sharp as `##`; `Note::simplified()` takes no preference; `TheoryError` also has `AccidentalOutOfRange`, `InvalidNote` and `SpellingOutOfRange`.
+- `Degree` has `all()`; `Scale` has `note_at(Degree)` and `degree_of` returns `Option<Degree>`; `Key` has `all_offered(mode)`, `degree_of(PitchClass)` and `KeyError::UnsupportedMode { mode }`.
+- `Span { start, end }` replaces `Range<usize>` in `Diagnostic`; `ChordParseError` variants carry `symbol` as well as `found`, with `span()` and `suggestion()` helpers.
+- `ChordQuality::roles()` returns a `Vec<ToneRole>`; `Chord::pitch_classes()` includes the slash bass; `ToneRole::of_interval`.
+- `ChordAnalysis` has a `key` field; `ChordFunction::Borrowed` may come from `HarmonicMinor`; `RomanNumeral::quality()` and `plain()` exist.
+
 ## 2. `mackey-voicing`
 
 ### 2.1 Instrument

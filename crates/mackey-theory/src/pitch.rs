@@ -684,6 +684,8 @@ mod tests {
         ("Fx", Letter::F, 2),
         ("B♭", Letter::B, -1),
         ("E♯", Letter::E, 1),
+        ("B𝄫", Letter::B, -2),
+        ("F𝄪", Letter::F, 2),
     ];
 
     const NOTE_REJECTS: &[&str] = &[

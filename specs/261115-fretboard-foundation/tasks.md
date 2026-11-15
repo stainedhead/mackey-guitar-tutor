@@ -7,16 +7,16 @@
 
 ## Progress Summary
 
-10/61 tasks complete. Update this file and `status.md` after every task (mandatory).
+11/61 tasks complete. Update this file and `status.md` after every task (mandatory).
 
 | Phase | Tasks | Done |
 |-------|-------|------|
-| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 10 |
+| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 11 |
 | B `mackey-voicing` | B1 to B16 (16) | 0 |
 | C `mackey-audio` | C1 to C9 (9) | 0 |
 | D `src-tauri` and `ui/` | D1 to D16 (16) | 0 |
 | E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
-| Total | 61 | 10 |
+| Total | 61 | 11 |
 
 ## Conventions
 
@@ -101,6 +101,7 @@
 - **Acceptance (AC-P0-1):** 12 roots × 21 qualities = 252 rows, hand-written (not generated from the code under test), each failing with a label naming root and quality; benchmark committed and within budget on the dev machine.
 
 ### A11. `mackey-theory`: ts feature, docs, coverage gate for the crate
+- **Status:** Done
 - **Depends on:** A9, A10 · **Est:** S · **FR:** FR-003, FR-007..012
 - **Files:** `#[cfg_attr(feature = "ts", derive(ts_rs::TS))]` on boundary types listed in the data dictionary; `README.md` (modules, depends on nothing, depended on by voicing/audio/app); doc examples on every public parsing and theory function.
 - **Acceptance:** `cargo test -p mackey-theory --features ts` exports TypeScript files into a temp dir without error; `make check` green; crate line coverage 100% of new code (checked with `cargo llvm-cov -p mackey-theory`); `make props` passes with 10,000 cases; commit any `proptest-regressions/`.

@@ -2,7 +2,7 @@
 
 **Feature:** fretboard-foundation
 **Created:** 2026-11-15
-**Last updated:** 2026-11-15T20:05Z
+**Last updated:** 2026-11-15T20:08Z
 **Spec:** [spec.md](spec.md) · **Tasks:** [tasks.md](tasks.md) · **Orchestration dashboard:** [fretboard-foundation-status.md](fretboard-foundation-status.md)
 
 **Update this file after every task and every phase. It is the single source of truth for progress.**
@@ -23,11 +23,11 @@ Spec review (Step 2): done 2026-11-15, verdict **Implementation-ready** after fi
 
 ## Implementation Progress (Phase 5)
 
-10 of 61 tasks complete. Per-phase detail is in [tasks.md](tasks.md#progress-summary).
+11 of 61 tasks complete. Per-phase detail is in [tasks.md](tasks.md#progress-summary).
 
 | Implementation phase | Tasks | Done | Status |
 |----------------------|-------|------|--------|
-| A Workspace scaffold and `mackey-theory` | 11 | 10 | In Progress |
+| A Workspace scaffold and `mackey-theory` | 11 | 11 | Complete |
 | B `mackey-voicing` | 16 | 0 | Not Started |
 | C `mackey-audio` | 9 | 0 | Not Started |
 | D `src-tauri` and `ui/` | 16 | 0 | Not Started |
@@ -48,6 +48,7 @@ None. Open questions that need J (defaults chosen, work not blocked): Q-1, Q-2, 
 
 | Date (UTC) | Activity |
 |------------|----------|
+| 2026-11-15T20:08Z | Phase A complete: mackey-theory ts feature, README, docs, 99% line coverage; make check, make cover, make props green |
 | 2026-11-15T20:05Z | mackey-theory chord-symbol parser with diagnostics and snapshots (A8), diatonic chords, Roman numerals and function analysis (A9); 30 proptest properties pass at 10,000 cases |
 | 2026-11-15T20:01Z | mackey-theory chords, display spelling and the 252-row AC-P0-1 table (A6, A7, A10); parser benchmark 76 microseconds per 1,000 valid symbols |
 | 2026-11-15T19:58Z | Phase A: workspace scaffold and mackey-theory notes, intervals, scales, keys (A1 to A5) done; voicing and audio crate scaffolds stay with B1 and C1 |

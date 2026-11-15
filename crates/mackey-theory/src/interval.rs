@@ -313,7 +313,6 @@ impl Interval {
             -2 => "bb",
             -1 => "b",
             1 => "#",
-            2 => "##",
             _ => "",
         };
         format!("{prefix}{}", self.number)

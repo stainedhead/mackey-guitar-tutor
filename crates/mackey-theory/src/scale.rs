@@ -533,8 +533,32 @@ mod tests {
 
     #[test]
     fn a4_exotic_tonic_falls_back_to_a_simple_spelling() {
-        // F## harmonic minor needs a triple accidental on its fifth; it is spelled with sharps.
-        let degrees = scale("F##", Mode::HarmonicMinor).degrees();
+        // C## Lydian needs F### for its raised fourth; that tone is spelled G# instead.
+        let degrees = scale("C##", Mode::Lydian).degrees();
         assert_eq!(degrees.len(), 7);
+        assert_eq!(degrees[3].name(), "G#");
+        assert_eq!(degrees[0].name(), "C##");
+    }
+
+    #[test]
+    fn a4_display_names_of_every_mode() {
+        let names: Vec<&str> = Mode::ALL.iter().map(|m| m.display_name()).collect();
+        assert_eq!(
+            names,
+            [
+                "major",
+                "minor",
+                "harmonic minor",
+                "Dorian",
+                "Phrygian",
+                "Lydian",
+                "Mixolydian",
+                "Locrian",
+                "major pentatonic",
+                "minor pentatonic",
+                "blues"
+            ]
+        );
+        assert_eq!(Mode::NaturalMinor.relative(), Some(Mode::Major));
     }
 }

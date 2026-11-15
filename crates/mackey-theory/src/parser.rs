@@ -262,13 +262,10 @@ fn is_quality_char(c: char) -> bool {
 /// Longest text the edit-distance rows hold; callers keep both sides well under this.
 const ROW: usize = 24;
 
-/// Edit distance between two short texts, on stack rows (no allocation: this runs for every
-/// unknown quality, inside the parser's time budget). Texts of `ROW` chars or more count as
-/// infinitely far apart.
+/// Edit distance between two short texts (under `ROW` chars each, which the only caller
+/// guarantees), on stack rows: no allocation, since this runs for every unknown quality inside
+/// the parser's time budget.
 fn levenshtein(a: &[char], b: &[char]) -> usize {
-    if a.len() >= ROW || b.len() >= ROW {
-        return usize::MAX;
-    }
     let mut prev = [0usize; ROW];
     let mut cur = [0usize; ROW];
     for (j, slot) in prev.iter_mut().enumerate().take(b.len() + 1) {

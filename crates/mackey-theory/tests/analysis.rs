@@ -380,3 +380,14 @@ fn a9_every_secondary_dominant_of_every_major_key_is_named() {
         }
     }
 }
+
+#[test]
+fn a9_a_double_accidental_root_has_no_numeral() {
+    let c = key("C", Mode::Major);
+    let weird =
+        mackey_theory::Chord::new("B##".parse().unwrap(), mackey_theory::ChordQuality::Minor);
+    let a = analyze(&c, &weird);
+    assert!(!a.in_key);
+    assert_eq!(a.roman, None);
+    assert_eq!(a.badge().as_deref(), Some("Not in key"));
+}

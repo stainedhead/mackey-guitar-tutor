@@ -418,3 +418,46 @@ pub fn roman_to_chord(s: &str, key: &Key) -> Result<Chord, RomanParseError> {
         })?;
     Ok(Chord::new(root, quality))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn harmonic_a_minor() -> Vec<Note> {
+        Scale {
+            tonic: "A".parse().unwrap(),
+            mode: Mode::HarmonicMinor,
+        }
+        .degrees()
+    }
+
+    #[test]
+    fn a9_stacked_thirds_in_harmonic_minor_give_augmented_and_diminished_seventh() {
+        let notes = harmonic_a_minor();
+        // III+ (C E G#) and vii°7 (G# B D F)
+        assert_eq!(
+            stacked_quality(&notes, 2, false),
+            Some(ChordQuality::Augmented)
+        );
+        assert_eq!(
+            stacked_quality(&notes, 6, true),
+            Some(ChordQuality::Diminished7)
+        );
+        assert_eq!(stacked_quality(&notes, 0, true), None);
+        assert_eq!(stacked_quality(&[], 0, false), None);
+    }
+
+    #[test]
+    fn a9_numerals_for_augmented_and_diminished_seventh_qualities() {
+        let degree = Degree::new(3).unwrap();
+        let aug = RomanNumeral::from_quality(degree, Accidental::NATURAL, ChordQuality::Augmented);
+        assert_eq!(aug.map(|n| n.to_string()).as_deref(), Some("III+"));
+        let dim7 =
+            RomanNumeral::from_quality(degree, Accidental::NATURAL, ChordQuality::Diminished7);
+        assert_eq!(dim7.map(|n| n.to_string()).as_deref(), Some("iii°7"));
+        assert_eq!(
+            RomanNumeral::from_quality(degree, Accidental::NATURAL, ChordQuality::Sus4),
+            None
+        );
+    }
+}
