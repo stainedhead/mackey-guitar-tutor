@@ -81,6 +81,10 @@ pub fn triads(
     ];
     let capo = instrument.capo.value();
     let frets = instrument.frets.value();
+    let open_midis = instrument.tuning.midis();
+    let pitch = |string: crate::StringNumber, fret: u8| -> i32 {
+        open_midis.get(string.index()).copied().unwrap_or(0) + i32::from(fret)
+    };
     let per_string: Vec<Vec<u8>> = assignment
         .iter()
         .map(|(string, tone)| {
@@ -100,6 +104,17 @@ pub fn triads(
         for &fret_mid in mid_frets {
             for &fret_top in top_frets {
                 let combo = [fret_low, fret_mid, fret_top];
+                // The pitches must rise from the low string to the top one, or the lowest
+                // sounding note is not the inversion's bass (FR-003 of the auto review).
+                let [(s_low, _), (s_mid, _), (s_top, _)] = assignment;
+                let (p_low, p_mid, p_top) = (
+                    pitch(s_low, fret_low),
+                    pitch(s_mid, fret_mid),
+                    pitch(s_top, fret_top),
+                );
+                if !(p_low < p_mid && p_mid < p_top) {
+                    continue;
+                }
                 let pressed: Vec<u8> = combo.iter().copied().filter(|f| *f > capo).collect();
                 let span = match (pressed.iter().min(), pressed.iter().max()) {
                     (Some(lo), Some(hi)) => hi - lo,

@@ -106,6 +106,36 @@ proptest! {
         }
     }
 
+    /// FR-003 of the auto review: the labelled inversion is the one sounded. Every placement
+    /// ascends in pitch from the lowest string to the top string, so its lowest pitch is the
+    /// inversion's bass tone (an open string above fret 12 must not undercut the bass).
+    #[test]
+    fn fr003_every_triad_placement_ascends_and_has_the_labelled_bass(
+        chord in chord_strategy(),
+        ins in instrument_strategy(),
+        set in 0usize..4,
+        inversion in 0usize..3,
+    ) {
+        let tones = chord.tones();
+        if tones.len() < 3 || chord.quality == ChordQuality::Power { return Ok(()); }
+        let inversion = [Inversion::Root, Inversion::First, Inversion::Second][inversion];
+        let bass = tones[inversion.index()].note.pitch_class().value();
+        for v in triads(&chord, &ins, StringSet::ALL[set], inversion).placements() {
+            let sounding: Vec<i32> = midis(&ins, &v.strings).into_iter().flatten().collect();
+            prop_assert_eq!(sounding.len(), 3);
+            prop_assert!(
+                sounding.windows(2).all(|w| w[0] < w[1]),
+                "{} {:?} {}: pitches do not ascend",
+                chord.symbol(), inversion, v.fret_string(ins.capo)
+            );
+            let lowest = sounding.iter().min().copied().unwrap();
+            prop_assert_eq!(
+                u8::try_from(lowest.rem_euclid(12)).unwrap(), bass,
+                "{} {:?} {}: wrong bass", chord.symbol(), inversion, v.fret_string(ins.capo)
+            );
+        }
+    }
+
     /// FB-6: every triad placement holds exactly the triad's three pitch classes, one per string,
     /// the inversion's tone lowest, within four frets, above the capo.
     #[test]
@@ -241,4 +271,19 @@ proptest! {
         }
         prop_assert!(!v.announcement.is_empty());
     }
+}
+
+/// FR-003 example from the review: C on strings 3, 4, 5 in root position must not offer
+/// `x(15)(14)0xx`, whose lowest note is the open G (a second inversion).
+#[test]
+fn fr003_c_standard_s345_root_has_no_open_g_undercut() {
+    let c = Chord::new("C".parse().unwrap(), ChordQuality::Major);
+    let ins = Instrument::default();
+    let list = triads(&c, &ins, StringSet::S345, Inversion::Root);
+    let shown: Vec<String> = list
+        .placements()
+        .iter()
+        .map(|v| v.fret_string(ins.capo))
+        .collect();
+    assert!(!shown.iter().any(|s| s.contains("(15)(14)0")), "{shown:?}");
 }

@@ -14,6 +14,13 @@ Update after each fix with the decision, edge cases and a brief self-review (cod
 - Screenshot `real-explore-a-minor-pentatonic.png` regenerated and read: frets 5 to 8, "Box 1 of 5". Caption in `user-docs/explorer.md` fixed.
 - Self-review: logic stays in Rust, label format in one function, no new public API, clippy pedantic clean (Scale passed by value).
 
+### FR-003 triad inversion label (P0)
+
+- Fix in `triads.rs`: a combination is kept only when pitch(low string) < pitch(middle) < pitch(top), computed from the tuning's open MIDI notes plus fret. Because the three tones are distinct pitch classes, ascending order puts the inversion's bass tone lowest. Placements that were really another inversion (open string at fret 12 or above, or a high fret under an open string) are now dropped, and `Unavailable` is returned when none remain.
+- Regression tests (failed first): proptest `fr003_every_triad_placement_ascends_and_has_the_labelled_bass` over 12 roots, all qualities, preset and custom tunings, capo 0 to 12, all string sets and inversions; and `fr003_c_standard_s345_root_has_no_open_g_undercut`. The older property `fb_6...` only checked the lowest string, which is why it passed.
+- Existing snapshots and doc tests unchanged.
+- Self-review: one added filter in the existing triple loop, no new API; search cost unchanged (the filter is cheaper than building a voicing). Criterion bench not re-run locally (disk); the loop only gets shorter.
+
 ## Edge Cases and Solutions
 
 ## Deviations from Plan
