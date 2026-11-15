@@ -167,19 +167,7 @@ jobs:
       # `tauri ios init` needs XcodeGen to write the Xcode project.
       - name: Install XcodeGen
         run: brew install xcodegen
-      # Fallback chain (specs/261115-fretboard-foundation/research.md, Q4):
-      #   1. make ios-sim: tauri ios init --ci, then tauri ios build --debug --target aarch64-sim
-      #   2. compile-only: the Rust library for aarch64-apple-ios-sim plus the UI build
-      # If step 1 fails and step 2 passes the job is green with a warning annotation, so the
-      # Rust side stays covered while the Xcode path is fixed.
+      # Unsigned debug build for the Simulator: tauri ios init --ci, then tauri ios build
+      # --debug --target aarch64-sim (no Apple account; the simulator needs no signing).
       - name: Simulator build with the Tauri CLI
-        id: tauri
-        continue-on-error: true
         run: make ios-sim
-      - name: Fallback, compile the Rust library for the Simulator
-        if: steps.tauri.outcome == 'failure'
-        run: |
-          echo "::warning::make ios-sim failed; only the Rust library compiled for aarch64-apple-ios-sim"
-          npm ci --prefix ui
-          npm --prefix ui run build
-          cargo build --target aarch64-apple-ios-sim -p mackey-app --lib

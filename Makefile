@@ -92,7 +92,9 @@ bindings-check: bindings
 APP_ARGS ?=
 # The Tauri CLI looks for src-tauri/ below the current folder, so run it from the repo root
 # (npm --prefix ui run would start it in ui/).
-TAURI := ui/node_modules/.bin/tauri
+# Absolute: tauri ios init writes this path into the Xcode "Build Rust Code" phase, which
+# runs from src-tauri/gen/apple, so a relative path breaks the iOS build.
+TAURI := $(CURDIR)/ui/node_modules/.bin/tauri
 app: ui/node_modules
 ifeq ($(shell uname -s),Darwin)
 	$(TAURI) build --target universal-apple-darwin $(APP_ARGS)
