@@ -110,10 +110,11 @@ fn fb_6_4_unplayable_triads_say_why() {
     // Under a capo at the 20th fret the 4-fret window runs off a 24-fret neck for nothing, but a
     // capo at 12 leaves a normal triad.
     let high = instrument(TuningPreset::Standard, 12);
-    assert!(
-        !triads(&chord("C"), &high, StringSet::S234, Inversion::Root)
+    assert_ne!(
+        triads(&chord("C"), &high, StringSet::S234, Inversion::Root)
             .placements()
-            .is_empty()
+            .len(),
+        0
     );
 }
 

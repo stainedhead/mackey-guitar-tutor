@@ -27,7 +27,7 @@ fn instrument(preset: TuningPreset, capo: u8) -> Instrument {
 
 /// An independent oracle: every (string number, fret) in the window whose pitch class is a chord
 /// tone, computed from the tuning's open MIDI numbers (frets are absolute from the nut).
-fn oracle(c: &Chord, ins: &Instrument, start: u8) -> Vec<(u8, u8)> {
+fn oracle(c: Chord, ins: &Instrument, start: u8) -> Vec<(u8, u8)> {
     let pcs: Vec<i32> = c
         .tones()
         .iter()
@@ -73,7 +73,7 @@ fn ac_fb_7_1_am_position_5_holds_every_a_c_e_between_frets_4_and_9() {
         (6, 8),
     ];
     assert_eq!(got, expected);
-    assert_eq!(got, oracle(&chord("Am"), &ins, 5));
+    assert_eq!(got, oracle(chord("Am"), &ins, 5));
     assert!(
         a.notes.iter().any(|n| n.fret.value() == 5 && n.finger == 1),
         "finger 1 on fret 5"
@@ -154,7 +154,7 @@ fn fb_7_1_property_window_matches_the_oracle_across_tunings_capos_and_chords() {
                     got.sort_unstable();
                     assert_eq!(
                         got,
-                        oracle(&c, &ins, start),
+                        oracle(c, &ins, start),
                         "{symbol} {preset:?} capo {capo} start {start}"
                     );
                     for n in &a.notes {
@@ -175,7 +175,7 @@ fn fb_7_4_positions_hold_the_required_tones_and_respect_the_capo() {
     let positions = arpeggio_positions(&c, &ins);
     assert!(positions.windows(2).all(|w| w[0] < w[1]), "ascending");
     for start in &positions {
-        let notes: Vec<u8> = oracle(&c, &ins, *start)
+        let notes: Vec<u8> = oracle(c, &ins, *start)
             .iter()
             .map(|(s, f)| {
                 u8::try_from(
