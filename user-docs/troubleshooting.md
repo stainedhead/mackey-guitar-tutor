@@ -20,6 +20,10 @@ macOS keeps one permission per app. Open **System Settings > Privacy & Security 
 
 The Tuner found no input device. Connect a microphone or audio interface, or pick one in the **Input** menu. The reference tones work without a microphone.
 
+## The tuner says "This input is not delivering audio at a normal rate"
+
+The selected input is sending audio much faster than real time (a virtual or test device that is not tied to a clock), so the tuner stopped listening instead of using the whole processor. Choose another input in the **Input** menu, or close and reopen the Tuner.
+
 ## The tuner says "Too quiet" or "No stable pitch"
 
 "Too quiet": move the guitar closer to the microphone or raise the input level in System Settings > Sound > Input. "No stable pitch": mute the other strings and pluck one string, then let it ring.

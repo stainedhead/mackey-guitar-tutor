@@ -18,7 +18,7 @@ All images were made on 2026-11-15.
 | `real-explore-drop-d.png` | real, 1280×800 | Drop D tuning, open D chord (voicing view) |
 | `real-explore-ipad.png` | real, 1180×820 | The IV chord at the iPad landscape window size (desktop app in a window of that size, not the iPad app) |
 | `real-settings.png` | real, 1280×1180 | The whole Settings screen |
-| `real-tuner.png` | real, 1280×800 | The tuner on a machine with no microphone: the real tuner listening to silence, "Too quiet" |
+| `real-tuner.png` | real, 1280×800 | The tuner on a machine with no microphone: the real tuner listening to silence, "Listening…" |
 | `mock-explore-g-major-ipad-portrait.png`, `mock-explore-c-voicings-ipad-portrait.png` | mock, 820×1180 | Explore on iPad in portrait (tab bar) |
 | `mock-explore-g-major-narrow.png` | mock, 420×800 | Explore at Split View width |
 | `mock-tuner-flat-desktop.png`, `mock-tuner-in-tune-desktop.png` | mock | The tuner in string mode with a **simulated** flat A and an in-tune A; the readings are scripted, not measured |

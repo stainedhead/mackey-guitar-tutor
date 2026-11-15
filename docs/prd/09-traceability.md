@@ -65,6 +65,9 @@ Test names carry the requirement or acceptance-criterion ID (`fb_5_1_...`, `ac_f
 | SC-1 to SC-5 scales | `crates/mackey-voicing/tests/patterns.rs`, `properties.rs` |
 | LH-1 to LH-5 handedness, tunings, capo | `crates/mackey-voicing/tests/tunings.rs`, `curated_shapes.rs`, `voicings.rs`, `view.rs`; `ui/e2e/explore.spec.ts` (AC-LH-1.1) |
 | TU-1 to TU-7 tuner | `crates/mackey-audio/tests/tuner_fixtures.rs`, `tuner_strings.rs`, `src/dsp/cents.rs`; `crates/mackey-voicing/tests/tunings.rs`; `src-tauri/tests/state.rs`; `ui/src/tuner/describe.test.ts`; `ui/e2e/tuner.spec.ts` (mocked readings). Accuracy on a real guitar: manual, not yet done |
+| SC-3 (pattern stepper, box numbering) | `crates/mackey-voicing/tests/pattern_stepper.rs`, `patterns.rs` |
+| FB-6 (triad inversion label) | `crates/mackey-voicing/tests/properties.rs` (`fr003_*`) |
+| TU (tuner pacing) | `src-tauri/src/tuner.rs` and `crates/mackey-audio/src/io/pump.rs` unit tests (`fr002_*`) |
 | NF-23, NF-24 (settings, panics) | `src-tauri/src/settings.rs` and `guard.rs` unit tests; `src-tauri/tests/state.rs` |
 
 ## Earlier IDs

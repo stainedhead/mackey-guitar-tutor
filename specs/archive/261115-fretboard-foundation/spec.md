@@ -198,28 +198,28 @@ Each maps to at least one automated test unless marked manual. Owners are tasks 
 | AC-P0-2 | Parser accepts every quality and alternative spelling with every root and slash bass; `Hm7` suggests `Bm7`; never panics | FR-010 | `mackey-theory/tests/chord_parser.rs`, proptest |
 | AC-P0-3 | Transpose, interval and key-accidental properties | FR-007, 009, 012 | `mackey-theory/tests/properties.rs` |
 | AC-P0-4 | `ci.yml` defines all listed jobs and each exits 0 on the PR | FR-006 | `.github/workflows/ci.yml` (verified by the green PR) |
-| AC-P0-5 | UI calls `fretboard_view` via bindings, draws 6 strings and 22 frets | FR-003, 021 | `ui/e2e/neck.spec.ts` |
-| AC-FB-2.1 | F major notes view labels F G A Bb C D E | FR-008, 009, 019 | `mackey-voicing/tests/view_key_notes.rs` |
+| AC-P0-5 | UI calls `fretboard_view` via bindings, draws 6 strings and 22 frets | FR-003, 021 | `ui/e2e/explore.spec.ts` |
+| AC-FB-2.1 | F major notes view labels F G A Bb C D E | FR-008, 009, 019 | `mackey-voicing/tests/view.rs` |
 | AC-FB-2.2 | G major IV, key to D major, G selected | FR-020 | `mackey-voicing/src/selection/tests` |
 | AC-FB-4.1 | Key C, `D7`: D F# A C; "Not in key (V/V)" | FR-010, 011, 019 | `mackey-theory/tests/analysis.rs`, view test |
-| AC-FB-5.1 | C voicing view first is x32010, fingers x-3-2-0-1-0 | FR-014, 015 | `mackey-voicing/tests/voicings_standard.rs` |
+| AC-FB-5.1 | C voicing view first is x32010, fingers x-3-2-0-1-0 | FR-014, 015 | `mackey-voicing/tests/voicings.rs` |
 | AC-FB-5.2 | F list contains xx3211 and 133211 | FR-014, 015 | same |
 | AC-FB-5.3 | No voicing breaks span 4 / 4 fingers (any tuning, chord) | FR-015 | `mackey-voicing/tests/properties.rs` |
 | AC-FB-6.1 | C, strings 234, 1st inversion: E s4 f2, G s3 f0, C s2 f1 | FR-016 | `mackey-voicing/tests/triads.rs` |
 | AC-FB-6.2 | G, string set 123, show all: three inversions in fret order | FR-016 | same |
 | AC-FB-7.1 | Am position 5: every A, C, E in frets 4..=9, finger 1 on fret 5 | FR-017 | `mackey-voicing/tests/arpeggios.rs` |
 | AC-FB-9.1a | Benchmarks: `fretboard_view` ≤ 2 ms, search ≤ 5 ms | FR-019, 015 | `benches/`, release timing test |
-| AC-FB-9.1b | Each cycling key 100 times, redraw ≤ 16 ms | FR-023 | `ui/e2e/cycling-perf.spec.ts` |
-| AC-FB-9.1c | Each change writes its announcement to the live region | FR-023 | Vitest + `ui/e2e/live-region.spec.ts` |
-| AC-FB-1.6 | Tooltip string 3 fret 0, G and G: "G3", "1", "R", "Root" | FR-019, 021 | view test + `ui/e2e/tooltip.spec.ts` |
-| AC-FB-5.6 | No-voicing result with both options; nothing breaking FB-5.4 returned | FR-015 | `mackey-voicing/tests/no_voicing.rs` |
+| AC-FB-9.1b | Each cycling key 100 times, redraw ≤ 16 ms | FR-023 | `ui/e2e/explore.spec.ts` |
+| AC-FB-9.1c | Each change writes its announcement to the live region | FR-023 | Vitest + `ui/e2e/explore.spec.ts` |
+| AC-FB-1.6 | Tooltip string 3 fret 0, G and G: "G3", "1", "R", "Root" | FR-019, 021 | view test + `ui/e2e/explore.spec.ts` |
+| AC-FB-5.6 | No-voicing result with both options; nothing breaking FB-5.4 returned | FR-015 | `mackey-voicing/tests/voicings.rs`, `view.rs` |
 | AC-E-FB-4 | Capo 5, position 2 → first position at or above capo, "Moved above the capo" | FR-020 | selection tests |
 | AC-E-FB-8 | No audio device: all explorer commands succeed; Play errors once | FR-024 | `src-tauri` tests with a fake audio port |
-| AC-SC-3.1 | A minor pentatonic box 1 frets and roots | FR-018 | `mackey-voicing/tests/scale_patterns.rs` |
+| AC-SC-3.1 | A minor pentatonic box 1 frets and roots | FR-018 | `mackey-voicing/tests/patterns.rs`, `mackey-voicing/tests/pattern_stepper.rs` |
 | AC-SC-4.1 | C → A7 follow-the-chords: C major → A Mixolydian | FR-018 | same |
-| AC-LH-1.1 | Left-handed: nut right, mirrored, tooltips unchanged | FR-021 | `ui/e2e/left-handed.spec.ts` |
+| AC-LH-1.1 | Left-handed: nut right, mirrored, tooltips unchanged | FR-021 | `ui/e2e/explore.spec.ts` |
 | AC-LH-4.1 | Drop D, D chord: six-string D with string 6 open, pitches correct | FR-014, 015 | `mackey-voicing/tests/tunings.rs` |
-| AC-LH-5.1 | Capo 2, G shape: "G shape (sounds A)" | FR-019, 022 | `mackey-voicing/tests/capo.rs` |
+| AC-LH-5.1 | Capo 2, G shape: "G shape (sounds A)" | FR-019, 022 | `mackey-voicing/tests/view.rs` |
 | AC-TU-1.1 | 440.0 Hz → A4, 0 ± 1 cent, "In tune" within 400 ms | FR-026, 027 | `mackey-audio/tests/tuner_fixtures.rs` |
 | AC-TU-1.2 | Synthetic guitar tones ±20/±5 cents within ±3 cents | FR-026 | same |
 | AC-NF-9 | First reading ≤ 150 ms after onset; ≥ 20 readings/s | FR-026 | same |

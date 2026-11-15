@@ -99,7 +99,7 @@ crates/mackey-voicing/
     error.rs
   tests/
     voicings_standard.rs tunings.rs capo.rs no_voicing.rs triads.rs arpeggios.rs
-    scale_patterns.rs view_key_notes.rs view_tooltips.rs selection.rs properties.rs
+    patterns.rs pattern_stepper.rs view_key_notes.rs view_tooltips.rs selection.rs properties.rs
     fixtures/ snapshots/ (insta: FretboardView JSON for named scenarios)
   benches/{search.rs,view.rs}
 ```

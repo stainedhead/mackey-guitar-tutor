@@ -4,7 +4,7 @@ The tuner listens to one string at a time and tells you how far it is from the n
 
 ![The tuner on a computer with no microphone](../docs/images/real-tuner.png)
 
-*The real tuner on a computer with no microphone: the app listens to silence and reports "Too quiet". With a guitar, the big letter is the note and the needle shows how many cents you are flat or sharp.*
+*The real tuner on a computer with no microphone: the app listens to silence and shows "Listening…". With a guitar, the big letter is the note and the needle shows how many cents you are flat or sharp.*
 
 ## Microphone
 

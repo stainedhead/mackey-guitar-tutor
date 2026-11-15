@@ -24,7 +24,7 @@ Not built yet: practice sessions, songs, rhythm, sound from a SoundFont, the iPa
 
 ![The tuner with no microphone attached](docs/images/real-tuner.png)
 
-These are screenshots of the real app (Rust core, WebKit webview) running under a virtual display on Linux; see [docs/images](docs/images/README.md) for how each was made and what is mocked. The tuner shot has no microphone, so it shows the real "Too quiet" state.
+These are screenshots of the real app (Rust core, WebKit webview) running under a virtual display on Linux; see [docs/images](docs/images/README.md) for how each was made and what is mocked. The tuner shot has no microphone, so it shows the real "Listening…" state.
 
 ## Use it
 

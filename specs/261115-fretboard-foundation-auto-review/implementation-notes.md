@@ -30,6 +30,13 @@ Update after each fix with the decision, edge cases and a brief self-review (cod
 - Not done: the manual ALSA null-device CPU check (no audio hardware path in this container); covered by the fake clock tests. D-91 marked resolved in the archived notes.
 - Self-review: no allocation or lock added to cpal callbacks (only the worker changed); no new dependency; policy is pure and device-free. FR-005 is partly met here (see its task).
 
+### FR-004, FR-006, FR-007 (P2)
+
+- FR-004: spec.md traceability named files that do not exist (`scale_patterns.rs`, `view_key_notes.rs`, `voicings_standard.rs`, `no_voicing.rs`, `capo.rs`, and five `ui/e2e` files). A one-off script that resolves every test path in `spec.md` and `docs/prd/09-traceability.md` against `git ls-files` found them; all were corrected to the real files (`patterns.rs`, `pattern_stepper.rs`, `view.rs`, `voicings.rs`, `ui/e2e/explore.spec.ts`). The path check stays a documented review (not added to xtask: it would need a parser for free-form table cells); AC-SC-3.1 is now covered by core (`patterns.rs`), selection, view and announcement tests (`pattern_stepper.rs`). The e2e mock label format agrees because `scenarios.json` is regenerated from Rust.
+- FR-006: `'unsafe-inline'` removed from the production `style-src`. React writes the two dynamic styles (needle rotation, level bar width) through the CSSOM (`element.style`), which CSP does not block; only `style=""` attributes in markup and `<style>` elements are. Verified in the real app under Xvfb: Explore (screenshot byte-identical) and Tuner render correctly. The dev CSP keeps `'unsafe-inline'` for Vite's HMR; scripts stay `'self'` only in production. No ADR needed (hardening only).
+- FR-007: D-91 marked resolved; Explore caption and screenshot (FR-001); tuner screenshot regenerated (now "Listening…" because the null input is no longer flooding), README, images README and user-docs updated; traceability table names the new tests; troubleshooting documents the new notice.
+- FR-005 (partial, deferred remainder): the loop's decision logic (bounded step, yield policy, unpaced and silent-stream detection) moved to `pump.rs` and is unit tested with a fake ring and clock. Command handling and stream-loss fallback stay in `input.rs` because they need a live `cpal` session; `input.rs` therefore stays in `COVER_IGNORE`, now holding only thin cpal glue. Removing it from the exclusion needs a coverage run, which is CI-only here.
+
 ## Edge Cases and Solutions
 
 ## Deviations from Plan
