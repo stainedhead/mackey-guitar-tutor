@@ -2,7 +2,7 @@
 
 Rules for AI agents and human contributors working in `mackey-guitar-tutor`: **Mackey Guitar Tutor**, an app for macOS and iPad that helps beginner and intermediate guitarists learn the fretboard and play real songs. The stack is a **Rust core** (Cargo workspace) with a **Tauri 2 shell** and a **React + TypeScript UI** whose fretboard is drawn in **SVG**. Targets are macOS (universal binary) and iPad (Tauri iOS); Windows, Linux, iPhone and Android are deferred, so keep the core portable but do not build or test for them.
 
-Before changing code, read `INTENT.md` (purpose, scope, key decisions), the root `README.md`, the `README.md` in the folders you touch, and `docs/architecture.md`. The product requirements are in `docs/product-spec.md` and the active PRD/spec under `specs/`; decisions are in `docs/adr/`.
+Before changing code, read `INTENT.md` (purpose, scope, key decisions), the root `README.md`, the `README.md` in the folders you touch, and `docs/architecture.md`. Order of authority: `INTENT.md` → the PRD in `docs/prd/` (numbered requirements, acceptance criteria, NFRs, traceability) → the design docs in `docs/` → the active spec under `specs/`. Decisions are in `docs/adr/`.
 
 ## Architecture: pure core, thin shell
 
@@ -76,7 +76,7 @@ UI and app targets (`ui-lint`, `ui-test`, `e2e`, `bindings`, `app`, `ios-sim`) a
 2. **Table-driven tests** for theory and parsers: a `const CASES: &[(...)]` (or array) of inputs and expected outputs, iterated with a label in the assertion message so a failure names its case (for example every chord quality in all 12 keys, spelled correctly).
 3. **Property tests (`proptest`)** for every invariant the theory engine promises: transpose up then down is the identity; interval add then subtract returns the start; a chord's pitch classes are the same in every voicing; spelling matches the key's accidentals; voicing search never exceeds the span limit or drops the root or third. Write `Arbitrary`/strategy functions next to the type in a `#[cfg(test)]` module (or behind a `proptest` feature if other crates need them). Commit `proptest-regressions/` files.
 4. **Snapshot tests (`insta`)** for parser output: chord sheets, ChordPro and practice notation in; normalised output, parsed model and diagnostics out. Review changes with `cargo insta review`; never accept snapshots blindly. Fixtures live in the crate's `tests/fixtures/` and must be written for the project or public domain.
-5. **Benchmarks (`criterion`)** guard the voicing search and parsers against the NF budgets in `docs/product-spec.md`.
+5. **Benchmarks (`criterion`)** guard the voicing search and parsers against the performance budgets in `docs/prd/08-nfr.md`.
 6. Unit tests live in a `#[cfg(test)] mod tests` beside the code; cross-module tests go in the crate's `tests/`. Prefer fakes (a hand-written struct implementing the trait) over mocking frameworks.
 7. Every bug fix starts with a regression test.
 8. Run `make check` before any commit.
@@ -127,7 +127,7 @@ Documentation is part of the change. A change is not done until the affected doc
 |---|---|---|---|
 | `README.md` (root) | Everyone | Overview, quick start, links to all docs | Features, commands or setup change |
 | `INTENT.md` (root) | Everyone | One-page purpose, scope and key decisions | Purpose, scope or a key decision changes |
-| `docs/product-spec.md` | Product/engineering | Vision, users, numbered requirements, open questions | A requirement is added, changed or removed |
+| `docs/prd/` | Product/engineering | The PRD: scope, personas, global rules, per-feature requirements and acceptance criteria, UX flows, NFRs, traceability (requirement → crate → test → phase) | A requirement is added, changed or removed; keep `09-traceability.md` in step |
 | `docs/architecture.md` | Engineers | Crate layout, domain model, boundary, algorithms, quality practice | Structure, interfaces or dependencies change |
 | `docs/adr/NNNN-*.md` | Engineers | One record per architectural decision (indexed from `docs/README.md`) | Any significant decision is made or reversed (new ADR; mark the old one superseded) |
 | `docs/roadmap.md` | Everyone | Phases and exit criteria | A phase starts, finishes or changes scope |
