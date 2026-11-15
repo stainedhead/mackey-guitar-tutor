@@ -4,11 +4,11 @@
 **Jira:** N/A
 **Status:** Reviewed, ready for spec (review log at the end)
 **Owner:** J
-**Source of truth:** this file is the dev-flow working PRD for one implementation run. It is an adapter over the product PRD in [`docs/prd/`](docs/prd/README.md) and [`INTENT.md`](INTENT.md): it selects the requirements for this run, numbers them `FR-nnn` for the dev-flow tools, and points at the detailed requirement (`FB-*`, `SC-*`, `LH-*`, `TU-*`, `G-*`, `NF-*`, `UX-*`) for exact behaviour. **Where this file and `docs/prd/` differ, `docs/prd/` wins and this file is fixed.** Acceptance criteria IDs (`AC-*`) are the product PRD's.
+**Source of truth:** this file is the dev-flow working PRD for one implementation run. It is an adapter over the product PRD in [`docs/prd/`](../../docs/prd/README.md) and [`INTENT.md`](../../INTENT.md): it selects the requirements for this run, numbers them `FR-nnn` for the dev-flow tools, and points at the detailed requirement (`FB-*`, `SC-*`, `LH-*`, `TU-*`, `G-*`, `NF-*`, `UX-*`) for exact behaviour. **Where this file and `docs/prd/` differ, `docs/prd/` wins and this file is fixed.** Acceptance criteria IDs (`AC-*`) are the product PRD's.
 
 ## Problem Statement
 
-A beginner or improving guitarist (J first, then the Bea and Ivan personas in [docs/prd/README.md §3](docs/prd/README.md#3-personas)) learns chord shapes by rote and stays stuck in the first few frets. They cannot see *where* the notes of a key, chord, triad, arpeggio or scale sit on the neck, cannot step through them quickly, and have no in-app way to get in tune first. The repository today has the design (INTENT, PRD, architecture, ADRs) and the Rust workspace tooling (`xtask`, `make check`, CI), but **no product code**: no theory engine, no fretboard, no app shell, no UI and no audio path.
+A beginner or improving guitarist (J first, then the Bea and Ivan personas in [docs/prd/README.md §3](../../docs/prd/README.md#3-personas)) learns chord shapes by rote and stays stuck in the first few frets. They cannot see *where* the notes of a key, chord, triad, arpeggio or scale sit on the neck, cannot step through them quickly, and have no in-app way to get in tune first. The repository today has the design (INTENT, PRD, architecture, ADRs) and the Rust workspace tooling (`xtask`, `make check`, CI), but **no product code**: no theory engine, no fretboard, no app shell, no UI and no audio path.
 
 This run builds the foundation every later phase stands on: the Tauri 2 app shell for macOS and iPad (iOS Simulator), the pure theory and voicing core, the shared SVG fretboard driven by a `FretboardView` computed in Rust, the explorer (keys, chords, voicings, triads, arpeggios, scale overlays, cycling), left-handed mode, tunings and capo, and the tuner.
 
@@ -24,9 +24,9 @@ This run builds the foundation every later phase stands on: the Tauri 2 app shel
 - Rhythm (P1b: transport clock, metronome, drums, speed trainer; RH-*, DR-*, ST-*, TR-*). The transport bar is not built in this run.
 - Practice sessions (P2, PS-*), songs (P3/P4, SG-*), web import (P5), CAGED maps, tips, progress, ear training, looper, mic recognition (P6 to P8).
 - Persistence beyond settings: `mackey-store` (SQLite), library export/import, Recently deleted and drafts (G-6) are P2/P3. Settings in this run persist through a small JSON file owned by `src-tauri` (see FR-028).
-- Bundled SoundFont sample playback. Sound assets need licence confirmation at source (open item in [09-traceability.md](docs/prd/09-traceability.md#open-items)); this run synthesises guitar-like tones (FR-024) and leaves the SoundFont for P1b, where the asset work is scheduled.
+- Bundled SoundFont sample playback. Sound assets need licence confirmation at source (open item in [09-traceability.md](../../docs/prd/09-traceability.md#open-items)); this run synthesises guitar-like tones (FR-024) and leaves the SoundFont for P1b, where the asset work is scheduled.
 - Release automation (`release.yml`, ad-hoc signed `.dmg` on tags). It needs nothing from J but is not needed to prove the walking skeleton; it is a P0 item deferred to the next run unless time allows.
-- Device validation on a real iPad, Apple signing, App Store, iCloud (need J's Apple ID; see [platforms.md §7](docs/platforms.md#7-ipad-signing-and-validation-decided)).
+- Device validation on a real iPad, Apple signing, App Store, iCloud (need J's Apple ID; see [platforms.md §7](../../docs/platforms.md#7-ipad-signing-and-validation-decided)).
 - Windows, Linux, iPhone and Android as products. Linux CI compiles and tests the code only because runners are cheap.
 - First-launch onboarding flow F-1, multi-window (UX-4.1), menus mirroring every command (UX-4.2): P4 polish.
 
@@ -36,11 +36,11 @@ Each FR names the product requirements it implements; the detail and edge cases 
 
 ### Scaffold and boundary (P0)
 
-**FR-001:** Cargo workspace members `crates/mackey-theory`, `crates/mackey-voicing`, `crates/mackey-audio` and `src-tauri` (crate `mackey-app`), each with a `README.md`, registered in the workspace `members`, the `xtask` layer table and the AGENTS.md table, so `make archcheck` passes. The existing table already allows these edges; in this run `mackey-audio` depends on `mackey-theory` only (`mackey-rhythm` arrives in P1b). `CLAUDE.md` already exists (it includes AGENTS.md), so the roadmap P0 `CLAUDE.md` item is done ([architecture.md §2](docs/architecture.md#2-module-layout)).
+**FR-001:** Cargo workspace members `crates/mackey-theory`, `crates/mackey-voicing`, `crates/mackey-audio` and `src-tauri` (crate `mackey-app`), each with a `README.md`, registered in the workspace `members`, the `xtask` layer table and the AGENTS.md table, so `make archcheck` passes. The existing table already allows these edges; in this run `mackey-audio` depends on `mackey-theory` only (`mackey-rhythm` arrives in P1b). `CLAUDE.md` already exists (it includes AGENTS.md), so the roadmap P0 `CLAUDE.md` item is done ([architecture.md §2](../../docs/architecture.md#2-module-layout)).
 
 **FR-002:** A Tauri 2 app in `src-tauri/` with a React + TypeScript (strict) + Vite UI in `ui/`. Window minimum 900 × 600, default 1280 × 800 (UX-4). Strict CSP with no remote content; capabilities allow only the app's own commands (NF-7.3).
 
-**FR-003:** Types crossing the IPC boundary derive `serde` and generate TypeScript bindings with `ts-rs` (ADR 0007 already permits it; add a one-line note to the ADR saying it was chosen because tauri-specta 2 is pre-release) into `ui/src/bindings/` (generated, never hand-edited). A make target regenerates them and CI fails if they are stale ([ADR 0007](docs/adr/0007-web-ui-and-ipc-boundary.md)).
+**FR-003:** Types crossing the IPC boundary derive `serde` and generate TypeScript bindings with `ts-rs` (ADR 0007 already permits it; add a one-line note to the ADR saying it was chosen because tauri-specta 2 is pre-release) into `ui/src/bindings/` (generated, never hand-edited). A make target regenerates them and CI fails if they are stale ([ADR 0007](../../docs/adr/0007-web-ui-and-ipc-boundary.md)).
 
 **FR-004:** Every Tauri command returns `Result<T, AppError>` where `AppError` is serialisable with a plain message and optional details; panics inside a command are caught and returned as "Something went wrong" (NF-22, NF-24).
 
@@ -50,7 +50,7 @@ Each FR names the product requirements it implements; the detail and edge cases 
 
 ### Theory core: `mackey-theory` (P0, G-1)
 
-**FR-007:** Types `PitchClass`, `Letter`, `Note` (letter + accidental, spelled), `Pitch` (note + octave, MIDI and frequency conversion with a reference A4), `Interval` (quality + number), validated at construction ([architecture.md §3.1](docs/architecture.md#31-music-theory)).
+**FR-007:** Types `PitchClass`, `Letter`, `Note` (letter + accidental, spelled), `Pitch` (note + octave, MIDI and frequency conversion with a reference A4), `Interval` (quality + number), validated at construction ([architecture.md §3.1](../../docs/architecture.md#31-music-theory)).
 
 **FR-008:** Scales and modes: Major (Ionian), Natural minor (Aeolian), Harmonic minor, Dorian, Phrygian, Lydian, Mixolydian, Locrian, Major pentatonic, Minor pentatonic, Blues, each spelling its degrees correctly for its tonic (FB-2.1, SC-1).
 
@@ -86,7 +86,7 @@ Each FR names the product requirements it implements; the detail and edge cases 
 
 **FR-022:** The Explore screen: toolbar with key picker (tonic + mode, the key always shown as text, FB-2.2), tuning and capo picker, labels mode and view type; the diatonic chord strip with the sevenths toggle (FB-4.2); the chord field with inline errors and suggestions (FB-4.4, E-FB-1); the voicing list with mini diagrams grouped as FB-5.2; triad string-set and inversion controls; arpeggio position control and "Show order"; scale overlay toggle and scale picker; "3 of 7" counters (FB-9.2); "Not in key" badge (FB-4.5); capo shape/sounding names (LH-5).
 
-**FR-023:** Keyboard shortcuts from FB-9 and the Explore rows of [07 §4](docs/prd/07-ux-flows.md#4-keyboard-shortcuts-mac-and-ipad-with-a-keyboard) (`↑ ↓ ← →`, `I`, `S`, `P` with Shift, `V`, `L`, `O`, `[`, `]`, `R`, `Space`, `Cmd-T`), disabled while a text field has focus (UX-6), with no two commands in one area sharing a key (UX-7, tested). Every change is announced through an ARIA live region (FB-9.1). On iPad: swipe on the neck for voicings, buttons for every cycling action (FB-9 table), 44 pt targets (UX-5.1).
+**FR-023:** Keyboard shortcuts from FB-9 and the Explore rows of [07 §4](../../docs/prd/07-ux-flows.md#4-keyboard-shortcuts-mac-and-ipad-with-a-keyboard) (`↑ ↓ ← →`, `I`, `S`, `P` with Shift, `V`, `L`, `O`, `[`, `]`, `R`, `Space`, `Cmd-T`), disabled while a text field has focus (UX-6), with no two commands in one area sharing a key (UX-7, tested). Every change is announced through an ARIA live region (FB-9.1). On iPad: swipe on the neck for voicings, buttons for every cycling action (FB-9 table), 44 pt targets (UX-5.1).
 
 **FR-024:** Sound: Play (Space or button) plays the selection as a strum (low to high, 30 ms apart), an arpeggio in eighth notes at 70 bpm, or the key's scale ascending (FB-8.1); clicking a position plays its note (FB-1.7); a mute toggle (FB-8.4). **FB-8.2 (nylon, steel, electric from a bundled SoundFont) is deferred to P1b**, where the sound-asset licence work is scheduled; this run ships one synthesised steel-like voice. Tones are synthesised in `mackey-audio` (plucked-string synthesis) on a cpal output stream; the callback follows the real-time rules (no allocation, locks or I/O; commands arrive over an `rtrb` queue). "No audio output" is shown once when no device is available (E-FB-8).
 
@@ -100,7 +100,7 @@ Each FR names the product requirements it implements; the detail and edge cases 
 
 ### Settings (P1 subset)
 
-**FR-028:** The Instrument, Display, Sound and Tuner settings from [08 §6](docs/prd/08-nfr.md#6-settings-complete-list-for-v1) that this run's features use (handedness, flip strings, frets, default tuning, allow stretches, theme, labels default, show fret numbers, selection playback volume and mute, input device, reference A4; the playback instrument selector is hidden until P1b and "Show tips" waits for P6), with the G-4 defaults, applied immediately, persisted as JSON in the app data directory by `src-tauri`, and reset per group.
+**FR-028:** The Instrument, Display, Sound and Tuner settings from [08 §6](../../docs/prd/08-nfr.md#6-settings-complete-list-for-v1) that this run's features use (handedness, flip strings, frets, default tuning, allow stretches, theme, labels default, show fret numbers, selection playback volume and mute, input device, reference A4; the playback instrument selector is hidden until P1b and "Show tips" waits for P6), with the G-4 defaults, applied immediately, persisted as JSON in the app data directory by `src-tauri`, and reset per group.
 
 ## Non-Functional Requirements
 
@@ -109,7 +109,7 @@ Each FR names the product requirements it implements; the detail and edge cases 
 - **Security and privacy:** No network calls, telemetry or accounts (NF-7). Microphone audio is processed in memory only and never written to disk (NF-7.1); the permission is requested only when the tuner first opens (NF-7.2). Strict CSP and minimal Tauri capabilities (NF-7.3). `unsafe_code` stays forbidden; `cargo deny` passes with permissive licences only.
 - **Accessibility:** Colour-blind-safe palette with shape cues (G-2, NF-5.2), full keyboard control with visible focus (NF-5.1), VoiceOver labels on every fretboard position and announced changes (NF-5), Reduce Motion respected (NF-5.4), system text size respected with a 11 pt minimum on neck labels (NF-5.3).
 - **Observability:** `tracing` in `src-tauri` and `mackey-audio` (never in the audio callback); command errors are logged with their full chain to a local log file in the app data directory; nothing is sent anywhere (NF-7, NF-22, NF-24).
-- **Quality:** `make check` and CI green on macOS and Linux; line coverage ≥ 80% overall, new pure-crate code fully covered by tests that name their requirement ID (for example `fb_5_4_no_voicing_exceeds_span`, [09-traceability.md](docs/prd/09-traceability.md)); table-driven tests for theory, property tests for the invariants listed in AGENTS.md, insta snapshots for parser output.
+- **Quality:** `make check` and CI green on macOS and Linux; line coverage ≥ 80% overall, new pure-crate code fully covered by tests that name their requirement ID (for example `fb_5_4_no_voicing_exceeds_span`, [09-traceability.md](../../docs/prd/09-traceability.md)); table-driven tests for theory, property tests for the invariants listed in AGENTS.md, insta snapshots for parser output.
 - **Not measured this run:** memory (NF-12), app size (NF-13) and visual sync (NF-8.2, needs the transport from P1b).
 - **Compatibility:** macOS 13+ universal; iPadOS 17+ (Simulator only in this run); 44.1 and 48 kHz devices (NF-19, NF-20).
 
@@ -178,7 +178,7 @@ Each criterion maps to at least one automated test unless marked *(manual)*.
 |----------|-------|-----------------|
 | Are synthetic tuner fixtures enough for the P1 exit, or must recorded guitar WAVs pass first? | J | Default: synthetic is enough for this run; recorded WAVs (`crates/mackey-audio/tests/fixtures/`) become a follow-up AC before device validation. |
 | Is one synthesised voice acceptable until P1b (FB-8.2 deferred)? | J | Default: yes; recorded in `docs/prd/09-traceability.md` open items. |
-| SoundFont or synthesised tones for selection playback long term? | J / P1b | Synthesised in this run; P1b's asset work decides, per [sound-assets.md](docs/sound-assets.md). |
+| SoundFont or synthesised tones for selection playback long term? | J / P1b | Synthesised in this run; P1b's asset work decides, per [sound-assets.md](../../docs/sound-assets.md). |
 | Swift `audio-session` plugin in this run or the next? | Build | Default: next run, unless the Simulator CI build is green early in this run. Decide by the end of the implementation step. |
 | Should the explorer's settings move into `mackey-store` when it lands in P2? | Build | Resolved: yes, in P2; the JSON file is a stopgap owned by `src-tauri`. |
 

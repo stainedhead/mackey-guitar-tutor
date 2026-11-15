@@ -1,7 +1,7 @@
 # Dev-Flow Implementation Status
 
 **PRD:** fretboard-foundation-PRD.md
-**Spec:** (set after Step 1)
+**Spec:** specs/261115-fretboard-foundation/
 **Branch:** claude/project-thread-e8va25
 **Review PRD:** fretboard-foundation-auto-review-PRD.md
 **Process Start:** 2026-11-15T19:24:00Z
@@ -14,9 +14,9 @@ Notes: run in a cloud container (Linux). The PRD was created by adapting docs/pr
 
 | Step | Name | Status | Start | End | Runtime (min) |
 |------|------|--------|-------|-----|---------------|
-| 1  | Create Spec from PRD            | 🔄 In Progress | 2026-11-15T19:24Z | — | — |
-| 2  | Review Spec                     | ⬜ Pending | — | — | — |
-| 3  | Implement Product               | ⬜ Pending | — | — | — |
+| 1  | Create Spec from PRD            | ✅ Complete | 2026-11-15T19:24Z | 2026-11-15T19:36Z | 12 |
+| 2  | Review Spec                     | ✅ Complete | 2026-11-15T19:36Z | 2026-11-15T19:43Z | 7 |
+| 3  | Implement Product               | 🔄 Next (not started) | — | — | — |
 | 4  | Documentation and User Docs     | ⬜ Pending | — | — | — |
 | 5  | Code and Design Review          | ⬜ Pending | — | — | — |
 | 6  | Prepare Review PRD              | ⬜ Pending | — | — | — |
@@ -28,3 +28,5 @@ Notes: run in a cloud container (Linux). The PRD was created by adapting docs/pr
 | 12 | Process Analysis Report         | ⬜ Pending | — | — | — |
 | 13 | Archive Spec                    | ⬜ Pending | — | — | — |
 | 14 | Open Pull Request               | ⬜ Pending | — | — | — |
+
+Step 1 and 2 times are approximate (one worker did both; the split is by when review began). Step 2 verdict: Implementation-ready after fixes (see `implementation-notes.md`, "Spec review (Step 2)"). Spec: 38 PRD ACs + 19 derived SAC, 61 tasks in phases A to E.
