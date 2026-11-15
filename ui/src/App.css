@@ -1,0 +1,90 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --sidebar-bg: #f1f1f1;
+  --accent: #0072b2;
+  --wood: #e9dcc3;
+  --string: #6b6b6b;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1b1b;
+    --fg: #f0f0f0;
+    --sidebar-bg: #262626;
+    --accent: #56b4e9;
+    --wood: #3a3226;
+    --string: #b0b0b0;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 180px;
+  padding: 16px;
+  background: var(--sidebar-bg);
+}
+
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar button[aria-current='page'] {
+  background: var(--accent);
+  color: #fff;
+}
+
+.brand {
+  font-size: 1.1rem;
+  margin: 0 0 16px;
+}
+
+.content {
+  flex: 1;
+  padding: 16px 24px;
+}
+
+.neck {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.neck-wood {
+  fill: var(--wood);
+}
+
+.nut,
+.string {
+  stroke: var(--string);
+  stroke-width: 2;
+}
