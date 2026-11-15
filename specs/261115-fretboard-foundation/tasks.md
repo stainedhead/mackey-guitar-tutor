@@ -7,16 +7,16 @@
 
 ## Progress Summary
 
-8/61 tasks complete. Update this file and `status.md` after every task (mandatory).
+10/61 tasks complete. Update this file and `status.md` after every task (mandatory).
 
 | Phase | Tasks | Done |
 |-------|-------|------|
-| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 8 |
+| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 10 |
 | B `mackey-voicing` | B1 to B16 (16) | 0 |
 | C `mackey-audio` | C1 to C9 (9) | 0 |
 | D `src-tauri` and `ui/` | D1 to D16 (16) | 0 |
 | E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
-| Total | 61 | 8 |
+| Total | 61 | 10 |
 
 ## Conventions
 
@@ -81,12 +81,14 @@
 - **Tests:** table-driven cases for every key × all 12 pitch classes with no context (expected sharps/flats hand-written); property: no `Speller::display` result has a double accidental; the pitch class is preserved.
 
 ### A8. `mackey-theory`: chord-symbol parser with diagnostics
+- **Status:** Done
 - **Depends on:** A6 · **Est:** L · **FR:** FR-010
 - **Files:** `src/parser.rs`, `tests/chord_parser.rs`, `tests/fixtures/chord_symbols.txt` (one symbol per line, written for the project), `tests/snapshots/`.
 - **Acceptance (AC-P0-2, E-FB-1):** accepts every quality and alias in the data dictionary grammar with every root (including accidentals and Unicode `♯ ♭`) and an optional slash bass; the player's root spelling is kept (`A#m`, `Bbm`); `Hm7` → error with suggestion `Bm7`; extended symbols outside the FB-4.3 grammar (`Cmaj13#11`, `C#maj13#11b9`, `C7b9`) return the E-FB-1 error with a positioned span and no suggestion (spec Q-9 defers them; log the deviation from E-FB-2 in `implementation-notes.md`); `Csus` = sus4; distance-≤2 suggestions (`Cmaj77` → `Cmaj7`, `Amj7` → `Amaj7`); empty or whitespace-only input → `Empty`; trailing garbage → `TrailingInput` with its span; `parse_chord` returns diagnostics (all of them, positioned), `parse_chord_symbol` the strict `Result`.
 - **Tests:** table-driven `CASES` (input → expected symbol or error kind and span); insta snapshots of `ParseOutcome` for a fixture list including 20 invalid inputs; proptest: `parse_chord(any_string)` never panics (strategy: arbitrary `String`, plus strings from a symbol-biased alphabet, plus non-ASCII); proptest: for every generated valid chord, `parse(chord.symbol()) == chord`.
 
 ### A9. `mackey-theory`: diatonic chords, Roman numerals, analysis
+- **Status:** Done
 - **Depends on:** A5, A6, A8 · **Est:** L · **FR:** FR-011 · **SAC-06**
 - **Files:** `src/roman.rs`, `src/analysis.rs`, `tests/roman.rs`, `tests/analysis.rs`.
 - **Acceptance:** `diatonic_chords` for all 7 modes in major and minor keys with triads and sevenths (Imaj7 ii7 iii7 IVmaj7 V7 vi7 viiø7 in major; natural minor and the other modes use their own qualities); `RomanNumeral` `Display`/`FromStr` round trip; `roman_to_chord("vi", G)` = Em; `bVII` in C = Bb; `V7/V` in C = D7; `analyze(C, D7)` = not in key, `SecondaryDominant { target: V }`, badge "Not in key (V/V)" (AC-FB-4.1); `analyze(C, Bb)` = borrowed `bVII` "borrowed from C minor" (match the PRD example wording for G in the test: "bVII, borrowed from G minor"); in-key chords return `in_key: true` and no badge.

@@ -109,7 +109,7 @@ pub enum ChordParseError {
         suggestion: Option<String>,
     },
     /// The text after `/` is not a note name.
-    #[error("Not a chord symbol I know: {symbol}. {found:?} is not a bass note.")]
+    #[error("{}", bass_message(symbol, found))]
     InvalidBass {
         /// The offending text.
         span: Span,
@@ -132,6 +132,14 @@ fn unknown_message(symbol: &str, suggestion: Option<&str>) -> String {
     match suggestion {
         Some(s) => format!("Not a chord symbol I know: {symbol}. Did you mean {s}?"),
         None => format!("Not a chord symbol I know: {symbol}."),
+    }
+}
+
+fn bass_message(symbol: &str, found: &str) -> String {
+    if found.is_empty() {
+        format!("Not a chord symbol I know: {symbol}. A bass note is missing after the slash.")
+    } else {
+        format!("Not a chord symbol I know: {symbol}. {found:?} is not a bass note.")
     }
 }
 
@@ -431,6 +439,7 @@ fn parse_quality(
     text: &str,
     main: &str,
     root_len: usize,
+    root_ok: bool,
     out: &mut Collected,
 ) -> Option<ChordQuality> {
     let token = main.get(root_len..).unwrap_or_default();
@@ -451,7 +460,8 @@ fn parse_quality(
     let rest = token.get(rest_at..).unwrap_or_default();
     if rest.chars().next().is_some_and(is_quality_char) {
         let chars: Vec<char> = token.chars().collect();
-        let suggestion = suggest_quality(&chars).map(|alias| {
+        // A corrected quality is no use while the root itself is wrong.
+        let suggestion = suggest_quality(&chars).filter(|_| root_ok).map(|alias| {
             let head = text.get(..root_len).unwrap_or_default();
             let tail = text.get(main.len()..).unwrap_or_default();
             format!("{head}{alias}{tail}")
@@ -514,7 +524,7 @@ fn parse_inner(input: &str, options: ParseOptions) -> Collected {
     let main = slash.and_then(|i| text.get(..i)).unwrap_or(text);
 
     let (root, root_len) = parse_root(&ctx, text, main, &mut out);
-    let quality = parse_quality(&ctx, text, main, root_len, &mut out);
+    let quality = parse_quality(&ctx, text, main, root_len, root.is_some(), &mut out);
     let mut bass = None;
     let mut bass_ok = true;
     if let Some(slash) = slash {

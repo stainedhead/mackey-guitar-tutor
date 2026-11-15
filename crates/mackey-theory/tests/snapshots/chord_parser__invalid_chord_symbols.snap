@@ -1,0 +1,274 @@
+---
+source: crates/mackey-theory/tests/chord_parser.rs
+expression: outcomes
+---
+- - Hm7
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 1
+        severity: Error
+        message: "Not a chord symbol I know: Hm7. Did you mean Bm7?"
+        suggestion: Bm7
+- - Hb7
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 2
+        severity: Error
+        message: "Not a chord symbol I know: Hb7. Did you mean Bb7?"
+        suggestion: Bb7
+- - H
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 1
+        severity: Error
+        message: "Not a chord symbol I know: H. Did you mean B?"
+        suggestion: B
+- - am
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 1
+        severity: Error
+        message: "Not a chord symbol I know: am. Did you mean Am?"
+        suggestion: Am
+- - xyz
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 1
+        severity: Error
+        message: "Not a chord symbol I know: xyz."
+        suggestion: ~
+      - span:
+          start: 1
+          end: 3
+        severity: Error
+        message: "Not a chord symbol I know: xyz."
+        suggestion: ~
+- - "Cmaj13#11"
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 9
+        severity: Error
+        message: "Not a chord symbol I know: Cmaj13#11."
+        suggestion: ~
+- - "C#maj13#11b9"
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 2
+          end: 12
+        severity: Error
+        message: "Not a chord symbol I know: C#maj13#11b9."
+        suggestion: ~
+- - C7b9
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 4
+        severity: Error
+        message: "Not a chord symbol I know: C7b9."
+        suggestion: ~
+- - "C7#9"
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 4
+        severity: Error
+        message: "Not a chord symbol I know: C7#9."
+        suggestion: ~
+- - Cmaj77
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 6
+        severity: Error
+        message: "Not a chord symbol I know: Cmaj77. Did you mean Cmaj7?"
+        suggestion: Cmaj7
+- - Amj7
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 4
+        severity: Error
+        message: "Not a chord symbol I know: Amj7. Did you mean Amaj7?"
+        suggestion: Amaj7
+- - Csus3
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 5
+        severity: Error
+        message: "Not a chord symbol I know: Csus3. Did you mean Csus2?"
+        suggestion: Csus2
+- - C maj7
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 6
+        severity: Error
+        message: "Not a chord symbol I know: C maj7. Unexpected text after the chord."
+        suggestion: ~
+- - Cm7 b5
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 3
+          end: 6
+        severity: Error
+        message: "Not a chord symbol I know: Cm7 b5. Unexpected text after the chord."
+        suggestion: ~
+- - C!
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 2
+        severity: Error
+        message: "Not a chord symbol I know: C!. Unexpected text after the chord."
+        suggestion: ~
+- - C/
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 2
+        severity: Error
+        message: "Not a chord symbol I know: C/. A bass note is missing after the slash."
+        suggestion: ~
+- - C/H
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 2
+          end: 3
+        severity: Error
+        message: "Not a chord symbol I know: C/H. \"H\" is not a bass note."
+        suggestion: ~
+- - C/E/G
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 2
+          end: 5
+        severity: Error
+        message: "Not a chord symbol I know: C/E/G. \"E/G\" is not a bass note."
+        suggestion: ~
+- - "D/F#x"
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 2
+          end: 5
+        severity: Error
+        message: "Not a chord symbol I know: D/F#x. \"F#x\" is not a bass note."
+        suggestion: ~
+- - /E
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 0
+        severity: Error
+        message: "Not a chord symbol I know: /E."
+        suggestion: ~
+- - "7"
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 1
+        severity: Error
+        message: "Not a chord symbol I know: 7."
+        suggestion: ~
+- - "Cmaj7#"
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 6
+        severity: Error
+        message: "Not a chord symbol I know: Cmaj7#."
+        suggestion: ~
+- - C+7
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 3
+        severity: Error
+        message: "Not a chord symbol I know: C+7. Did you mean C+5?"
+        suggestion: C+5
+- - Cdim9
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 5
+        severity: Error
+        message: "Not a chord symbol I know: Cdim9. Did you mean Cdim7?"
+        suggestion: Cdim7
+- - C♭♭
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 4
+          end: 7
+        severity: Error
+        message: "Not a chord symbol I know: C♭♭."
+        suggestion: ~
+- - Cé
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 3
+        severity: Error
+        message: "Not a chord symbol I know: Cé."
+        suggestion: ~
+- - C🎸
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 1
+          end: 5
+        severity: Error
+        message: "Not a chord symbol I know: C🎸. Unexpected text after the chord."
+        suggestion: ~
+- - Xmaj77/Q
+  - chord: ~
+    diagnostics:
+      - span:
+          start: 0
+          end: 1
+        severity: Error
+        message: "Not a chord symbol I know: Xmaj77/Q."
+        suggestion: ~
+      - span:
+          start: 1
+          end: 6
+        severity: Error
+        message: "Not a chord symbol I know: Xmaj77/Q."
+        suggestion: ~
+      - span:
+          start: 7
+          end: 8
+        severity: Error
+        message: "Not a chord symbol I know: Xmaj77/Q. \"Q\" is not a bass note."
+        suggestion: ~

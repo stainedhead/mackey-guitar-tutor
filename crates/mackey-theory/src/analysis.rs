@@ -127,7 +127,7 @@ fn secondary_dominant(key: Key, chord: Chord) -> Option<ChordFunction> {
 fn parallel_modes(key: Key) -> &'static [Mode] {
     match key.mode() {
         Mode::Major => &[Mode::NaturalMinor],
-        Mode::NaturalMinor => &[Mode::Major, Mode::HarmonicMinor],
+        Mode::NaturalMinor => &[Mode::HarmonicMinor, Mode::Major],
         _ => &[Mode::Major, Mode::NaturalMinor],
     }
 }
@@ -148,7 +148,19 @@ fn borrowed(key: Key, chord: Chord) -> Option<ChordFunction> {
                 if stacked_quality(&notes, index, seventh) != Some(chord.quality) {
                     continue;
                 }
-                if let Some(roman) = numeral_for(key, *note, chord.quality) {
+                // Harmonic minor is the minor key with one raised note, so its chords are
+                // numbered against itself (`V`, `vii°`), not as altered natural-minor degrees.
+                let roman = if mode == Mode::HarmonicMinor {
+                    u8::try_from(index + 1)
+                        .ok()
+                        .and_then(|n| Degree::new(n).ok())
+                        .and_then(|d| {
+                            RomanNumeral::from_quality(d, Accidental::NATURAL, chord.quality)
+                        })
+                } else {
+                    numeral_for(key, *note, chord.quality)
+                };
+                if let Some(roman) = roman {
                     return Some(ChordFunction::Borrowed { from: mode, roman });
                 }
             }
