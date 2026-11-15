@@ -1,0 +1,13 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: render(view)
+---
+D dominant 7, all tones | D dominant 7, all tones
+badge: Not in key (V/V)
+fit 0..22 off 0/0
+1 .   .   *F# .   .   *A  .   .   *C  .   #D  .   .   .   *F#
+2 .   *C  .   #D  .   .   .   *F# .   .   *A  .   .   *C  .
+3 .   .   *A  .   .   *C  .   #D  .   .   .   *F# .   .   *A
+4 #D  .   .   .   *F# .   .   *A  .   .   *C  .   #D  .   .
+5 *A  .   .   *C  .   #D  .   .   .   *F# .   .   *A  .   .
+6 .   .   *F# .   .   *A  .   .   *C  .   #D  .   .   .   *F#

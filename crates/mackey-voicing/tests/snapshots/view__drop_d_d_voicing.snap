@@ -1,0 +1,12 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: "render(&build(&sel(\"D\", Mode::Major, Some(\"D\"), ViewType::Voicing), &drop_d))"
+---
+D major, Open D (all six strings) | D major, Open D (all six strings), 1 of 24
+fit 0..4 off 0/0
+1 .   .   *F# .   .   .   .   .   .   .   .   .   .   .   .
+2 .   .   .   #D  .   .   .   .   .   .   .   .   .   .   .
+3 .   .   *A  .   .   .   .   .   .   .   .   .   .   .   .
+4 #D  .   .   .   .   .   .   .   .   .   .   .   .   .   .
+5 *A  .   .   .   .   .   .   .   .   .   .   .   .   .   .
+6 #D  .   .   .   .   .   .   .   .   .   .   .   .   .   .

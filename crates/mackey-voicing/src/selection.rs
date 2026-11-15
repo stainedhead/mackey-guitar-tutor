@@ -1025,8 +1025,10 @@ pub fn announce(s: &Selection, ctx: &Context<'_>, cache: &mut VoicingCache) -> S
 /// let s = apply(&s, &ctx, Action::SetView(ViewType::Arpeggio)).selection;
 /// let mut after = before.clone();
 /// after.capo = Capo::new(5).unwrap();
-/// let moved = instrument_changed(&s, &ctx, &Context { instrument: &after, handedness: &handedness });
-/// assert!(moved.announcement.is_empty() || !moved.announcement.is_empty());
+/// let after_ctx = Context { instrument: &after, handedness: &handedness };
+/// let moved = instrument_changed(&s, &ctx, &after_ctx);
+/// assert!(moved.selection.is_valid(&after_ctx));
+/// assert_eq!(moved.selection.view, ViewType::Arpeggio);
 /// ```
 #[must_use]
 pub fn instrument_changed(sel: &Selection, old: &Context<'_>, new: &Context<'_>) -> Applied {

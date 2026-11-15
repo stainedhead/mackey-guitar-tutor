@@ -1,0 +1,14 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: render(view)
+---
+A major, Open G shape | A major, Open G shape, 1 of 24
+capo label: G shape (sounds A)
+badge: Not in key (V/V)
+fit 1..6 off 0/0
+1 .   .   .   .   .   #A  .   .   .   .   .   .   .   .   .
+2 .   .   *C# .   .   .   .   .   .   .   .   .   .   .   .
+3 .   .   #A  .   .   .   .   .   .   .   .   .   .   .   .
+4 .   .   *E  .   .   .   .   .   .   .   .   .   .   .   .
+5 .   .   .   .   *C# .   .   .   .   .   .   .   .   .   .
+6 .   .   .   .   .   #A  .   .   .   .   .   .   .   .   .

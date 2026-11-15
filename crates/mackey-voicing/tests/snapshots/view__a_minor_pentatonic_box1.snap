@@ -1,0 +1,12 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: render(view)
+---
+A minor pentatonic scale | A minor, all notes, A minor pentatonic overlay
+fit 0..4 off 0/0
+1 *E  .   .   *G  .   .   .   .   .   .   .   .   .   .   .
+2 .   *C  .   oD  .   .   .   .   .   .   .   .   .   .   .
+3 *G  .   #A  .   .   .   .   .   .   .   .   .   .   .   .
+4 oD  .   *E  .   .   .   .   .   .   .   .   .   .   .   .
+5 #A  .   .   *C  .   .   .   .   .   .   .   .   .   .   .
+6 *E  .   .   *G  .   .   .   .   .   .   .   .   .   .   .

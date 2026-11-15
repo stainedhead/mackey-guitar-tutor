@@ -1,0 +1,12 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: render(view)
+---
+C major, first inversion, strings 234 | C major, first inversion, strings 2 3 4
+fit 0..3 off 0/0
+1 .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+2 .   #C  .   .   .   .   .   .   .   .   .   .   .   .   .
+3 *G  .   .   .   .   .   .   .   .   .   .   .   .   .   .
+4 .   .   *E  .   .   .   .   .   .   .   .   .   .   .   .
+5 .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+6 .   .   .   .   .   .   .   .   .   .   .   .   .   .   .

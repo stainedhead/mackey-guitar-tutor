@@ -1,0 +1,12 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: render(view)
+---
+A minor, arpeggio, position 1 | A minor, arpeggio up, position 1
+fit 0..6 off 0/0
+1 *E  .   .   .   .   #A  .   .   .   .   .   .   .   .   .
+2 .   *C  .   .   .   *E  .   .   .   .   .   .   .   .   .
+3 .   .   #A  .   .   *C  .   .   .   .   .   .   .   .   .
+4 .   .   *E  .   .   .   .   .   .   .   .   .   .   .   .
+5 #A  .   .   *C  .   .   .   .   .   .   .   .   .   .   .
+6 *E  .   .   .   .   #A  .   .   .   .   .   .   .   .   .

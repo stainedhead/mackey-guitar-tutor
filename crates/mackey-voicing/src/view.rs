@@ -316,27 +316,44 @@ pub struct FretboardView {
     pub key_label: String,
 }
 
-/// Chromatic degree labels for a pitch class outside the scale.
-const CHROMATIC: [&str; 12] = [
-    "1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7",
-];
 const CHROMATIC_INTERVAL: [&str; 12] = [
     "R", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7",
 ];
 
-fn scale_degree_label(scale: Scale, pc: PitchClass) -> String {
+/// Semitones of the major scale degrees, used to name notes outside the scale.
+const MAJOR_OFFSETS: [i16; 7] = [0, 2, 4, 5, 7, 9, 11];
+
+/// The degree label of a note relative to the scale's tonic. Scale notes use the scale's own
+/// intervals; a note outside the scale is labelled from its spelling, so F# in C is "#4" and
+/// Bb is "b7" (G-2.2).
+fn scale_degree_label(scale: Scale, note: Note) -> String {
+    let pc = note.pitch_class();
     if let Some(degree) = scale.degree_of(pc)
         && let Some(interval) = scale.mode.intervals().get(degree.index())
     {
         let label = interval.degree_label();
         return if label == "R" { "1".to_owned() } else { label };
     }
-    let offset = scale.tonic.pitch_class().semitones_to(pc);
-    CHROMATIC
-        .get(usize::from(offset))
+    let steps =
+        (i16::from(note.letter.index()) - i16::from(scale.tonic.letter.index())).rem_euclid(7);
+    let natural = MAJOR_OFFSETS
+        .get(usize::try_from(steps).unwrap_or(0))
         .copied()
-        .unwrap_or("?")
-        .to_owned()
+        .unwrap_or(0);
+    let mut diff = i16::from(scale.tonic.pitch_class().semitones_to(pc)) - natural;
+    if diff > 6 {
+        diff -= 12;
+    } else if diff < -6 {
+        diff += 12;
+    }
+    let prefix = match diff {
+        -2 => "bb",
+        -1 => "b",
+        1 => "#",
+        2 => "##",
+        _ => "",
+    };
+    format!("{prefix}{}", steps + 1)
 }
 
 fn scale_role(scale: Scale, pc: PitchClass) -> NoteRole {
@@ -474,7 +491,7 @@ fn make_position(
     let role = base.role.unwrap_or_else(|| names.role(pc));
     let is_open = base.fret == instrument.capo.value();
     let octave = octave_of(midi, display.label);
-    let degree = scale_degree_label(names.degree_scale, pc);
+    let degree = scale_degree_label(names.degree_scale, names.theory(pc));
     let interval = names.interval_label(pc);
     let note_name = display.label.name();
     let finger_text = base.finger.map(|f| f.to_string());

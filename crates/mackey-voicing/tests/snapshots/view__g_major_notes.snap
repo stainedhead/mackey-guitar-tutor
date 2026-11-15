@@ -1,0 +1,12 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: render(view)
+---
+G major, all notes | G major, all notes
+fit 0..22 off 0/0
+1 oE  .   *F# #G  .   oA  .   *B  oC  .   *D  .   oE  .   *F#
+2 *B  oC  .   *D  .   oE  .   *F# #G  .   oA  .   *B  oC  .
+3 #G  .   oA  .   *B  oC  .   *D  .   oE  .   *F# #G  .   oA
+4 *D  .   oE  .   *F# #G  .   oA  .   *B  oC  .   *D  .   oE
+5 oA  .   *B  oC  .   *D  .   oE  .   *F# #G  .   oA  .   *B
+6 oE  .   *F# #G  .   oA  .   *B  oC  .   *D  .   oE  .   *F#
