@@ -238,6 +238,57 @@ impl From<FretCount> for u8 {
 }
 checked_serde!(FretCount, u8);
 
+/// A playback tempo in beats per minute, `30..=250`, default 70 (G-4).
+///
+/// ```
+/// use mackey_voicing::Bpm;
+/// assert_eq!(Bpm::default().value(), 70);
+/// assert!(Bpm::new(29).is_err());
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, type = "number"))]
+pub struct Bpm(u16);
+
+impl Bpm {
+    /// Validates `30..=250`.
+    ///
+    /// # Errors
+    /// [`VoicingError::TempoOutOfRange`] outside `30..=250`.
+    pub fn new(bpm: u16) -> Result<Self, VoicingError> {
+        if (30..=250).contains(&bpm) {
+            Ok(Self(bpm))
+        } else {
+            Err(VoicingError::TempoOutOfRange(bpm))
+        }
+    }
+
+    /// The tempo.
+    #[must_use]
+    pub fn value(self) -> u16 {
+        self.0
+    }
+}
+
+impl Default for Bpm {
+    fn default() -> Self {
+        Self(70)
+    }
+}
+
+impl TryFrom<u16> for Bpm {
+    type Error = VoicingError;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        Self::new(value)
+    }
+}
+
+impl From<Bpm> for u16 {
+    fn from(value: Bpm) -> Self {
+        value.0
+    }
+}
+checked_serde!(Bpm, u16);
+
 /// The nine tuning presets of LH-2.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export))]

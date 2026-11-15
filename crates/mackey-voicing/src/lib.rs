@@ -21,6 +21,7 @@ mod error;
 mod fingering;
 mod instrument;
 mod patterns;
+mod playback;
 mod rules;
 mod search;
 mod selection;
@@ -36,12 +37,16 @@ pub use arpeggio::{
 pub use error::VoicingError;
 pub use fingering::assign_fingering;
 pub use instrument::{
-    Capo, Fret, FretCount, Handedness, Instrument, Inversion, StringNumber, StringSet, Tuning,
+    Bpm, Capo, Fret, FretCount, Handedness, Instrument, Inversion, StringNumber, StringSet, Tuning,
     TuningPreset, TuningWarning,
 };
 pub use patterns::{
     FollowChoice, FollowReason, PatternKind, PatternNote, ScalePattern, full_neck, scale_for_chord,
     scale_patterns,
+};
+pub use playback::{
+    PlanKind, PlannedNote, PlaybackPlan, STRUM_RING_MS, STRUM_SPACING_MS, playback_plan,
+    playback_plan_cached,
 };
 pub use search::voicings_for;
 pub use selection::{

@@ -154,7 +154,8 @@ fn build_positional(
             midi += 1;
         }
         if taken < per_string {
-            break;
+            // The pattern runs off the neck (a high capo or a short neck): not offered.
+            return None;
         }
     }
     Some(notes)

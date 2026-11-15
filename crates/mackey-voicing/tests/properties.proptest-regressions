@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 52cb20caac539c33b3ca5471533123a89f0e6a36b2dd9e1181659dff1fb8a14b # shrinks to root = 0, mode = 0, ins = Instrument { tuning: Tuning { name: "Standard", strings: [Pitch { note: Note { letter: E, accidental: Accidental(0) }, octave: 2 }, Pitch { note: Note { letter: A, accidental: Accidental(0) }, octave: 2 }, Pitch { note: Note { letter: D, accidental: Accidental(0) }, octave: 3 }, Pitch { note: Note { letter: G, accidental: Accidental(0) }, octave: 3 }, Pitch { note: Note { letter: B, accidental: Accidental(0) }, octave: 3 }, Pitch { note: Note { letter: E, accidental: Accidental(0) }, octave: 4 }] }, frets: FretCount(19), capo: Capo(8) }
