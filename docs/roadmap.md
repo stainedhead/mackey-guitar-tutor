@@ -8,7 +8,7 @@ gantt
     axisFormat %b
     section Foundation
     P0 Scaffold and theory core     :p0, 2026-11-23, 2w
-    P1 Fretboard explorer           :p1, after p0, 4w
+    P1 Fretboard, scales, tuner     :p1, after p0, 5w
     section Practice
     P1b Rhythm: metronome and drums :p1b, after p0, 3w
     P2 Practice sessions            :p2, after p1, 4w
@@ -16,6 +16,10 @@ gantt
     P3 Songs: paste and ChordPro    :p3, after p1, 4w
     P4 Song to practice, polish     :p4, after p3, 2w
     P5 Web import and search (gated):p5, after p4, 3w
+    section Learning
+    P6 CAGED, theory tips, progress :p6, after p4, 4w
+    P7 Ear training and looper      :p7, after p6, 4w
+    P8 Mic chord recognition        :p8, after p7, 4w
 ```
 
 P1b (rhythm) needs only the P0 scaffold, so it runs alongside P1. P2 and P3 can run in parallel once P1 is done; they share the theory, voicing and rhythm layers.
@@ -26,12 +30,14 @@ P1b (rhythm) needs only the P0 scaffold, so it runs alongside P1. P2 and P3 can 
 - `MusicTheory`: notes with spelling, intervals, scales and modes, keys, chord qualities (triads, sevenths, sus, add, 6, 9, slash), `ChordSymbolParser`, Roman numerals.
 - **Exit:** table-driven tests for every chord quality in all 12 keys spelled correctly; parser accepts the symbol variants in [song-import.md §4.3](song-import.md#43-chords-over-lyrics).
 
-## P1: Fretboard explorer (4 weeks), covers FB-1 to FB-9
+## P1: Fretboard explorer, scales, tunings and tuner (5 weeks), covers FB-1 to FB-9, SC-1 to SC-5, LH-1 to LH-5, TU-1 to TU-5
 
 - `FretboardUI` Canvas view, labels mode, left-handed, tunings, capo.
 - `VoicingEngine`: curated open and CAGED shapes, triad search on string sets, arpeggio-in-position, scoring.
 - Cycling controller with keyboard shortcuts; sampler playback.
-- **Exit:** a beginner can pick G major, step I to vii°, and for each see open shape, CAGED shapes, triads on each string set and an arpeggio in position, at 60 fps.
+- Scale and mode overlays with pentatonic boxes; left-handed and string-flip views; tuning presets and custom tunings, with every shape recomputed per tuning.
+- `AudioInputKit` v1: microphone permission flow and the tuner.
+- **Exit:** a beginner can pick G major, step I to vii°, and for each see open shape, CAGED shapes, triads on each string set and an arpeggio in position, at 60 fps, in any supported tuning, left- or right-handed; A minor pentatonic box 1 to 5 cycles cleanly; the tuner reads within ±3 cents.
 
 ## P1b: Rhythm, metronome and drum backing (3 weeks), covers RH-1 to RH-7, DR-1 to DR-6, ST-1 to ST-5
 
@@ -64,6 +70,22 @@ P1b (rhythm) needs only the P0 scaffold, so it runs alongside P1. P2 and P3 can 
 - Share extension (selected text first, page second), local HTML extraction, search results opening in the browser.
 - `SongSource` provider protocol, ready for a licensed provider.
 
+## P6: CAGED maps, theory tips, progress (4 weeks), covers CG-*, TT-*, PR-*
+
+- CAGED shape map with linked arpeggios and pentatonic boxes; position map for a fret window.
+- Theory facts engine and tips panel.
+- `ProgressKit`: dashboard, streaks with weekly goals, per-transition trends, drill suggestions.
+
+## P7: Ear training and looper (4 weeks), covers ET-*, LP-*
+
+- Interval, chord-quality and progression drills (graded by clicking the fretboard until P8).
+- Record over the backing with latency compensation, loop playback, onset timing view.
+
+## P8: Chord and note recognition by microphone (4 weeks), covers MR-*
+
+- Expected-chord verification from chroma templates; auto-counted clean changes; ear-training "play it back" grading.
+- **Exit:** at least 90% correct verdicts on a recorded test set of acoustic and electric chords, with false "correct" under 5%.
+
 ## Later
 
-User-defined drum patterns and MIDI drum file import (DR-7), pitch and chord detection from the microphone, iPad build, iCloud sync, teacher sharing, bass and 7-string, scales and pentatonic boxes, spaced repetition across sessions.
+User-defined drum patterns and MIDI drum file import (DR-7), iPad build, iCloud sync, teacher sharing, bass and 7-string, spaced repetition across sessions, Core ML chord model.

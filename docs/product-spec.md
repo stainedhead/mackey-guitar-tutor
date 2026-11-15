@@ -16,23 +16,23 @@ Beginners can memorize a few open chords but get lost on the rest of the neck. M
 
 ## 3. Scope
 
-In scope for v1: macOS desktop app, standard 6-string guitar, right- and left-handed views, standard tuning plus a small set of alternate tunings, local storage.
+In scope for v1: macOS desktop app, 6-string guitar, right- and left-handed views, standard and alternate tunings (Drop D, DADGAD, open G and others) with capo, scale and mode overlays, a built-in tuner (microphone input for single-note pitch only), local storage.
 
-Out of scope for v1: recorded (non-synthesized) backing tracks, audio pitch detection / "listen and grade", cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
+Out of scope for v1, planned for later phases: CAGED maps, theory tips, progress and streaks, ear training, looper and record-yourself, chord recognition by microphone ("listen and grade"). Not planned: recorded (non-synthesized) backing tracks, cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
 
 ## 4. Feature area A: Fretboard explorer (foundation)
 
 | ID | Requirement |
 |----|-------------|
 | FB-1 | Render a neck with 6 strings and 0 to 24 frets, inlays, configurable visible fret range, left/right-handed. |
-| FB-2 | Set a key (tonic + mode: major, natural minor, and the 7 diatonic modes; pentatonic and blues in a later phase). |
+| FB-2 | Set a key (tonic + mode: major, natural minor, and the 7 diatonic modes). Scale overlays including pentatonic and blues are SC-1 to SC-5. |
 | FB-3 | Show all notes of the key on the neck, labelled by note name, scale degree, or interval (toggle). |
 | FB-4 | Select a chord by symbol (`Cmaj7`) or by degree (`IV`). Show every occurrence of its tones, root highlighted. |
 | FB-5 | Show playable **voicings**: open shapes, CAGED shapes, and triads on each adjacent 3-string set, with all inversions. |
 | FB-6 | Show **arpeggios** for a chord within a chosen position (fret window of about 4 to 5 frets), with suggested fingering. |
 | FB-7 | **Cycle** with keyboard and buttons: next/previous scale degree, next/previous voicing, next/previous inversion, next/previous position up the neck. |
 | FB-8 | Play the selection as audio (strummed or arpeggiated) using built-in samples. |
-| FB-9 | Tuning and capo setting, which change every displayed fret position. |
+| FB-9 | Tuning and capo setting, which change every displayed fret position (detail in LH-1 to LH-5). |
 
 ## 5. Feature area B: Practice sessions
 
@@ -78,7 +78,23 @@ Players need to practise in cadence. A metronome and drum backing run at an adju
 
 Rhythm is available everywhere: in the explorer (for arpeggio and scale drills), in practice sessions (`@ladder 60-96 +4 drums:rock`), and in song view, where the target tempo is the song's tempo.
 
-## 8. Non-functional requirements
+## 8. Feature area E: Learning features
+
+Full design in [learning-features.md](learning-features.md).
+
+| Feature | IDs | Phase |
+|---------|-----|-------|
+| Built-in tuner (chromatic and per-string, any tuning) | TU-1 to TU-5 | v1 |
+| Scales and modes overlay (pentatonic, major/minor, modes, boxes, follow-the-chords) | SC-1 to SC-5 | v1 |
+| Left-handed mode and alternate tunings (Drop D, DADGAD, open G, custom, capo) | LH-1 to LH-5 | v1 |
+| CAGED and position maps | CG-1 to CG-5 | Later (P6) |
+| Theory tips (Roman numerals, function, why it fits, substitutions) | TT-1 to TT-4 | Later (P6) |
+| Progress, streaks and drill suggestions | PR-1 to PR-5 | Later (P6) |
+| Ear training | ET-1 to ET-5 | Later (P7) |
+| Looper and record yourself over the drums | LP-1 to LP-5 | Later (P7) |
+| Chord and note recognition by microphone | MR-1 to MR-4 | Later (P8) |
+
+## 9. Non-functional requirements
 
 | ID | Requirement |
 |----|-------------|
@@ -89,11 +105,12 @@ Rhythm is available everywhere: in the explorer (for arpeggio and scale drills),
 | NF-5 | Accessibility: VoiceOver labels for fretboard positions, colour-blind-safe palette, Dynamic Type where it applies. |
 | NF-6 | Music theory engine at 95%+ line coverage; parsers covered by a fixture corpus of real-world chord sheets. |
 | NF-8 | Rhythm timing is sample-accurate: under 1 ms drift over 10 minutes, tempo changes land on bar lines. |
-| NF-7 | No song content leaves the device; no telemetry without opt-in. |
+| NF-7 | No song content or audio leaves the device; no telemetry without opt-in. |
+| NF-9 | Tuner reads within ±3 cents and updates at least 20 times per second. |
 
-## 9. Open questions
+## 10. Open questions
 
 1. **Platform reach.** macOS only (per README), or plan for iPad from the start? SwiftUI keeps this cheap if decided early.
 2. **Distribution and money.** Mac App Store, direct download, free, or paid? This matters for licensing song content (paid apps have less room under fair use and stricter provider terms).
-3. **Audio input.** Is "listen and check my chord" a goal for a later phase? It affects whether we adopt an audio engine abstraction now.
+3. **Audio interfaces.** Should we test and document specific USB interfaces for electric players (tuner, looper, recognition), or rely on whatever macOS exposes?
 4. **Sharing.** Are teacher-to-student shared sessions in scope (files only, or a service)?

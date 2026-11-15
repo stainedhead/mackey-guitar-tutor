@@ -12,6 +12,7 @@ Status: Draft v0.1 (2026-11-15)
 | Persistence | SwiftData, plus plain-text source of truth for sessions and songs | Sessions are notation text, songs are ChordPro, so data is portable | [0003](adr/0003-text-first-persistence.md) |
 | Audio and rhythm | AVAudioEngine + `AVAudioUnitSampler` (guitar and General MIDI drum SoundFonts); one sample-accurate transport clock for metronome, drums and visuals | No dependencies, low latency, clean sound at any tempo | [0005](adr/0005-sequenced-drums.md) |
 | Song content | Local-only, user-initiated import; no scraping service | Legal and App Review risk | [0004](adr/0004-user-initiated-song-import.md) |
+| Audio input | AVAudioEngine input tap, McLeod/YIN pitch, chroma verification, Core ML later | Offline, private, no backend | [0006](adr/0006-on-device-audio-analysis.md) |
 | Testing | Swift Testing for packages, XCUITest for smoke flows | | |
 
 ## 2. Module layout
@@ -26,6 +27,8 @@ flowchart TD
     Theory[MusicTheory<br/>notes, intervals, scales, chords, keys, chord-symbol parser]
     Audio[RhythmKit<br/>transport clock, metronome, drum sequencer, speed trainer, sampler]
     Store[Persistence<br/>SwiftData models, import/export]
+    Input[AudioInputKit<br/>pitch detection, onsets, chord verification, recording]
+    Progress[ProgressKit<br/>stats, streaks, drill suggestions]
     Search[SongSourceKit<br/>SongSource protocol, web search, URL fetch, providers]
 
     App --> FBUI & Practice & Songs & Store & Search & Audio
@@ -35,6 +38,10 @@ flowchart TD
     Songs --> Voicing
     Search --> Songs
     Practice --> Audio
+    App --> Input & Progress
+    Input --> Theory
+    Input --> Audio
+    Progress --> Store
     Songs --> Audio
     Store --> Practice & Songs
 ```
@@ -44,6 +51,7 @@ Rules:
 - `MusicTheory` and `VoicingEngine` are pure Swift: no SwiftUI, no Foundation I/O, deterministic, value types. They are the most heavily tested code.
 - `PracticeKit` and `SongKit` depend on the theory layer only, never on UI. Their parsers are pure functions from `String` to a result with diagnostics.
 - Only `SongSourceKit` touches the network.
+- `AudioInputKit` is the only code that reads the microphone; all analysis is on device ([ADR 0006](adr/0006-on-device-audio-analysis.md)).
 - `RhythmKit` owns the audio engine and the `TransportClock`. Features subscribe to clock positions; nothing else keeps its own timer. Design in [rhythm.md](rhythm.md).
 
 ## 3. Domain model
@@ -68,7 +76,9 @@ Spelling matters: a beginner in F should see Bb, not A#. Keys own the spelling r
 ### 3.2 Fretboard and voicings
 
 ```swift
-struct Tuning { let strings: [Pitch] }             // low to high; .standard = E A D G B E
+struct Tuning { let name: String; let strings: [Pitch] }  // low to high; presets: standard, dropD, dadgad, openG, ...
+struct Handedness { var mirrored: Bool; var lowStringOnTop: Bool }
+struct ScalePattern { let scale: Scale; let kind: Kind; let positions: [FretPosition] }  // pentatonic box 1..5, 3nps
 struct Instrument { let tuning: Tuning; let frets: Int; let capo: Int }
 struct FretPosition { let string: Int; let fret: Int }
 struct Voicing {
