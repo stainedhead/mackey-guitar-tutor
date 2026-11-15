@@ -1,0 +1,86 @@
+# Product Spec
+
+Status: Draft v0.1 (2026-11-15)
+
+## 1. Vision
+
+Beginners can memorize a few open chords but get lost on the rest of the neck. Mackey Guitar Tutor shows *where* the notes of a key, chord, triad or arpeggio live, lets the player step through them at their own pace, turns that knowledge into deliberate practice, and connects it to songs they actually want to play.
+
+## 2. Users
+
+| Persona | Goal | What they need from us |
+|---------|------|------------------------|
+| **Beginner** (0 to 12 months) | Play first songs, change chords cleanly | Open chord shapes, slow drills, clear "what finger where" |
+| **Improver** (1 to 3 years) | Escape the open position, understand why chords fit | Triads across string sets, CAGED positions, arpeggios, Roman numerals |
+| **Teacher** | Hand students a focused routine | Quick-to-type practice sessions that can be shared as text |
+
+## 3. Scope
+
+In scope for v1: macOS desktop app, standard 6-string guitar, right- and left-handed views, standard tuning plus a small set of alternate tunings, local storage.
+
+Out of scope for v1: audio pitch detection / "listen and grade", cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
+
+## 4. Feature area A: Fretboard explorer (foundation)
+
+| ID | Requirement |
+|----|-------------|
+| FB-1 | Render a neck with 6 strings and 0 to 24 frets, inlays, configurable visible fret range, left/right-handed. |
+| FB-2 | Set a key (tonic + mode: major, natural minor, and the 7 diatonic modes; pentatonic and blues in a later phase). |
+| FB-3 | Show all notes of the key on the neck, labelled by note name, scale degree, or interval (toggle). |
+| FB-4 | Select a chord by symbol (`Cmaj7`) or by degree (`IV`). Show every occurrence of its tones, root highlighted. |
+| FB-5 | Show playable **voicings**: open shapes, CAGED shapes, and triads on each adjacent 3-string set, with all inversions. |
+| FB-6 | Show **arpeggios** for a chord within a chosen position (fret window of about 4 to 5 frets), with suggested fingering. |
+| FB-7 | **Cycle** with keyboard and buttons: next/previous scale degree, next/previous voicing, next/previous inversion, next/previous position up the neck. |
+| FB-8 | Play the selection as audio (strummed or arpeggiated) using built-in samples. |
+| FB-9 | Tuning and capo setting, which change every displayed fret position. |
+
+## 5. Feature area B: Practice sessions
+
+A practice session is a short, named routine: a sequence of items (notes, chords, triads, arpeggios), the transitions between them, and the method used to practice them. Full design in [practice-sessions.md](practice-sessions.md).
+
+| ID | Requirement |
+|----|-------------|
+| PS-1 | Create a session by typing one line of **quick-entry notation**, e.g. `key G; G > Em >> C > D x4 @ changes 60s`. A live preview shows the parsed result and any errors as you type. |
+| PS-2 | Items can be chords (`Em7`), degrees (`vi`), triads (`C:tri inv1 str123`), arpeggios (`Am:arp pos5`), or single notes (`n:F#`). |
+| PS-3 | Mark specific **transitions** as focus changes (`>>`) so the drill spends extra time on them. |
+| PS-4 | Choose a **method** from presets (one-minute changes, tempo ladder, loop, random order, name-the-note, strum pattern) with parameters. |
+| PS-5 | Run mode: fretboard shows the current and the *next* item (ghosted), metronome, count-in, timer, and progress through the sequence. |
+| PS-6 | Log each run (date, tempo reached, changes per minute, self-rating). Show simple history per session and per transition. |
+| PS-7 | Sessions are plain text under the hood, so they can be copied, pasted and shared. |
+| PS-8 | Generate a session from a song (Feature C) or from the current fretboard selection. |
+
+## 6. Feature area C: Songs (chords and lyrics)
+
+Full design and legal analysis in [song-import.md](song-import.md).
+
+| ID | Requirement |
+|----|-------------|
+| SG-1 | Import by **pasting text** in the common "chords over lyrics" layout; auto-detect chord lines vs lyric lines. |
+| SG-2 | Import **ChordPro** (`.cho`, `.chopro`, `.crd`) files and inline `[G]lyrics` text; export to ChordPro. |
+| SG-3 | Import from a web page the user is viewing, via a macOS **Share extension** or a "paste URL" action, user-initiated, one page at a time, stored only locally. |
+| SG-4 | **Search** for songs: show web search results that open in the user's browser; import happens only through SG-1 to SG-3. Licensed providers can plug in later behind the same interface. |
+| SG-5 | Display the song as a chart: lyrics with chords aligned above, sections (verse, chorus), and a chord palette of every chord used. |
+| SG-6 | Click any chord to see it on the fretboard. The app suggests a **voicing set** that minimises hand movement between consecutive chords. |
+| SG-7 | Transpose, set capo (with "capo to play in open shapes" suggestion), and detect the likely key so Roman numerals can be shown. |
+| SG-8 | Auto-scroll at a set tempo; current line and current chord highlighted, with the fretboard following along. |
+| SG-9 | One click "Practice this song": builds a practice session from the song's chord progression, flagging its hardest transitions as focus changes. |
+| SG-10 | Users can edit an imported song (fix a mis-parsed chord, move a chord) before saving. |
+
+## 7. Non-functional requirements
+
+| ID | Requirement |
+|----|-------------|
+| NF-1 | Fretboard redraw under 16 ms (60 fps) while cycling. |
+| NF-2 | Quick-entry parse and preview under 50 ms per keystroke. |
+| NF-3 | Fully usable offline; network only for search and URL import. |
+| NF-4 | Keyboard-first: every cycling and run-mode action has a shortcut. |
+| NF-5 | Accessibility: VoiceOver labels for fretboard positions, colour-blind-safe palette, Dynamic Type where it applies. |
+| NF-6 | Music theory engine at 95%+ line coverage; parsers covered by a fixture corpus of real-world chord sheets. |
+| NF-7 | No song content leaves the device; no telemetry without opt-in. |
+
+## 8. Open questions
+
+1. **Platform reach.** macOS only (per README), or plan for iPad from the start? SwiftUI keeps this cheap if decided early.
+2. **Distribution and money.** Mac App Store, direct download, free, or paid? This matters for licensing song content (paid apps have less room under fair use and stricter provider terms).
+3. **Audio input.** Is "listen and check my chord" a goal for a later phase? It affects whether we adopt an audio engine abstraction now.
+4. **Sharing.** Are teacher-to-student shared sessions in scope (files only, or a service)?
