@@ -57,3 +57,4 @@ The earlier product spec's IDs are all kept: FB-1 to FB-9, PS-1 to PS-8, SG-1 to
 | Teacher-to-student sharing: files only, or a service? | J | Before any sharing work (not planned for v1) |
 | Legal review of web import | J | Start of P5 |
 | Confirm each sound asset's licence at source | Build | P1b |
+| FB-8.2 instrument choice deferred to P1b; v1 foundation ships one synthesised voice (default, pending J) | J | P1b |
