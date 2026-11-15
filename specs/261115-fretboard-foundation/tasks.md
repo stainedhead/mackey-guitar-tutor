@@ -264,12 +264,14 @@
 ## Phase D: `src-tauri` and `ui/`
 
 ### D1. Tauri 2 scaffold, config, capabilities, command registry
+- **Progress:** Scaffold done (infrastructure worker): `mackey-app` builds on Linux, config, capabilities, plists, icons, `app_info` command; the command registry is the `COMMAND_NAMES` list and its tests. Pending: `fretboard_view`, the capability/permission-per-command test, logging.
 - **Depends on:** B14, C9 · **Est:** L · **FR:** FR-002, FR-003, FR-004 (partly)
 - **Files:** `src-tauri/{Cargo.toml,build.rs,tauri.conf.json,Info.plist,capabilities/default.json,icons/**,README.md,src/{main.rs,lib.rs,commands_list.rs,commands/mod.rs}}`, root `Cargo.toml` (add `src-tauri` to `members`, add `tauri`, `tauri-build`, `tracing-subscriber`, `tracing-appender` to `[workspace.dependencies]`), `Makefile` `ui/dist` stub rule (D-15), `ui/package.json` minimal so `tauri.conf.json`'s `beforeBuildCommand` works, `ui/.nvmrc` (22) and `engines`, `src-tauri/capabilities/README.md`, `src-tauri/icons/README.md` (doccheck does not skip these folders).
 - **Acceptance (SAC-02):** `cargo build -p mackey-app` succeeds on Linux with WebKitGTK and ALSA dev packages; window 1280×800, min 900×600; CSP per the architecture; capabilities list only app command permissions; `NSMicrophoneUsageDescription` in `Info.plist`; one command `fretboard_view` returning an empty-selection view works (walking skeleton); archcheck passes (`tauri` only in `mackey-app`); `make deny` passes or `deny.toml` is extended for permissive licences only (Q-6).
 - **Tests:** unit test that `COMMAND_NAMES` has no duplicates and that `capabilities/default.json` mentions exactly the permissions `allow-<name>` for each name (parse the JSON in the test).
 
 ### D2. `AppError`, panic guard, logging
+- **Progress:** Partly done: `AppError { message, details }`, `guard` with tests (AC-NF-24). Pending: `AppErrorKind`, core-error `From` conversions, mutex poisoning, `tracing` file logging.
 - **Depends on:** D1 · **Est:** M · **FR:** FR-004 · **SAC-03**
 - **Files:** `src-tauri/src/{error.rs,guard.rs,logging.rs}`.
 - **Acceptance:** `AppError`/`AppErrorKind` with `From` conversions mapping each core error to a plain message (E-FB-1 text for chord parse errors, "No audio output" for `NoOutputDevice`, "Microphone access is off" for `PermissionDenied`); `guard(|| ...)` wraps a closure in `catch_unwind(AssertUnwindSafe)` and returns `AppError { kind: Internal, message: "Something went wrong", details: Some(panic message) }`, logging the full chain with `tracing`; poisoned mutex handled (recover with `into_inner`, log); logging layer writes to `app_data_dir/logs/mackey.log` (rotating daily, 3 kept) with a test using a temp dir.
@@ -294,12 +296,14 @@
 - **Tests:** with `FakeAudio::NoDevice`: AC-E-FB-8; with `Recording`: strum order and delays for a C voicing (6 notes → 5 with the muted low E, 30 ms spacing in samples at 48 kHz = 1,440), `play_note` frequency for string 3 fret 0 = 196.0 Hz; target list for capo 2 equals F#2 B2 E3 A3 C#4 F#4; throttle unit test.
 
 ### D6. Bindings generator, fixtures and stale-bindings check
+- **Progress:** Skeleton done: `ts-rs` export of `AppInfo` and `AppError` into `ui/src/bindings/`, `make bindings`, `make bindings-check`, CI `bindings` job (D-44). Pending: command-wrapper generator, `events.ts`, `scenarios.json`.
 - **Depends on:** D4, D5 · **Est:** L · **FR:** FR-003
 - **Files:** `src-tauri/src/{commands/manifest.rs,bindings.rs}`, `ui/src/bindings/{README.md,*.ts (generated)}`, `ui/src/mocks/scenarios.json` (generated), `Makefile` (`bindings`, `bindings-check` in E1).
 - **Acceptance:** all boundary types export with `ts-rs`; `commands.ts` has one typed async wrapper per command and `events.ts` the `tuner_reading` subscription helper; generated files carry a "GENERATED, do not edit" header; `scenarios.json` produced by driving the real `Explorer` through the scripted sequences listed in D14; running the generator twice yields identical bytes; `COMMAND_NAMES` equals the manifest names (test).
 - **Tests:** the generator tests themselves (run only with `--features ts`). Staleness cannot be checked inside a normal `cargo test`, so it is checked by `make bindings-check` (E1), which regenerates and runs `git diff --exit-code`.
 
 ### D7. UI scaffold: Vite, TS strict, lint, test runners, tokens, command layer
+- **Progress:** Scaffold done: Vite 7, React 18, TS strict, typed ESLint + Prettier, Vitest, `src/ipc/` command layer with mock selection (D-43, D-45). Pending: tokens, store, contrast tests.
 - **Depends on:** D1 · **Est:** L · **FR:** FR-002, FR-021
 - **Files:** `ui/package.json`, `ui/package-lock.json` (committed), `ui/tsconfig.json` (`strict`, `noUncheckedIndexedAccess`), `ui/vite.config.ts` (port 1420, `build.target: 'safari16'`, mock mode), `ui/eslint.config.js` (typescript-eslint strict, react-hooks, jsx-a11y), `ui/.prettierrc`, `ui/index.html`, `ui/src/{main.tsx,App.tsx,commands/index.ts,state/store.ts,theme/tokens.css}`, READMEs in `ui/` and `ui/src/bindings/` (`ui/src/**` is skipped by doccheck; `ui/e2e/` gets its README in D15).
 - **Acceptance:** `npm ci && npm run lint && npm run typecheck && npm test` pass; tokens define the Okabe-Ito colours of G-2 (`--note-root #D55E00`, `--note-third #0072B2`, `--note-fifth #009E73`, `--note-seventh #E69F00`, `--note-ext #CC79A7`, scale grey, `--anchor`, `--muted`) in light and dark with `prefers-color-scheme` and `data-theme`; text contrast tests (WCAG AA 4.5:1; note dots 3:1 on the neck) computed in a Vitest test from the token values; command layer selects real or mock implementation; pinned exact versions.
@@ -348,6 +352,7 @@
 - **Tests:** the Vitest suite; a test that every scenario step deserialises into the generated types (type-level check via `satisfies`).
 
 ### D15. Playwright suite (WebKit, desktop and iPad)
+- **Progress:** Scaffold done: Playwright config (WebKit; `desktop` and `ipad` projects, mock web server), `e2e/README.md`, one skeleton spec. Pending: the feature specs, portrait project, axe.
 - **Depends on:** D14 · **Est:** L · **FR:** FR-006, FR-021..027
 - **Files:** `ui/e2e/README.md` (doccheck does not skip `e2e`), `ui/playwright.config.ts` (projects `desktop` 1280×800 and `ipad` 1180×820 with `hasTouch`, a third `ipad-portrait` 820×1180; webServer `vite --mode mock`), `ui/e2e/*.spec.ts`.
 - **Acceptance:** AC-P0-5 (neck draws 6 strings and 22 frets), AC-FB-9.1b (each cycling key pressed 100 times, each redraw ≤ 16 ms measured from `keydown` dispatch to the next `requestAnimationFrame` after the DOM update, p100 ≤ 16 ms on the mock layer, with the first 5 warm-up presses discarded and the budget stated in the test), AC-FB-9.1c (announcements for each cycling action), AC-FB-1.6 (tooltip), AC-LH-1.1 (nut on the right, frets mirrored, tooltips unchanged), shortcut tests (key ignored in the chord field), tuner states, iPad layouts, axe accessibility scan (`@axe-core/playwright`, no serious violations on Explore and Tuner in light and dark), colour-blind check is the token test in D7.
@@ -363,37 +368,44 @@
 ## Phase E: Makefile, AGENTS.md, CI, docs
 
 ### E1. Makefile targets
+- **Progress:** Done except `dev`: `ui-lint ui-test e2e bindings bindings-check app ios-sim`, stub rule, `ui/node_modules` rule, `check` extended (D-15, D-46).
 - **Depends on:** D7 · **Est:** M · **FR:** FR-005 · **SAC-04**
 - **Files:** `Makefile`.
 - **Acceptance:** `.PHONY` gains `ui-lint ui-test e2e bindings bindings-check app dev ios-sim`; `ui/node_modules` file target runs `npm ci --prefix ui` when `package-lock.json` is newer; `ui-lint` = eslint + prettier `--check` + `tsc --noEmit`; `ui-test` = `vitest run`; `e2e` = `npx playwright test` (installs WebKit when `CI` is unset? no: documented as a one-time `npx playwright install webkit`); `bindings` and `bindings-check` per the architecture; `app` = `npx tauri build --target universal-apple-darwin` on macOS (`APP_ARGS ?=`; on other hosts it builds for the host with `--no-bundle` and says so); `dev` = `npx tauri dev`; `ios-sim` = `npx tauri ios init` if `src-tauri/gen/apple` is missing, then the simulator build (E6 sets the exact command); the stub rule `ui/dist/index.html`; `make check` = existing steps plus `ui-lint ui-test` and `bindings-check` when `node` is installed, otherwise a clear error naming what to install.
 - **Tests:** `make -n` dry runs in the task notes; `make doccheck` passes after E2.
 
 ### E2. AGENTS.md updates
+- **Progress:** Done: AGENTS.md Commands table, CI table and "Not yet in place" updated.
 - **Depends on:** E1 · **Est:** S · **FR:** FR-005
 - **Files:** `AGENTS.md`.
 - **Acceptance:** Commands table gains a row per new `.PHONY` target (`ui-lint`, `ui-test`, `e2e`, `bindings`, `bindings-check`, `app`, `dev`, `ios-sim`) and the sentence "UI and app targets ... are added with the Tauri scaffold" is replaced by the facts; CI/CD "Not yet in place" paragraph updated (what now exists, what remains: `release.yml`); crate table unchanged (already allows these edges) with a note that `mackey-audio` uses theory only for now; `make doccheck` passes.
 
 ### E3. CI: Rust jobs with system packages, stub dist
+- **Progress:** Done: Linux packages step; stub `ui/dist` via the Makefile.
 - **Depends on:** D1 · **Est:** M · **FR:** FR-006
 - **Files:** `.github/workflows/ci.yml`.
 - **Acceptance:** the `rust` matrix job installs Linux packages (`sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev librsvg2-dev libasound2-dev libssl-dev pkg-config`) before the Rust steps; macOS needs nothing; `make cover` excludes the thin glue by regex (E7); all steps use `make`.
 
 ### E4. CI: UI, Playwright and stale-bindings jobs
+- **Progress:** Done: jobs `ui`, `e2e`, `bindings`. Cannot be run on GitHub from the sandbox.
 - **Depends on:** D15, E1 · **Est:** M · **FR:** FR-006
 - **Files:** `.github/workflows/ci.yml`.
 - **Acceptance:** jobs `ui` (setup-node 22 with npm cache, `make ui-lint`, `make ui-test`), `e2e` (`npx playwright install --with-deps webkit` then `make e2e`; uploads `ui/playwright-report` and traces on failure), `bindings` (Rust toolchain, system packages, `make bindings-check`); each exits 0 on the PR.
 
 ### E5. CI: universal macOS build
+- **Progress:** Written, not run (needs macOS): job `mac-app` with the `lipo -archs` check.
 - **Depends on:** D1, E1 · **Est:** M · **FR:** FR-006 · **SAC-19**
 - **Files:** `.github/workflows/ci.yml`.
 - **Acceptance:** job `mac-app` on `macos-latest`: Rust (targets from `rust-toolchain.toml` include both Apple triples), setup-node, `make app` producing a universal `.app` (unsigned; no Apple secrets referenced), artefact uploaded; verify with `lipo -archs` that both `arm64` and `x86_64` are present (step fails otherwise).
 
 ### E6. CI: iOS Simulator build
+- **Progress:** Written, not run (needs macOS): job `ios-sim` with the compile-only fallback; record the working command in ADR 0008 after the first run.
 - **Depends on:** D1, E1 · **Est:** L (unknown-risk task: start early) · **FR:** FR-006
 - **Files:** `.github/workflows/ci.yml`, `Makefile` (`ios-sim`), `docs/adr/0008-ipad-via-tauri-ios.md` (one-paragraph note with the working command).
 - **Acceptance:** job `ios-sim` on `macos-latest` runs `make ios-sim` successfully with no Apple account; the fallback chain from research.md Q-3 is tried in order and the first that works is recorded; the job selects a simulator runtime that exists on the runner image (`xcrun simctl list runtimes`); if `NSMicrophoneUsageDescription` must be merged into the generated `Info.plist` for iOS it is configured in `tauri.conf.json`'s `bundle.iOS` (`infoPlist`) not by editing generated files.
 
 ### E7. Coverage configuration
+- **Progress:** Done: `COVER_IGNORE` in the Makefile (D-48).
 - **Depends on:** D5 · **Est:** S · **FR:** FR-006
 - **Files:** `Makefile` (`cover`: `--ignore-filename-regex` for `src-tauri/src/main.rs`, `src-tauri/build.rs`, `crates/mackey-audio/src/io/`, `src-tauri/src/bindings.rs`, each excluded with a comment saying why).
 - **Acceptance:** `make cover` ≥ 80% overall; the exclusion list is documented in `AGENTS.md`'s Commands row for `make cover`; new pure-crate code is fully covered (check per crate with `cargo llvm-cov -p`).
@@ -406,6 +418,7 @@
 ---
 
 ### E9. `xtask doccheck`: skip generated report folders
+- **Progress:** Done (with a unit-test extension).
 - **Depends on:** none (do it with E1) · **Est:** S · **FR:** FR-005
 - **Files:** `xtask/src/doccheck.rs` (add `playwright-report`, `test-results`, `coverage` to `SKIP_DIRS`; extend its unit test first), `xtask/README.md`.
 - **Why:** these folders are git-ignored but exist in the working tree after `make e2e` or `make ui-test`, and `doccheck` walks the working tree, so a local `make check` would fail with "has no README.md".

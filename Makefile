@@ -1,22 +1,35 @@
-.PHONY: build test props lint fmt fmt-check cover archcheck doccheck deny tools check
+.PHONY: build test props lint fmt fmt-check cover archcheck doccheck deny tools check ui-lint ui-test e2e bindings bindings-check app ios-sim
 
 # Toolchain comes from rust-toolchain.toml; every cargo call below uses it.
 
-build:
+# tauri::generate_context! fails to compile when the frontendDist folder is missing, so the
+# Rust targets create a stub ui/dist/index.html when no real UI build exists (D-15). A real
+# `npm --prefix ui run build` (make app, make ios-sim) replaces it.
+UI_STUB := ui/dist/index.html
+$(UI_STUB):
+	mkdir -p ui/dist
+	echo '<!doctype html><title>Mackey Guitar Tutor (UI not built)</title>' > $(UI_STUB)
+
+# UI dependencies, installed from the lockfile whenever it changes.
+ui/node_modules: ui/package-lock.json
+	npm ci --prefix ui
+	touch ui/node_modules
+
+build: $(UI_STUB)
 	cargo build --workspace --all-targets
 
 # Unit, integration and doc tests (benches are compiled by make build and make lint).
-test:
+test: $(UI_STUB)
 	cargo test --workspace
 
 # Property tests with many more cases than the default 256 (proptest). A failure writes
 # the shrunk case to the crate's proptest-regressions/; commit it with the fix so
 # make test replays it. CI runs this on Linux.
 PROPTEST_CASES ?= 10000
-props:
+props: $(UI_STUB)
 	PROPTEST_CASES=$(PROPTEST_CASES) cargo test --workspace --release
 
-lint:
+lint: $(UI_STUB)
 	cargo clippy --workspace --all-targets --all-features -- -D warnings
 
 fmt:
@@ -26,8 +39,11 @@ fmt-check:
 	cargo fmt --all --check
 
 # Line coverage with cargo-llvm-cov; fails under 80% of lines overall (AGENTS.md).
-cover:
-	cargo llvm-cov --workspace --fail-under-lines 80 --summary-only
+# Excluded as thin glue that needs a window system or the Tauri runtime (D-16): the desktop
+# entry point, the build script and the runtime builder.
+COVER_IGNORE := src-tauri/(src/main|src/runtime|build)\.rs
+cover: $(UI_STUB)
+	cargo llvm-cov --workspace --fail-under-lines 80 --summary-only --ignore-filename-regex '$(COVER_IGNORE)'
 
 # Crate layer rules (AGENTS.md): which crates may depend on which, and which may do I/O.
 archcheck:
@@ -45,4 +61,51 @@ deny:
 tools:
 	cargo install --locked cargo-deny cargo-llvm-cov
 
-check: fmt lint archcheck doccheck deny test
+# UI checks: ESLint (typed, strict), Prettier --check and tsc --noEmit.
+ui-lint: ui/node_modules
+	npm --prefix ui run lint
+	npm --prefix ui run typecheck
+
+# UI unit tests (Vitest, jsdom, mocked command layer).
+ui-test: ui/node_modules
+	npm --prefix ui test
+
+# Playwright specs in WebKit (desktop and iPad projects) against the mocked command layer.
+# One-time: npx --prefix ui playwright install --with-deps webkit
+e2e: ui/node_modules
+	npm --prefix ui run e2e
+
+# Regenerate the TypeScript bindings (ts-rs) into ui/src/bindings.
+bindings: $(UI_STUB)
+	cargo test -p mackey-app export_bindings
+
+# Fails when the committed bindings differ from what the Rust types generate.
+bindings-check: bindings
+	@if [ -n "$$(git status --porcelain -- ui/src/bindings)" ]; then \
+		echo "ui/src/bindings is stale: run 'make bindings' and commit the result"; \
+		git status --short -- ui/src/bindings; \
+		exit 1; \
+	fi
+
+# The app. On macOS: a universal (arm64 + x86_64) .app and .dmg, ad-hoc signed
+# (bundle.macOS.signingIdentity "-"). Elsewhere: a host binary with no bundle, as a smoke build.
+APP_ARGS ?=
+# The Tauri CLI looks for src-tauri/ below the current folder, so run it from the repo root
+# (npm --prefix ui run would start it in ui/).
+TAURI := ui/node_modules/.bin/tauri
+app: ui/node_modules
+ifeq ($(shell uname -s),Darwin)
+	$(TAURI) build --target universal-apple-darwin $(APP_ARGS)
+else
+	@echo "Not macOS: building the host binary without a bundle (macOS is the real target)"
+	$(TAURI) build --no-bundle $(APP_ARGS)
+endif
+
+# Compile the app for the iOS Simulator (no Apple account, unsigned). macOS with Xcode only.
+# Generates src-tauri/gen/apple on first run (git-ignored, never hand-edited), then runs the
+# debug simulator build; the CLI's before-build hook builds the frontend.
+ios-sim: ui/node_modules
+	test -d src-tauri/gen/apple || $(TAURI) ios init --ci
+	$(TAURI) ios build --debug --target aarch64-sim --ci $(APP_ARGS)
+
+check: fmt lint archcheck doccheck deny test ui-lint ui-test bindings-check

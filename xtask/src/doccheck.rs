@@ -14,6 +14,9 @@ const SKIP_DIRS: &[&str] = &[
     "node_modules",
     "dist",
     "gen",
+    "playwright-report",
+    "test-results",
+    "coverage",
     "src",
     "tests",
     "benches",
@@ -141,6 +144,12 @@ mod tests {
             ".git/objects",
             "docs/adr",
             "target/debug",
+            "ui/node_modules/pkg",
+            "ui/dist",
+            "ui/playwright-report",
+            "ui/test-results",
+            "ui/coverage",
+            "src-tauri/gen/apple",
         ] {
             fs::create_dir_all(root.join(dir)).unwrap();
         }
@@ -148,6 +157,8 @@ mod tests {
             "crates/README.md",
             "crates/mackey-theory/README.md",
             "specs/README.md",
+            "ui/README.md",
+            "src-tauri/README.md",
         ] {
             fs::write(root.join(file), "# x\n").unwrap();
         }

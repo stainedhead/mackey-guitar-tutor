@@ -3,7 +3,7 @@ resolver = "3"
 # Domain crates live in crates/<name>/ (mackey-theory, mackey-voicing, ...) and the Tauri
 # shell in src-tauri/ (crate mackey-app). Add each one here when you create it, and to the
 # layer table in xtask/src/archcheck.rs and AGENTS.md.
-members = ["crates/mackey-theory", "xtask"]
+members = ["crates/mackey-theory", "src-tauri", "xtask"]
 
 [workspace.package]
 edition = "2024"
@@ -24,6 +24,10 @@ ts-rs = "12"
 proptest = "1"
 insta = { version = "1", features = ["yaml"] }
 criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
+tracing = "0.1"
+# Tauri 2 stable line (3.x is alpha); tauri-build must match tauri's major.
+tauri = { version = "2", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
