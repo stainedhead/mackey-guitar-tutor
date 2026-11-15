@@ -1,0 +1,50 @@
+[workspace]
+resolver = "3"
+# Domain crates live in crates/<name>/ (mackey-theory, mackey-voicing, ...) and the Tauri
+# shell in src-tauri/ (crate mackey-app). Add each one here when you create it, and to the
+# layer table in xtask/src/archcheck.rs and AGENTS.md.
+members = ["xtask"]
+
+[workspace.package]
+edition = "2024"
+# Keep in step with rust-toolchain.toml (the single source for the toolchain).
+rust-version = "1.100"
+license = "MIT"
+repository = "https://github.com/stainedhead/mackey-guitar-tutor"
+publish = false
+
+[workspace.dependencies]
+# Every third-party version is declared once here; crates use `dep = { workspace = true }`.
+# Add an entry when the first crate needs it (cargo warns about unused ones). Standard
+# picks (AGENTS.md): thiserror 2, serde 1 (derive), proptest 1, insta 1 (yaml), criterion.
+serde_json = "1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+unreachable_pub = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+# CI runs clippy with -D warnings, so every "warn" here fails the build.
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+# No panics in library code; clippy.toml allows these in tests.
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+todo = "warn"
+unimplemented = "warn"
+dbg_macro = "warn"
+print_stdout = "warn"
+print_stderr = "warn"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
+# When proptest and insta join the workspace, add `[profile.dev.package.proptest]`,
+# `[profile.dev.package.insta]` and `[profile.dev.package.similar]` with `opt-level = 3`:
+# property tests and snapshot diffs run much faster with optimised dependencies.

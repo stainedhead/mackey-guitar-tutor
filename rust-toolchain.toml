@@ -1,0 +1,7 @@
+# Single source for the Rust toolchain: CI, releases and every contributor use this.
+# Bump to the latest stable when it ships, together with rust-version in Cargo.toml.
+[toolchain]
+channel = "1.100.0"
+profile = "minimal"
+components = ["clippy", "rustfmt", "llvm-tools-preview"]
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "aarch64-apple-ios", "aarch64-apple-ios-sim"]

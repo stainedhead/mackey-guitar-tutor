@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  rust:
+    name: rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macOS is the real target; Linux is a cheap, fast check of the portable core.
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install the toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov,cargo-deny
+      - name: Format
+        run: make fmt-check
+      - name: Lint
+        run: make lint
+      - name: Architecture rules
+        run: make archcheck
+      - name: Docs checks
+        run: make doccheck
+      - name: Test
+        run: make test
+      - name: Coverage
+        run: make cover
+      - name: Licences and advisories
+        if: runner.os == 'Linux'
+        run: make deny
+      - name: Property tests (many cases)
+        if: runner.os == 'Linux'
+        run: make props
+
+  # Added in roadmap phase P0 with ui/ and src-tauri/: UI lint, type check, Vitest,
+  # Playwright (WebKit, desktop and iPad viewports), the stale-bindings check,
+  # `tauri build` (universal macOS) and `tauri ios build` for the iOS Simulator.
