@@ -7,7 +7,7 @@
 Players need to start slow and build up to full speed, so drum backing must play at any tempo from very slow to fast, stay in time with the metronome and practice visuals, and follow song sections.
 
 ## Decision
-Represent drum grooves as step patterns (JSON) and play them through a General MIDI drum SoundFont with rustysynth (a pure-Rust SoundFont synthesizer) inside the cpal audio callback, scheduled from the shared `TransportClock`. The bundled SoundFont must have a licence that allows redistribution in the app (checked before P1b ships).
+Represent drum grooves as step patterns (JSON) and play them through a General MIDI drum SoundFont with rustysynth (a pure-Rust SoundFont synthesizer) inside the cpal audio callback, scheduled from the shared `TransportClock`. Drum kits are CC0 or public-domain multi-sample kits played by a small one-shot sampler, with a General MIDI SoundFont (MIT) as fallback; see [sound-assets.md](../sound-assets.md).
 
 ## Alternatives
 - **Recorded audio loops with time-stretching:** more realistic at the native tempo, but artefacts at large stretch ratios (e.g. 50% speed), larger app size, and loops must be licensed or recorded.

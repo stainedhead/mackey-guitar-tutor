@@ -64,7 +64,7 @@ flowchart LR
 
 ### 5.2 Drum patterns are data, not audio loops
 
-Patterns are step sequences played through a drum-kit SoundFont (General MIDI drum map) by rustysynth, a pure-Rust synthesizer running inside the audio callback. Because hits are synthesized, any tempo from 30 to 250 bpm sounds clean: no time-stretching artefacts. See [ADR 0005](adr/0005-sequenced-drums.md).
+Patterns are step sequences played through freely licensed multi-sampled drum kits by a small one-shot sampler inside the audio callback, mapped to General MIDI drum notes ([sound-assets.md](sound-assets.md)). Because hits are synthesized, any tempo from 30 to 250 bpm sounds clean: no time-stretching artefacts. See [ADR 0005](adr/0005-sequenced-drums.md).
 
 Pattern definition (bundled as JSON, also the user-pattern format later):
 

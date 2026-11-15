@@ -7,7 +7,7 @@
 The tuner (v1), looper, ear training and chord recognition all listen to the player through the microphone or an audio interface.
 
 ## Decision
-All audio input is processed on device, in real time, in the `mackey-audio` crate: a cpal input stream feeds a lock-free ring buffer, and an analysis thread runs pitch detection (McLeod / YIN), onset detection, and chroma-based expected-chord verification. An ONNX model run with ONNX Runtime (the `ort` crate) is the upgrade path, as it runs on macOS (with Core ML acceleration) and on any platform we add later. Recordings are stored only locally. The OS microphone permission (the macOS privacy prompt, declared with `NSMicrophoneUsageDescription`) is requested the first time a listening feature is opened, with a plain explanation.
+All audio input is processed on device, in real time, in the `mackey-audio` crate: a cpal input stream feeds a lock-free ring buffer, and an analysis thread runs pitch detection (McLeod / YIN), onset detection, and chroma-based expected-chord verification. An ONNX model run with ONNX Runtime (the `ort` crate) is the upgrade path, as it runs on macOS (with Core ML acceleration) and on any platform we add later. Recordings are stored only locally. The OS microphone permission (the macOS and iPadOS privacy prompt, declared with `NSMicrophoneUsageDescription`) is requested the first time a listening feature is opened, with a plain explanation.
 
 ## Alternatives
 - **Cloud recognition service:** more model capacity, but adds latency, cost, an account, and sends the user's audio off device.

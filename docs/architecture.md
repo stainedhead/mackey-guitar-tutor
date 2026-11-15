@@ -1,22 +1,22 @@
 # Architecture
 
-Status: Draft v0.2 (2026-11-15). Stack: Rust core, Tauri 2 desktop shell, web UI. Target: macOS only for now (universal build). Windows, Linux and mobile are deferred; the design keeps them possible but we do not build or test for them yet.
+Status: Draft v0.2 (2026-11-15). Stack: Rust core, Tauri 2 shell, web UI. Targets: macOS (universal build) and iPad (Tauri iOS) from the start; see [platforms.md](platforms.md). Windows, Linux, iPhone and Android are deferred; the design keeps them possible but we do not build or test for them yet.
 
 ## 1. Technology choices
 
 | Concern | Choice | Why | ADR |
 |---------|--------|-----|-----|
 | Core language | Rust (stable, 2024 edition) in a Cargo workspace | Strong types for music theory, safe and predictable real-time audio, portable if other platforms are added later | [0001](adr/0001-rust-core-tauri-shell.md) |
-| App shell | Tauri 2 | Small native Mac app with the Rust backend in-process; other platforms possible later | 0001 |
+| App shell | Tauri 2 | One app for Mac (desktop) and iPad (iOS target) with the Rust backend in-process | 0001, [0008](adr/0008-ipad-via-tauri-ios.md) |
 | UI | TypeScript, React, Vite; fretboard drawn in SVG | Mainstream skills, crisp scalable neck, built-in hit-testing and accessibility | [0007](adr/0007-web-ui-and-ipc-boundary.md) |
 | UI to core boundary | Tauri commands and events with generated TypeScript types (tauri-specta or ts-rs) | One source of truth for types, compile-time checked on both sides | 0007 |
 | Modularity | One crate per domain; pure core crates with no I/O | Testable, reusable on mobile and in a CLI | [0002](adr/0002-pure-music-theory-core.md) |
-| Persistence | SQLite (rusqlite, bundled) in `~/Library/Application Support/`; plain text is the source of truth for sessions and songs | Portable data, zero setup | [0003](adr/0003-text-first-persistence.md) |
-| Audio output and rhythm | cpal on CoreAudio + rustysynth SoundFont synth for guitar and GM drums; one sample-accurate transport clock | Native low latency without a web audio dependency; clean sound at any tempo | [0005](adr/0005-sequenced-drums.md) |
+| Persistence | SQLite (rusqlite, bundled) in the app container (`~/Library/Application Support/` on Mac, the app sandbox on iPad); plain text is the source of truth for sessions and songs | Portable data, zero setup | [0003](adr/0003-text-first-persistence.md) |
+| Audio output and rhythm | cpal on CoreAudio (Mac and iPad) + rustysynth for guitar tones + a small one-shot sampler for CC0 drum kits ([sound-assets.md](sound-assets.md)); a Swift plugin sets up `AVAudioSession` on iPad; one sample-accurate transport clock | Native low latency without a web audio dependency; clean sound at any tempo | [0005](adr/0005-sequenced-drums.md) |
 | Audio input | cpal input stream; McLeod/YIN pitch, onsets, chroma verification; ONNX Runtime (ort) model later | Offline, private, no backend | [0006](adr/0006-on-device-audio-analysis.md) |
 | Song content | Local-only, user-initiated import; no scraping service | Legal and store-review risk | [0004](adr/0004-user-initiated-song-import.md) |
-| Distribution | Notarized, signed universal `.dmg` with the Tauri updater; Mac App Store optional later | No dependency on store review for v1 | |
-| Testing | `cargo test` with proptest (properties) and insta (golden files), criterion benchmarks; Vitest for UI logic; Playwright against the dev UI and tauri-driver for end-to-end smoke tests | | |
+| Distribution | Mac: unsigned (ad-hoc signed) universal `.dmg` on GitHub Releases, no updater. iPad: Xcode install (free Apple ID or Developer Program). App Store later | Personal use for now | |
+| Testing | `cargo test` with proptest (properties) and insta (golden files), criterion benchmarks; Vitest for UI logic; Playwright (WebKit, desktop and iPad viewports) against the UI with a mocked command layer; a short manual smoke checklist on Mac and iPad per release (tauri-driver cannot drive WKWebView) | | |
 
 ## 2. Module layout
 
@@ -33,6 +33,7 @@ flowchart TD
     Progress[mackey-progress<br/>stats, streaks, drill suggestions]
     Store[mackey-store<br/>SQLite, import/export]
     Sources[mackey-sources<br/>SongSource trait, web search, providers]
+    Session[plugins/audio-session<br/>Swift: AVAudioSession on iPad]
 
     UI <-->|typed commands and events| App
     App --> Practice & Songs & Store & Sources & Audio & Progress
@@ -41,6 +42,7 @@ flowchart TD
     Songs --> Theory & Voicing
     Sources --> Songs
     Audio --> Rhythm --> Theory
+    App --> Session
     Progress --> Store
     Store --> Practice & Songs
 ```
@@ -50,6 +52,7 @@ Rules:
 - `mackey-theory`, `mackey-voicing`, `mackey-practice` and `mackey-songs` are pure: no I/O, no threads, no global state, deterministic. Parsers are pure functions from `&str` to a result with diagnostics. They contain nothing macOS-specific, so they would compile unchanged for other targets later.
 - `mackey-rhythm` is pure scheduling logic (what happens at which sample). `mackey-audio` is the only crate that opens audio devices, and the only one that reads the microphone ([ADR 0006](adr/0006-on-device-audio-analysis.md)).
 - Only `mackey-sources` touches the network.
+- Platform-specific code is limited to `src-tauri` (windows, menus, pickers) and the Swift `audio-session` plugin on iPad; everything else is shared by Mac and iPad.
 - `src-tauri` is a thin adapter: it maps commands to core calls, owns app state behind a mutex (never touched by the audio thread), and forwards events. No music logic lives there.
 - The UI holds view state only. Anything a test should check (which frets to light, which voicing is chosen) is computed in Rust and sent to the UI as data.
 
@@ -197,13 +200,15 @@ flowchart LR
 
 - The cpal output callback is the clock. It never allocates, locks or blocks; all messages arrive through single-producer/single-consumer ring buffers (rtrb), and synth voices and patterns are pre-allocated.
 - The UI does not use the event's arrival time. Each `transport_position` event carries sample position, tempo and the output latency; the UI's `requestAnimationFrame` loop extrapolates from the last event, so the playhead and chord changes stay smooth despite IPC jitter and line up with what the player hears.
-- Device and latency: CoreAudio default device, with a device picker for USB audio interfaces and a buffer-size setting. Anything macOS sees as a CoreAudio device works. (cpal also supports WASAPI, ASIO, ALSA and JACK, which is what keeps Windows and Linux possible later.)
+- Device and latency: CoreAudio on both Mac and iPad (on iPad, after the audio-session plugin sets category, mode and buffer size). Default device, with a device picker for USB audio interfaces and a buffer-size setting. Anything macOS sees as a CoreAudio device works. (cpal also supports WASAPI, ASIO, ALSA and JACK, which is what keeps Windows and Linux possible later.)
 - Analysis (tuner, onsets, chord verification) runs on its own thread from an input ring buffer, never in the audio callback.
 
 ## 7. Quality and engineering practice
 
-- Theory and parser code test-first, with table-driven tests (every chord quality in every key, spelled correctly) and proptest properties (transpose up then down is identity; ChordPro round-trips).
+- Theory and parser code test-first, with table-driven tests (every chord quality in every key, spelled correctly).
+- **Property tests (proptest) for the theory engine:** transposing up then down is the identity; every interval added then subtracted returns the start note; a chord's pitch classes are the same in every voicing found; enharmonic spelling always matches the key's accidentals; voicing search never returns a voicing over the span limit or missing the root or third.
+- **Golden-file tests (insta) for the parsers:** chord sheets and ChordPro in, normalised ChordPro and the parsed model out; practice notation in, parsed session and diagnostics out. Any change to output shows as a reviewable snapshot diff. ChordPro also has a round-trip property.
 - A `fixtures/` corpus of chord sheets (written for the project or public domain) is the regression suite for the song parser, checked with insta snapshots.
 - Criterion benchmarks guard the voicing search and parsers against regressions in the NF-1/NF-2 budgets.
-- CI on GitHub Actions on `macos-latest`: `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test --workspace`, UI lint, type check and Vitest, then `tauri build` for a universal binary. Release builds are signed and notarized from tagged commits. (The pure core crates can also run on a cheap Linux runner for speed; that is a CI convenience, not platform support.)
+- CI on GitHub Actions on `macos-latest`: `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test --workspace`, UI lint, type check, Vitest and Playwright, then `tauri build` for a universal Mac binary and `tauri ios build` for the iOS simulator (an unsigned compile check). Tagged commits attach an ad-hoc signed `.dmg` to a GitHub Release. (The pure core crates can also run on a cheap Linux runner for speed; that is a CI convenience, not platform support.)
 - A `CLAUDE.md` at the repo root with build/test commands and the crate rules above, so agentic contributors respect the layer boundaries.

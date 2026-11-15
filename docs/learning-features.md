@@ -20,7 +20,7 @@ These features build on the fretboard, practice, song and rhythm layers. Agreed 
 
 | ID | Requirement |
 |----|-------------|
-| TU-1 | Chromatic tuner from the Mac's built-in microphone or a CoreAudio audio interface input: detected note, octave, cents offset (needle and numeric), in tune within ±3 cents. |
+| TU-1 | Chromatic tuner from the built-in microphone on Mac or iPad, or any audio interface CoreAudio supports: detected note, octave, cents offset (needle and numeric), in tune within ±3 cents. |
 | TU-2 | Tuning-aware string mode: shows the target string for the current tuning (standard, Drop D, DADGAD, open G, custom) and auto-selects the nearest string. |
 | TU-3 | Reference pitch A4 adjustable 415 to 466 Hz (default 440). |
 | TU-4 | Reference tones: play each open string through the sampler to tune by ear. |

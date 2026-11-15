@@ -16,9 +16,9 @@ Beginners can memorize a few open chords but get lost on the rest of the neck. M
 
 ## 3. Scope
 
-In scope for v1: macOS desktop app (Rust core in a Tauri shell; Windows, Linux and mobile deferred), 6-string guitar, right- and left-handed views, standard and alternate tunings (Drop D, DADGAD, open G and others) with capo, scale and mode overlays, a built-in tuner (microphone input for single-note pitch only), local storage.
+In scope for v1: macOS and iPad apps (Rust core in a Tauri shell; Windows, Linux, iPhone and Android deferred), for personal use, distributed as an unsigned direct download on the Mac ([platforms.md](platforms.md)), 6-string guitar, right- and left-handed views, standard and alternate tunings (Drop D, DADGAD, open G and others) with capo, scale and mode overlays, a built-in tuner (microphone input for single-note pitch only), local storage.
 
-Out of scope for v1, planned for later phases: CAGED maps, theory tips, progress and streaks, ear training, looper and record-yourself, chord recognition by microphone ("listen and grade"). Not planned for now: Windows and Linux builds, recorded (non-synthesized) backing tracks, cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
+Out of scope for v1, planned for later phases: CAGED maps, theory tips, progress and streaks, ear training, looper and record-yourself, chord recognition by microphone ("listen and grade"). Not planned for now: Windows, Linux, iPhone and Android builds, App Store release, iCloud sync (later), recorded (non-synthesized) backing tracks, cloud sync, accounts, iOS/iPadOS, bass and 7-string. The architecture keeps these open (see [architecture.md](architecture.md)).
 
 ## 4. Feature area A: Fretboard explorer (foundation)
 
@@ -102,15 +102,26 @@ Full design in [learning-features.md](learning-features.md).
 | NF-2 | Quick-entry parse and preview under 50 ms per keystroke. |
 | NF-3 | Fully usable offline; network only for search and URL import. |
 | NF-4 | Keyboard-first: every cycling and run-mode action has a shortcut. |
-| NF-5 | Accessibility: VoiceOver labels (ARIA) for fretboard positions, full keyboard navigation, colour-blind-safe palette, respects the macOS text size and reduced-motion settings. |
+| NF-5 | Accessibility (confirmed): VoiceOver labels for every fretboard position on Mac and iPad, full keyboard control (including iPad with a hardware keyboard), colour-blind-safe palette with shape cues, respects system text size and Reduce Motion. Detail in [platforms.md §6](platforms.md#6-accessibility-confirmed). |
 | NF-6 | Music theory engine at 95%+ line coverage; parsers covered by a fixture corpus of real-world chord sheets. |
 | NF-8 | Rhythm timing is sample-accurate: under 1 ms drift over 10 minutes, tempo changes land on bar lines. |
 | NF-7 | No song content or audio leaves the device; no telemetry without opt-in. |
+| NF-10 | Touch-first on iPad: every hover action has a tap equivalent; tap targets at least 44 pt. |
+| NF-11 | Bundled sounds are CC0, public domain or MIT only ([sound-assets.md](sound-assets.md)). |
 | NF-9 | Tuner reads within ±3 cents and updates at least 20 times per second. |
 
-## 10. Open questions
+## 10. Decisions and open questions
 
-1. **Platform reach.** Decided: macOS first with Rust and Tauri; Windows, Linux and mobile deferred. Open: is there a rough timeframe for the next platform, so we know how strictly to guard portability?
-2. **Distribution and money.** v1 is planned as a notarized direct download. Mac App Store later? Free or paid? This matters for licensing song content (paid apps have less room under fair use and stricter provider terms).
-3. **Audio interfaces.** Should we test and document specific USB interfaces for electric players (tuner, looper, recognition), or rely on whatever CoreAudio exposes?
-4. **Sharing.** Are teacher-to-student shared sessions in scope (files only, or a service)?
+Decided (J, 2026-11-15):
+
+- **Stack and platforms:** Rust core, Tauri shell, macOS and iPad now; Windows, Linux, iPhone and Android later.
+- **Distribution:** personal use for now; unsigned (ad-hoc signed) direct download on the Mac; App Store maybe later. The design stays sandbox-friendly so that move is cheap.
+- **Audio interfaces:** rely on whatever CoreAudio supports on Mac and iPad.
+- **Audio and storage:** all audio on the native Rust thread; local storage, optional iCloud sync later.
+- **Sound assets:** open-source or licence-free only (CC0, public domain, MIT).
+- **Accessibility:** colour-blind-safe colours, keyboard control and VoiceOver.
+
+Still open:
+
+1. **iPad signing route:** free Apple ID (reinstall every 7 days) or the Apple Developer Program ($99/year). See [platforms.md §7](platforms.md#7-open-decision).
+2. **Sharing:** are teacher-to-student shared sessions in scope (files only, or a service)?
