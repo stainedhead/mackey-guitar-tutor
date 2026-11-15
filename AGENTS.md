@@ -160,7 +160,8 @@ Rules:
 
 ## Git workflow
 
-- Direct pushes to `main` are allowed; a pull request is optional. Run `make check` before pushing, and watch CI after (see CI/CD above).
+- Direct pushes to `main` are allowed for repo setup, docs and small fixes. Run `make check` before pushing, and watch CI after (see CI/CD above).
+- **Implementation work goes on its own branch** (one per spec or roadmap phase, for example `feat/<YYMMDD-feature>`), committed as it progresses, with **one pull request at the end of the work** that is reviewed and merged when CI is green.
 - Small, focused commits with imperative-mood messages; reference the spec directory (`specs/YYMMDD-<feature>/`) when the work belongs to one.
 
 ## Dev-Flow Skills
