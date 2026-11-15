@@ -39,9 +39,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx vite --mode mock',
+    // A production build, not the dev server: React's development build is several times slower
+    // and would make the NF-1 redraw measurement meaningless. dist-mock keeps the real dist/ intact.
+    command:
+      'npx vite build --mode mock --outDir dist-mock && npx vite preview --mode mock --outDir dist-mock --port 1420 --strictPort --host 127.0.0.1',
     url: 'http://127.0.0.1:1420',
-    reuseExistingServer: !process.env['CI'],
-    timeout: 60_000,
+    reuseExistingServer: false,
+    timeout: 120_000,
   },
 });

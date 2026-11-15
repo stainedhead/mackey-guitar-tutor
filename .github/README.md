@@ -22,6 +22,7 @@ Repository automation and agent instructions.
 
 - `macos-latest` is Apple silicon with Xcode and iOS Simulator runtimes installed; the `ios-sim` job prints them. XcodeGen is installed with Homebrew because `tauri ios init` needs it.
 - The Tauri CLI runs from the repo root as `npm run tauri --` (root `package.json`), and its hooks are `npm --prefix ui run build`/`dev`. Started by npm, it records `npm run tauri` in the Xcode build phase, which works from `src-tauri/gen/apple`.
+- cpal's CoreAudio backend (pulled in by `mackey-audio`) needs AudioToolbox, CoreAudio and AVFoundation at the Xcode link step. They are listed in `bundle.iOS.frameworks` in `src-tauri/tauri.conf.json`, which `tauri ios init` writes into `project.yml`; a `rustc-link-lib` in `build.rs` would not survive the static library (first link failed with undefined `_AudioUnitRender`, `_AVAudioSessionInterruptionNotification`).
 - The iOS Simulator build is `tauri ios build --debug --target aarch64-sim --ci` with no development team. The Tauri CLI path in the Makefile must be absolute, because `tauri ios init` writes it into the Xcode "Build Rust Code" phase, which runs from `src-tauri/gen/apple` (first CI run failed on the relative path).
 - Action major versions (`setup-node@v6`, `upload-artifact@v5`) were chosen without registry access; bump them if a job reports a missing tag.
 

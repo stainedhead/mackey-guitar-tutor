@@ -118,10 +118,11 @@ test.describe('Explore', () => {
     const measured = timings.slice(5);
     expect(measured).toHaveLength(100);
     const sorted = [...measured].sort((a, b) => a - b);
-    // AC-FB-9.1b asks for 16 ms per redraw. A shared runner has the odd GC pause, so the 90th
-    // percentile must meet 16 ms and no single redraw may take more than 100 ms (D-64).
-    expect(sorted[89]).toBeLessThanOrEqual(16);
-    expect(sorted[99]).toBeLessThanOrEqual(100);
+    // NF-1: p95 of the time from keydown to the DOM update, on the production build (the dev
+    // server's React is several times slower). The wait for the next frame is not redraw cost,
+    // so it is not included. No single redraw may take three frames (D-64).
+    expect(sorted[94]).toBeLessThanOrEqual(16);
+    expect(sorted[99]).toBeLessThanOrEqual(50);
   });
 });
 

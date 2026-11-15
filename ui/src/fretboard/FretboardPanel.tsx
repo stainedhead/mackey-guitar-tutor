@@ -61,7 +61,11 @@ export function FretboardPanel({
 }: Props) {
   const frame = useRef<HTMLDivElement>(null);
   const width = useElementWidth(frame);
-  const scaleLength = scaleLengthForRange(zoom.from, zoom.to, width, minFretWidth);
+  // A bisection of 40 steps over up to 22 frets: only redo it when its inputs change.
+  const scaleLength = useMemo(
+    () => scaleLengthForRange(zoom.from, zoom.to, width, minFretWidth),
+    [zoom.from, zoom.to, width, minFretWidth],
+  );
   const layout = useMemo(
     () =>
       layoutNeck({

@@ -44,7 +44,8 @@
       "signingIdentity": "-"
     },
     "iOS": {
-      "minimumSystemVersion": "17.0"
+      "minimumSystemVersion": "17.0",
+      "frameworks": ["AudioToolbox", "CoreAudio", "AVFoundation"]
     }
   }
 }

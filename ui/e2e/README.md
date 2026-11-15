@@ -1,6 +1,6 @@
 # ui/e2e
 
-Playwright end-to-end specs for the UI. They run in **WebKit** (the closest cross-platform proxy for WKWebView) against `vite --mode mock`, so the command layer is the mock in [`../src/mocks/`](../src/mocks) replaying states recorded from the real Rust core; no Tauri runtime is needed. Projects: `desktop` (1280×800), `ipad` (1180×820, touch), `ipad-portrait` (820×1180, touch) and `narrow` (420×800, Split View width).
+Playwright end-to-end specs for the UI. They run in **WebKit** (the closest cross-platform proxy for WKWebView) against a production build of `vite --mode mock` (`dist-mock/`, served by `vite preview`; see D-64), so the command layer is the mock in [`../src/mocks/`](../src/mocks) replaying states recorded from the real Rust core; no Tauri runtime is needed. Projects: `desktop` (1280×800), `ipad` (1180×820, touch), `ipad-portrait` (820×1180, touch) and `narrow` (420×800, Split View width).
 
 | File                  | Purpose                                                                                                                                                                                                          |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
