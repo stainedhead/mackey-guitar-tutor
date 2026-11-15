@@ -2,7 +2,7 @@
 
 **Feature:** fretboard-foundation
 **Created:** 2026-11-15
-**Last updated:** 2026-11-15T19:58Z
+**Last updated:** 2026-11-15T20:01Z
 **Spec:** [spec.md](spec.md) · **Tasks:** [tasks.md](tasks.md) · **Orchestration dashboard:** [fretboard-foundation-status.md](fretboard-foundation-status.md)
 
 **Update this file after every task and every phase. It is the single source of truth for progress.**
@@ -23,11 +23,11 @@ Spec review (Step 2): done 2026-11-15, verdict **Implementation-ready** after fi
 
 ## Implementation Progress (Phase 5)
 
-5 of 61 tasks complete. Per-phase detail is in [tasks.md](tasks.md#progress-summary).
+8 of 61 tasks complete. Per-phase detail is in [tasks.md](tasks.md#progress-summary).
 
 | Implementation phase | Tasks | Done | Status |
 |----------------------|-------|------|--------|
-| A Workspace scaffold and `mackey-theory` | 11 | 5 | In Progress |
+| A Workspace scaffold and `mackey-theory` | 11 | 8 | In Progress |
 | B `mackey-voicing` | 16 | 0 | Not Started |
 | C `mackey-audio` | 9 | 0 | Not Started |
 | D `src-tauri` and `ui/` | 16 | 0 | Not Started |
@@ -48,6 +48,7 @@ None. Open questions that need J (defaults chosen, work not blocked): Q-1, Q-2, 
 
 | Date (UTC) | Activity |
 |------------|----------|
+| 2026-11-15T20:01Z | mackey-theory chords, display spelling and the 252-row AC-P0-1 table (A6, A7, A10); parser benchmark 76 microseconds per 1,000 valid symbols |
 | 2026-11-15T19:58Z | Phase A: workspace scaffold and mackey-theory notes, intervals, scales, keys (A1 to A5) done; voicing and audio crate scaffolds stay with B1 and C1 |
 | 2026-11-15T19:42Z | Step 2 spec review complete; gaps fixed (19 SAC added, command-wrapper generator, revision counter, E9 xtask task, edge cases, non-goals, Q-9 to Q-11); Phases 0 to 4 marked complete |
 | 2026-11-15T19:27Z | Step 1 create-spec: spec directory created from the PRD; all phase files written |

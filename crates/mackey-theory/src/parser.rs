@@ -251,20 +251,37 @@ fn is_quality_char(c: char) -> bool {
     c.is_alphanumeric() || "#♯♭+-°øΔ△()".contains(c)
 }
 
+/// Longest text the edit-distance rows hold; callers keep both sides well under this.
+const ROW: usize = 24;
+
+/// Edit distance between two short texts, on stack rows (no allocation: this runs for every
+/// unknown quality, inside the parser's time budget). Texts of `ROW` chars or more count as
+/// infinitely far apart.
 fn levenshtein(a: &[char], b: &[char]) -> usize {
-    let mut prev: Vec<usize> = (0..=b.len()).collect();
+    if a.len() >= ROW || b.len() >= ROW {
+        return usize::MAX;
+    }
+    let mut prev = [0usize; ROW];
+    let mut cur = [0usize; ROW];
+    for (j, slot) in prev.iter_mut().enumerate().take(b.len() + 1) {
+        *slot = j;
+    }
     for (i, ca) in a.iter().enumerate() {
-        let mut cur = vec![i + 1];
+        if let Some(first) = cur.first_mut() {
+            *first = i + 1;
+        }
         for (j, cb) in b.iter().enumerate() {
             let cost = usize::from(ca != cb);
-            let best = (prev.get(j).copied().unwrap_or(0) + cost)
-                .min(prev.get(j + 1).copied().unwrap_or(0) + 1)
-                .min(cur.get(j).copied().unwrap_or(0) + 1);
-            cur.push(best);
+            let diagonal = prev.get(j).copied().unwrap_or(0) + cost;
+            let above = prev.get(j + 1).copied().unwrap_or(0) + 1;
+            let left = cur.get(j).copied().unwrap_or(0) + 1;
+            if let Some(slot) = cur.get_mut(j + 1) {
+                *slot = diagonal.min(above).min(left);
+            }
         }
-        prev = cur;
+        std::mem::swap(&mut prev, &mut cur);
     }
-    prev.last().copied().unwrap_or(0)
+    prev.get(b.len()).copied().unwrap_or(usize::MAX)
 }
 
 /// The closest known quality spelling to an unknown token, if one is near enough (distance
@@ -285,6 +302,10 @@ fn suggest_quality(token: &[char]) -> Option<&'static str> {
         .enumerate()
         .filter(|(_, (alias, _))| !alias.is_empty())
         .filter_map(|(index, (alias, _))| {
+            let candidate_len = alias.chars().count();
+            if candidate_len.abs_diff(normalised.len()) > max_distance {
+                return None;
+            }
             let candidate: Vec<char> = alias.chars().collect();
             let distance = levenshtein(&normalised, &candidate);
             if distance > max_distance {

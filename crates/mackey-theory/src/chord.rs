@@ -377,3 +377,178 @@ impl Chord {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn note(s: &str) -> Note {
+        s.parse().unwrap()
+    }
+
+    /// (quality, symbol, formula as degree labels, has seventh)
+    const CASES: &[(ChordQuality, &str, &str, bool)] = &[
+        (ChordQuality::Major, "", "R 3 5", false),
+        (ChordQuality::Minor, "m", "R b3 5", false),
+        (ChordQuality::Dominant7, "7", "R 3 5 b7", true),
+        (ChordQuality::Major7, "maj7", "R 3 5 7", true),
+        (ChordQuality::Minor7, "m7", "R b3 5 b7", true),
+        (ChordQuality::HalfDiminished7, "m7b5", "R b3 b5 b7", true),
+        (ChordQuality::Diminished, "dim", "R b3 b5", false),
+        (ChordQuality::Diminished7, "dim7", "R b3 b5 bb7", true),
+        (ChordQuality::Augmented, "aug", "R 3 #5", false),
+        (ChordQuality::Sus2, "sus2", "R 2 5", false),
+        (ChordQuality::Sus4, "sus4", "R 4 5", false),
+        (ChordQuality::Dominant7Sus4, "7sus4", "R 4 5 b7", true),
+        (ChordQuality::Sixth, "6", "R 3 5 6", false),
+        (ChordQuality::MinorSixth, "m6", "R b3 5 6", false),
+        (ChordQuality::Dominant9, "9", "R 3 5 b7 9", true),
+        (ChordQuality::Major9, "maj9", "R 3 5 7 9", true),
+        (ChordQuality::Minor9, "m9", "R b3 5 b7 9", true),
+        (ChordQuality::Add9, "add9", "R 3 5 9", false),
+        (ChordQuality::Dominant11, "11", "R 3 5 b7 9 11", true),
+        (ChordQuality::Dominant13, "13", "R 3 5 b7 9 13", true),
+        (ChordQuality::Power, "5", "R 5", false),
+    ];
+
+    #[test]
+    fn a6_formulas_symbols_and_sevenths() {
+        assert_eq!(CASES.len(), ChordQuality::ALL.len());
+        for (quality, symbol, formula, seventh) in CASES {
+            let labels: Vec<String> = quality
+                .intervals()
+                .iter()
+                .map(|i| i.degree_label())
+                .collect();
+            assert_eq!(labels.join(" "), *formula, "case {symbol:?} formula");
+            assert_eq!(quality.symbol(), *symbol, "case {symbol:?} symbol");
+            assert_eq!(quality.has_seventh(), *seventh, "case {symbol:?} seventh");
+            assert_eq!(
+                quality.roles().len(),
+                quality.intervals().len(),
+                "case {symbol:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a6_every_quality_starts_on_the_root_and_has_distinct_tones() {
+        for quality in ChordQuality::ALL {
+            let intervals = quality.intervals();
+            assert_eq!(
+                intervals.first().copied(),
+                Some(Interval::P1),
+                "case {quality:?}"
+            );
+            let mut semis: Vec<u8> = intervals.iter().map(|i| i.semitones() % 12).collect();
+            semis.sort_unstable();
+            semis.dedup();
+            assert_eq!(
+                semis.len(),
+                intervals.len(),
+                "case {quality:?}: duplicate pitch classes"
+            );
+        }
+    }
+
+    #[test]
+    fn a6_roles_and_required_tones() {
+        use ToneRole::{Extension, Fifth, Root, Seventh, Third};
+        assert_eq!(
+            ChordQuality::Dominant7.roles(),
+            [Root, Third, Fifth, Seventh]
+        );
+        assert_eq!(ChordQuality::Sus4.roles(), [Root, Extension, Fifth]);
+        assert_eq!(
+            ChordQuality::Dominant13.roles(),
+            [Root, Third, Fifth, Seventh, Extension, Extension]
+        );
+        assert_eq!(ChordQuality::Major.required_tones(), [Root, Third]);
+        assert_eq!(ChordQuality::Dominant9.required_tones(), [Root, Third]);
+        assert_eq!(ChordQuality::Sus2.required_tones(), [Root, Extension]);
+        assert_eq!(
+            ChordQuality::Dominant7Sus4.required_tones(),
+            [Root, Extension]
+        );
+        assert_eq!(ChordQuality::Power.required_tones(), [Root, Fifth]);
+    }
+
+    #[test]
+    fn a6_tones_carry_note_interval_and_role() {
+        let tones = Chord::new(note("D"), ChordQuality::Dominant7).tones();
+        let rows: Vec<(String, String, ToneRole)> = tones
+            .iter()
+            .map(|t| (t.note.name(), t.interval.to_string(), t.role))
+            .collect();
+        assert_eq!(
+            rows,
+            [
+                ("D".to_owned(), "P1".to_owned(), ToneRole::Root),
+                ("F#".to_owned(), "M3".to_owned(), ToneRole::Third),
+                ("A".to_owned(), "P5".to_owned(), ToneRole::Fifth),
+                ("C".to_owned(), "m7".to_owned(), ToneRole::Seventh),
+            ]
+        );
+    }
+
+    #[test]
+    fn a6_slash_bass_and_symbol() {
+        let d_over_fs = Chord::new(note("D"), ChordQuality::Major).with_bass(note("F#"));
+        assert_eq!(d_over_fs.symbol(), "D/F#");
+        assert_eq!(d_over_fs.bass_or_root(), note("F#"));
+        assert_eq!(Chord::new(note("A"), ChordQuality::Minor7).symbol(), "Am7");
+        assert_eq!(
+            Chord::new(note("A"), ChordQuality::Minor7).bass_or_root(),
+            note("A")
+        );
+    }
+
+    #[test]
+    fn a6_pitch_classes_include_the_bass() {
+        let c = Chord::new(note("C"), ChordQuality::Major);
+        let pcs: Vec<u8> = c.pitch_classes().iter().map(PitchClass::value).collect();
+        assert_eq!(pcs, [0, 4, 7]);
+        let c_over_bb = c.with_bass(note("Bb"));
+        let pcs: Vec<u8> = c_over_bb
+            .pitch_classes()
+            .iter()
+            .map(PitchClass::value)
+            .collect();
+        assert_eq!(pcs, [0, 4, 7, 10]);
+    }
+
+    #[test]
+    fn a6_transpose_moves_root_and_bass() {
+        let c = Chord::new(note("C"), ChordQuality::Minor).with_bass(note("Eb"));
+        let up = c.transpose(2, AccidentalPreference::Flats);
+        assert_eq!(up.symbol(), "Dm/F");
+        let flats = c.transpose(1, AccidentalPreference::Flats);
+        assert_eq!(flats.symbol(), "Dbm/E");
+        let sharps = c.transpose(1, AccidentalPreference::Sharps);
+        assert_eq!(sharps.symbol(), "C#m/E");
+    }
+
+    #[test]
+    fn a6_a_root_that_needs_a_triple_accidental_falls_back_to_a_simple_spelling() {
+        let weird = Chord::new(note("F##"), ChordQuality::Augmented);
+        let names: Vec<String> = weird.tones().iter().map(|t| t.note.name()).collect();
+        assert_eq!(names.len(), 3);
+        assert_eq!(weird.tones()[2].note.pitch_class().value(), 3);
+    }
+
+    #[test]
+    fn a6_pitch_class_set_basics() {
+        let mut set = PitchClassSet::default();
+        assert!(set.is_empty());
+        set.insert(PitchClass::new(3));
+        set.insert(PitchClass::new(15));
+        set.insert(PitchClass::new(0));
+        assert_eq!(set.len(), 2);
+        assert!(set.contains(PitchClass::new(3)));
+        assert!(!set.contains(PitchClass::new(4)));
+        assert_eq!(
+            set.iter().map(PitchClass::value).collect::<Vec<_>>(),
+            [0, 3]
+        );
+    }
+}

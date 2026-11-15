@@ -7,16 +7,16 @@
 
 ## Progress Summary
 
-5/61 tasks complete. Update this file and `status.md` after every task (mandatory).
+8/61 tasks complete. Update this file and `status.md` after every task (mandatory).
 
 | Phase | Tasks | Done |
 |-------|-------|------|
-| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 5 |
+| A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 8 |
 | B `mackey-voicing` | B1 to B16 (16) | 0 |
 | C `mackey-audio` | C1 to C9 (9) | 0 |
 | D `src-tauri` and `ui/` | D1 to D16 (16) | 0 |
 | E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
-| Total | 61 | 5 |
+| Total | 61 | 8 |
 
 ## Conventions
 
@@ -67,12 +67,14 @@
 - **Tests:** table of every offered key with its signature and spelled scale (hand-written); property (AC-P0-3 part 3): the accidentals appearing in a key's scale spelling are all of one kind (all sharps or all flats) and match the signature sign; `next_fifth` applied 12 times returns to the start.
 
 ### A6. `mackey-theory`: chord qualities and chords
+- **Status:** Done
 - **Depends on:** A3 · **Est:** M · **FR:** FR-010
 - **Files:** `src/chord.rs`.
 - **Acceptance:** all 21 qualities with intervals, symbols, required tones, roles; `Chord::tones` spells by interval from the root (D7 → D F# A C, Bbmaj7 → Bb D F A, A#m keeps A#, G#dim7 → G# B D F); slash bass; `symbol()` canonical text.
 - **Tests:** unit tests for formula sanity; this feeds A8.
 
 ### A7. `mackey-theory`: spelling (G-1.5, G-1.6)
+- **Status:** Done
 - **Depends on:** A5, A6 · **Est:** M · **FR:** FR-012
 - **Files:** `src/spelling.rs`.
 - **Acceptance:** `Speller` resolves chord tone, then scale tone, then key preference; display simplification removes double accidentals (Fx → G) and reports the theory spelling; AC-FB-2.1 data (F major notes F G A Bb C D E, no A#); in C major with no context the pitch class 10 is Bb (flats for C), in G major it is A# only if chromatic with no chord context (sharp key); the third of D7 in C is F#; the root of bVII in C is Bb.
@@ -91,6 +93,7 @@
 - **Tests:** tables for all 12 major keys × 7 degrees × (triad, seventh); property: every `diatonic_chord`'s tones are scale tones of the key.
 
 ### A10. `mackey-theory`: AC-P0-1 spelling table and benchmarks
+- **Status:** Done
 - **Depends on:** A7, A8 · **Est:** M · **FR:** FR-010, FR-012
 - **Files:** `tests/chord_spelling.rs` (hand-written `CASES`: for each of the 21 qualities, the full expected spelling in at least all 12 chromatic roots using the root spellings sharp-or-flat offered by the key pickers — C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B = 12 keys), `benches/parser.rs` (criterion: parse 1,000 symbols; NF-2 parser budget ≤ 1 ms per 1,000 characters).
 - **Acceptance (AC-P0-1):** 12 roots × 21 qualities = 252 rows, hand-written (not generated from the code under test), each failing with a label naming root and quality; benchmark committed and within budget on the dev machine.
