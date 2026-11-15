@@ -7,16 +7,16 @@
 
 ## Progress Summary
 
-27/61 tasks complete. Update this file and `status.md` after every task (mandatory).
+36/61 tasks complete. Update this file and `status.md` after every task (mandatory).
 
 | Phase | Tasks | Done |
 |-------|-------|------|
 | A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 11 |
 | B `mackey-voicing` | B1 to B16 (16) | 16 |
-| C `mackey-audio` | C1 to C9 (9) | 0 |
+| C `mackey-audio` | C1 to C9 (9) | 9 |
 | D `src-tauri` and `ui/` | D1 to D16 (16) | 0 |
 | E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
-| Total | 61 | 27 |
+| Total | 61 | 36 |
 
 ## Conventions
 
@@ -225,52 +225,61 @@
 ## Phase C: `mackey-audio`
 
 ### C1. Crate skeleton, dependencies and error type
+- **Status:** Done
 - **Depends on:** A1 · **Est:** S · **FR:** FR-001, FR-024, FR-026
 - **Files:** `crates/mackey-audio/Cargo.toml` (`cpal`, `rtrb`, `tracing`, `thiserror`, `serde`; dev: `proptest`, `criterion`, `assert_no_alloc`), `src/{lib.rs,error.rs,dsp/mod.rs,io/mod.rs}`.
 - **Acceptance:** archcheck passes (`cpal` only here, depends on theory only); `make deny` passes with the new dependencies (extend `deny.toml` only per Q-6); on Linux CI, ALSA headers are required: task E4 installs them, and until then the crate compiles locally with `libasound2-dev` (document in README).
 
 ### C2. MPM pitch detector (pure)
+- **Status:** Done
 - **Depends on:** C1, A2 · **Est:** L · **FR:** FR-026
 - **Files:** `src/dsp/pitch.rs`, `src/dsp/cents.rs`, `tests/common/signals.rs` (synthetic signal generators), `tests/tuner_fixtures.rs` (detector part).
 - **Acceptance:** `PitchDetector::detect` over a 2048-sample window for 60..=1400 Hz; sub-sample interpolation; returns `None` for silence, noise and for clarity under the threshold; `CentsOffset`, `nearest_pitch` (A4 reference); the synthetic generators produce (a) pure sines, (b) guitar-like tones (fundamental plus 6 harmonics with 1/n amplitude, exponential decay, tiny inharmonicity `f_n = n f0 sqrt(1 + B n^2)` with B ≈ 1e-4, plus −50 dBFS white noise from a seeded PRNG).
 - **Tests:** AC-TU-1.1 data (440.0 Hz, 0 ± 1 cent), AC-TU-1.3 (73.42 Hz → D2), AC-TU-3.1 (A4 = 442, 440 Hz → about −8 cents); AC-TU-1.2 for the six open strings of standard tuning at −20, −5, +5, +20 cents (24 cases) within ±3 cents; table of sample rates 44,100 and 48,000; proptest: for any frequency in 70..=1300 Hz and sample rate in {44100, 48000}, a pure sine is detected within 1 cent; the detector never panics on arbitrary `f32` slices of any length ≥ 1 (including NaN, ±inf: returns `None`).
 
 ### C3. Level meter and tuner state machine (pure)
+- **Status:** Done
 - **Depends on:** C2 · **Est:** L · **FR:** FR-026, FR-027 · **SAC-15**
 - **Files:** `src/dsp/level.rs`, `src/dsp/tuner.rs`, `tests/tuner_strings.rs`.
 - **Acceptance:** `Tuner::push_block` produces `TunerReading`s per hop with: median-of-3 cents smoothing (resets on pitch change), in tune within ±3 cents held for 300 ms, `NoStablePitch` after 500 ms without a pitch, `TooQuiet` after 3 s of low level, `TooLoud` on clipping, `LowConfidence` for two-string chords (strongest pitch kept when confidence is adequate), string mode (auto-select nearest target by cents; tap-to-lock; `Tighten`/`Loosen` direction; `far_from_any` beyond 3 semitones; per-string ticks), chromatic mode; capo handled by the app through `TunerTarget`s; A4 reference.
 - **Tests:** AC-TU-2.1 (DADGAD, 146.83 Hz → string 4, in tune), AC-TU-5.1 (targets from `Instrument` pitch list F#2 B2 E3 A3 C#4 F#4, built in test by transposing the standard pitches by 2 semitones), AC-NF-9 (first reading within 150 ms of onset: feed 20 ms of silence then a tone block-wise at 48 kHz; the first `Pitch` reading's `t_ms` − onset ≤ 150; ≥ 20 readings per second of tone), AC-TU-1.1 "In tune" within 400 ms of simulated input (budget: first reading when 2,048 samples are available, hold timer from the first in-tune reading, so about 343 ms; the test asserts ≤ 400 ms at 44.1 and 48 kHz and block sizes 256, 512 and 1,024 to cover device buffer sizes); table-driven status transitions with sample counters; E-TU-6 two-tone input (110 Hz + 165 Hz at similar level) → either strongest pitch or `LowConfidence`, never a wrong in-tune.
 
 ### C4. Karplus-Strong synth (pure) and the real-time rules test
+- **Status:** Done
 - **Depends on:** C1 · **Est:** L · **FR:** FR-024
 - **Files:** `src/dsp/synth.rs`, `tests/synth.rs`.
 - **Acceptance:** `Synth::new(sr, voices)` preallocates; `apply(SynthCommand)`, `render(&mut [f32])`; `NoteOn` with `delay_samples`; voice stealing; mute and volume (0..=1 linear from percent); `ReferenceToneOn` loops with re-pluck every 1.5 s until off (TU-4); output peak ≤ 1.0 for 16 simultaneous voices (soft limiter); decay to silence; no NaN.
 - **Tests:** `render` under `assert_no_alloc::assert_no_alloc(|| ...)` in debug builds (NF-8.1) with a custom allocator test binary (`#[global_allocator] static A: AllocDisabler`, `harness = true` in its own integration test file so the allocator does not affect other tests); pitch accuracy: render a 440 Hz and an 82.41 Hz note and run the detector (C2) on the output: within 3 cents; strum timing: 6 notes at 30 ms offsets start at the right sample (sample-exact onsets within 1 sample, measured by first non-zero sample).
 
 ### C5. Cpal output glue and device-absent path
+- **Status:** Done
 - **Depends on:** C4 · **Est:** M · **FR:** FR-024
 - **Files:** `src/io/output.rs`, `src/io/devices.rs`.
 - **Acceptance:** `OutputHandle::start()` (default output, f32, 44.1/48 kHz, mono duplicated across channels) with the callback draining the `rtrb` queue then `Synth::render`; `NoOutputDevice` when none; queue-full drop counter; no logging or allocation in the callback; tracing for open/close; stream error callback sets an atomic flag the app polls.
 - **Tests:** unit tests against a `trait OutputBackend` fake (the glue's testable part: command draining into the synth; device selection logic from a list); on CI Linux without a sound card the real `start()` must return `Err(NoOutputDevice)` or succeed, never panic (test accepts both).
 
 ### C6. Cpal input glue, analysis thread, device list, permission handling
+- **Status:** Done
 - **Depends on:** C3, C5 · **Est:** L · **FR:** FR-027
 - **Files:** `src/io/input.rs`, `src/io/devices.rs`.
 - **Acceptance:** `list_input_devices()`; `InputHandle::start(device: Option<&str>, cfg, on_reading) -> Result<InputHandle, AudioError>`; callback copies into the ring (mono mixdown), the analysis thread consumes hop-sized blocks and calls `Tuner::push_block`; rate limit to about 30 Hz handled by the app (C6 provides all readings, the app throttles); device removal → fallback to default with `TunerNotice::DeviceDisconnectedUsingDefault` (E-TU-5); permission: stream-build failure or one second of exact zeros while the OS reports the stream running → `AudioError::PermissionDenied` (Q-5); `stop()` joins the thread; `start` while running stops the previous handle, `stop` without `start` is a no-op; the analysis thread body runs under `catch_unwind` and a panic yields one `TunerNotice::AnalysisStopped` reading; audio never written anywhere.
 - **Tests:** unit tests on the pure parts via fakes: ring buffer → block assembly → tuner, mono mixdown, fallback decision function, zero-input permission heuristic; no real device needed in CI.
 
 ### C7. Tuner target helper and A4/string utilities
+- **Status:** Done
 - **Depends on:** C3 · **Est:** S · **FR:** FR-027
 - **Files:** `src/dsp/tuner.rs` (`targets_from_pitches(&[Pitch;6], a4) -> Vec<TunerTarget>`).
 - **Acceptance:** targets carry string number 1..=6 (index 0 = string 6), pitch, frequency from `ReferencePitch`; used by the app (D5).
 - **Tests:** table for standard, DADGAD, capo 2, A4 = 442.
 
 ### C8. Benchmarks and coverage for `mackey-audio`
+- **Status:** Done
 - **Depends on:** C3, C4 · **Est:** S · **FR:** FR-026
 - **Files:** `benches/pitch.rs`; `Makefile`'s cover target (E7) excludes `crates/mackey-audio/src/io/` with a comment.
 - **Acceptance:** detector cost per window recorded in `implementation-notes.md` (budget: ≤ 2 ms per 2048-sample window on the dev machine so the thread keeps up at 94 windows/s); `dsp` module coverage 100% of new code.
 
 ### C9. `mackey-audio`: ts feature, README, docs
+- **Status:** Done
 - **Depends on:** C7 · **Est:** S · **FR:** FR-003
 - **Files:** `#[cfg_attr(feature = "ts", derive(ts_rs::TS))]` on `TunerReading` and friends, `InputDevice`, `MicPermission`; README (modules, depends on theory, depended on by app; the real-time rules; the `io` exclusion).
 - **Acceptance:** `cargo test -p mackey-audio --features ts` exports; `make check` green.

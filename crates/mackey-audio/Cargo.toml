@@ -1,0 +1,36 @@
+[package]
+name = "mackey-audio"
+version = "0.1.0"
+description = "Audio for Mackey Guitar Tutor: pitch detection, tuner logic, plucked-string synth and the cpal device glue"
+readme = "README.md"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+# Generate TypeScript bindings for the boundary types (`cargo test -p mackey-audio --features ts`).
+ts = ["dep:ts-rs", "mackey-theory/ts"]
+
+[dependencies]
+mackey-theory = { path = "../mackey-theory" }
+cpal = { workspace = true }
+rtrb = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+ts-rs = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+criterion = { workspace = true }
+serde_json = { workspace = true }
+assert_no_alloc = { workspace = true }
+
+[[bench]]
+name = "pitch"
+harness = false
+
+[lints]
+workspace = true
