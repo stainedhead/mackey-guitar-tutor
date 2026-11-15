@@ -88,12 +88,9 @@ fn sc_3_all_five_a_minor_pentatonic_boxes_match_the_hand_table() {
             assert_eq!(&frets_on(p, string), want, "box {number} string {string}");
         }
     }
-    // Ordered by lowest fret.
-    assert!(
-        patterns
-            .windows(2)
-            .all(|w| w[0].lowest_fret <= w[1].lowest_fret)
-    );
+    // Ordered by box number, not by neck position (FR-001 of the auto review).
+    let numbers: Vec<u8> = patterns.iter().map(box_number).collect();
+    assert_eq!(numbers, [1, 2, 3, 4, 5]);
 }
 
 #[test]

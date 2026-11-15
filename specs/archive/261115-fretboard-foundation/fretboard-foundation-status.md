@@ -23,7 +23,7 @@ Notes: run in a cloud container (Linux). The PRD was created by adapting docs/pr
 | 6  | Prepare Review PRD              | ✅ Complete | 2026-11-15T22:24Z | 2026-11-15T22:24Z | 1 |
 | 7  | Archive Original Spec           | ✅ Complete | 2026-11-15T22:24Z | 2026-11-15T22:24Z | 1 |
 | 8  | Spec Review Fixes               | ✅ Complete | 2026-11-15T22:25Z | 2026-11-15T22:25Z | 1 |
-| 9  | Implement Review Fixes          | ⬜ Pending | — | — | — |
+| 9  | Implement Review Fixes          | 🔄 In progress | 2026-11-15T22:52Z | — | — |
 | 10 | Archive Fixes Spec              | ⬜ Pending | — | — | — |
 | 11 | Final Quality Pass              | ⬜ Pending | — | — | — |
 | 12 | Process Analysis Report         | ⬜ Pending | — | — | — |

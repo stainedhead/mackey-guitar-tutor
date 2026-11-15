@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::arpeggio::{ArpeggioDirection, arpeggio_positions, default_arpeggio_position};
 use crate::instrument::{Capo, Fret, Handedness, Instrument, Inversion, StringNumber, StringSet};
-use crate::patterns::{scale_for_chord, scale_patterns};
+use crate::patterns::{pattern_label, scale_for_chord, scale_patterns};
 use crate::search::voicings_for;
 use crate::triads::triads;
 use crate::voicing::{VoicingOptions, VoicingResult};
@@ -935,9 +935,14 @@ fn finish(
 /// The `VoiceOver` text for a selection: "E minor, first inversion, strings 2 3 4" (FB-9.1).
 #[must_use]
 pub fn announce(s: &Selection, ctx: &Context<'_>, cache: &mut VoicingCache) -> String {
-    let overlay = s
-        .overlay_scale()
-        .map_or_else(String::new, |scale| format!(", {} overlay", scale.name()));
+    let overlay = s.overlay_scale().map_or_else(String::new, |scale| {
+        let which = s
+            .overlay
+            .pattern_index
+            .and_then(|i| pattern_label(scale, ctx.instrument, i))
+            .map_or_else(String::new, |label| format!(", {label}"));
+        format!(", {} overlay{which}", scale.name())
+    });
     match (s.focus, s.chord) {
         (Focus::Chord, Some(chord)) => {
             let spoken = spoken_chord(&chord);

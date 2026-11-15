@@ -70,7 +70,7 @@ Tick **Scale overlay** and pick a scale from the **Scale** menu. The overlay is 
 
 ![A minor pentatonic, box 1 of 5](../docs/images/real-explore-a-minor-pentatonic.png)
 
-The example is A minor with the A minor pentatonic overlay on, showing the first of its five boxes (frets 0 to 3, the lowest). The notes are A, C, D, E and G on every string. **Follow the chords** switches the overlay to the scale that matches the current chord, which is the minor pentatonic for a minor chord.
+The example is A minor with the A minor pentatonic overlay on, showing box 1 of its five boxes (frets 5 to 8, with the root A on string 6 at the first finger). The counter reads "Box 1 of 5"; the arrows (or `P` and `Shift-P`) step through boxes 1 to 5 in order and back to the whole neck. The notes are A, C, D, E and G on every string. **Follow the chords** switches the overlay to the scale that matches the current chord, which is the minor pentatonic for a minor chord.
 
 ## Tunings and capo
 

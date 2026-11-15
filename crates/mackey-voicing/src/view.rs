@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use crate::arpeggio::{arpeggio, arpeggio_positions, default_arpeggio_position};
 use crate::error::VoicingError;
 use crate::instrument::{Fret, Handedness, Instrument, StringNumber};
-use crate::patterns::{PatternNote, full_neck, scale_patterns};
+use crate::patterns::{PatternNote, full_neck, pattern_label, scale_patterns};
 use crate::selection::{
     CapoNames, Context, Focus, LabelsMode, Notice, Selection, ViewType, VoicingCache, announce,
     spoken_chord,
@@ -913,9 +913,11 @@ pub fn fretboard_view_cached(
         }
         if let Some(i) = sel.overlay.pattern_index {
             let n = scale_patterns(&scale, instrument).len();
-            if list_position.is_none() && n > 0 {
+            if list_position.is_none()
+                && let Some(label) = pattern_label(scale, instrument, i)
+            {
                 list_position = Some(ListPosition {
-                    label: format!("{} of {n}", i + 1),
+                    label,
                     index: i + 1,
                     count: n,
                 });
@@ -926,9 +928,9 @@ pub fn fretboard_view_cached(
         && let (Some(scale), Some(i)) = (overlay, sel.overlay.pattern_index)
     {
         let n = scale_patterns(&scale, instrument).len();
-        if n > 0 {
+        if let Some(label) = pattern_label(scale, instrument, i) {
             list_position = Some(ListPosition {
-                label: format!("{} of {n}", i + 1),
+                label,
                 index: i + 1,
                 count: n,
             });

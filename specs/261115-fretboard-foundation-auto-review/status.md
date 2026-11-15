@@ -16,7 +16,7 @@
 | 2 | Research and data modelling | Complete | [research.md](research.md) |
 | 3 | Architecture and planning | Complete | [architecture.md](architecture.md), [plan.md](plan.md) |
 | 4 | Task breakdown | Complete | 7 tasks, one per FR |
-| 5 | Implementation | In Progress | 0 of 7 tasks |
+| 5 | Implementation | In Progress | 1 of 7 tasks (FR-001) |
 | 6 | Completion and archival | Not Started | |
 
 ## Blockers
@@ -28,3 +28,4 @@ None.
 | Date (UTC) | Activity |
 |------------|----------|
 | 2026-11-15T22:25Z | Spec created from the review PRD |
+| 2026-11-15 | FR-001 done: patterns sorted by box number, label "Box N of M", announcement, snapshot, screenshot regenerated |

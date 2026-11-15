@@ -191,8 +191,24 @@ pub fn scale_patterns(scale: &Scale, instrument: &Instrument) -> Vec<ScalePatter
             pattern_from(*scale, kind, notes)
         })
         .collect();
-    patterns.sort_by_key(|p| (p.lowest_fret, p.highest_fret));
+    // Box order, not neck order: the stepper and its label use the pattern number (AC-SC-3.1).
+    patterns.sort_by_key(|p| match p.kind {
+        PatternKind::PentatonicBox { number } | PatternKind::ThreeNps { number } => number,
+        PatternKind::FullNeck => 0,
+    });
     patterns
+}
+
+/// "Box 1 of 5" or "Pattern 3 of 7" for the pattern at `index` in [`scale_patterns`] order.
+pub(crate) fn pattern_label(scale: Scale, instrument: &Instrument, index: usize) -> Option<String> {
+    let all = scale_patterns(&scale, instrument);
+    let count = all.len();
+    let (word, number) = match all.get(index)?.kind {
+        PatternKind::PentatonicBox { number } => ("Box", number),
+        PatternKind::ThreeNps { number } => ("Pattern", number),
+        PatternKind::FullNeck => return None,
+    };
+    Some(format!("{word} {number} of {count}"))
 }
 
 /// Why `scale_for_chord` chose a scale (SC-4).
