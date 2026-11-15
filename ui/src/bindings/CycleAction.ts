@@ -3,4 +3,21 @@
 /**
  * The FB-9 cycling and navigation actions (no payload).
  */
-export type CycleAction = "ChordNext" | "ChordPrev" | "VoicingNext" | "VoicingPrev" | "InversionNext" | "InversionPrev" | "StringSetNext" | "StringSetPrev" | "PositionNext" | "PositionPrev" | "CycleView" | "CycleLabels" | "ToggleOverlay" | "KeyNext" | "KeyPrev" | "RelativeToggle" | "ClearFocus";
+export type CycleAction =
+  | 'ChordNext'
+  | 'ChordPrev'
+  | 'VoicingNext'
+  | 'VoicingPrev'
+  | 'InversionNext'
+  | 'InversionPrev'
+  | 'StringSetNext'
+  | 'StringSetPrev'
+  | 'PositionNext'
+  | 'PositionPrev'
+  | 'CycleView'
+  | 'CycleLabels'
+  | 'ToggleOverlay'
+  | 'KeyNext'
+  | 'KeyPrev'
+  | 'RelativeToggle'
+  | 'ClearFocus';

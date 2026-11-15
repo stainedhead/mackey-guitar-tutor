@@ -382,7 +382,9 @@ input.invalid {
 }
 
 .neck-frame {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .neck-scroll {
@@ -531,18 +533,20 @@ input.invalid {
   fill: var(--fg);
 }
 
-.edge-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+/* A fixed row above the neck: arrows sit outside the strings and never cover a note. */
+.edge-bar {
+  order: -1;
+  display: flex;
+  justify-content: space-between;
+  min-height: 32px;
 }
 
 .edge-left {
-  left: 4px;
+  margin-right: auto;
 }
 
 .edge-right {
-  right: 4px;
+  margin-left: auto;
 }
 
 /* Tuner */

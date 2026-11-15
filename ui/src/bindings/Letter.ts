@@ -3,4 +3,4 @@
 /**
  * A note letter, C to B.
  */
-export type Letter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
+export type Letter = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';

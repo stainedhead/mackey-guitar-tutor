@@ -3,16 +3,17 @@
 /**
  * "G shape (sounds A)" (LH-5).
  */
-export type CapoLabel = { 
-/**
- * The shape the fingers play: "G".
- */
-shape: string, 
-/**
- * What sounds: "A".
- */
-sounding: string, 
-/**
- * "G shape (sounds A)", or "A (G shape)" with sounding-first names.
- */
-text: string, };
+export type CapoLabel = {
+  /**
+   * The shape the fingers play: "G".
+   */
+  shape: string;
+  /**
+   * What sounds: "A".
+   */
+  sounding: string;
+  /**
+   * "G shape (sounds A)", or "A (G shape)" with sounding-first names.
+   */
+  text: string;
+};

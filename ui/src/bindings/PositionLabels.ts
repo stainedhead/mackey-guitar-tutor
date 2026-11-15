@@ -3,20 +3,21 @@
 /**
  * One precomputed label per labels mode (G-2.2).
  */
-export type PositionLabels = { 
-/**
- * "G", "Bb"; never a double accidental (G-1.6).
- */
-note_name: string, 
-/**
- * "1", "b3", "5", relative to the overlay scale's tonic, else the key's (SC-5).
- */
-scale_degree: string, 
-/**
- * "R", "3", "b7" relative to the chord root; `None` without a chord.
- */
-interval: string | null, 
-/**
- * "0" to "4"; `None` unless the position is part of a voicing, triad or arpeggio.
- */
-finger: string | null, };
+export type PositionLabels = {
+  /**
+   * "G", "Bb"; never a double accidental (G-1.6).
+   */
+  note_name: string;
+  /**
+   * "1", "b3", "5", relative to the overlay scale's tonic, else the key's (SC-5).
+   */
+  scale_degree: string;
+  /**
+   * "R", "3", "b7" relative to the chord root; `None` without a chord.
+   */
+  interval: string | null;
+  /**
+   * "0" to "4"; `None` unless the position is part of a voicing, triad or arpeggio.
+   */
+  finger: string | null;
+};

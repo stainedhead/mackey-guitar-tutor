@@ -3,32 +3,33 @@
 /**
  * Detector settings. [`DetectorConfig::new`] gives the defaults for a sample rate.
  */
-export type DetectorConfig = { 
-/**
- * Samples per second.
- */
-sample_rate: number, 
-/**
- * Analysis window in samples.
- */
-window: number, 
-/**
- * New samples between two analyses.
- */
-hop: number, 
-/**
- * Lowest frequency reported (Hz).
- */
-min_hz: number, 
-/**
- * Highest frequency reported (Hz).
- */
-max_hz: number, 
-/**
- * Clarity (NSDF peak height) a detection needs to count as a pitch.
- */
-clarity_threshold: number, 
-/**
- * MPM peak-pick constant: the first key maximum above `k * highest` is the period.
- */
-k: number, };
+export type DetectorConfig = {
+  /**
+   * Samples per second.
+   */
+  sample_rate: number;
+  /**
+   * Analysis window in samples.
+   */
+  window: number;
+  /**
+   * New samples between two analyses.
+   */
+  hop: number;
+  /**
+   * Lowest frequency reported (Hz).
+   */
+  min_hz: number;
+  /**
+   * Highest frequency reported (Hz).
+   */
+  max_hz: number;
+  /**
+   * Clarity (NSDF peak height) a detection needs to count as a pitch.
+   */
+  clarity_threshold: number;
+  /**
+   * MPM peak-pick constant: the first key maximum above `k * highest` is the period.
+   */
+  k: number;
+};

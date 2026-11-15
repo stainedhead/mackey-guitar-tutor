@@ -3,4 +3,4 @@
 /**
  * A constraint the player may relax when nothing fits (E-FB-3).
  */
-export type RelaxOption = "AllowStretches" | "AllowOmittedFifth";
+export type RelaxOption = 'AllowStretches' | 'AllowOmittedFifth';

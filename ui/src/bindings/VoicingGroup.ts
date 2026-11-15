@@ -3,4 +3,4 @@
 /**
  * The list groups of FB-5.2.
  */
-export type VoicingGroup = "Open" | "BarreAndCaged" | "Other";
+export type VoicingGroup = 'Open' | 'BarreAndCaged' | 'Other';

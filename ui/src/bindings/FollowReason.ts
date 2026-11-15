@@ -3,4 +3,10 @@
 /**
  * Why `scale_for_chord` chose a scale (SC-4).
  */
-export type FollowReason = "Diatonic" | "DominantMixolydian" | "MajorIonian" | "MinorDorian" | "DiminishedLocrian" | "Fallback";
+export type FollowReason =
+  | 'Diatonic'
+  | 'DominantMixolydian'
+  | 'MajorIonian'
+  | 'MinorDorian'
+  | 'DiminishedLocrian'
+  | 'Fallback';

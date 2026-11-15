@@ -3,16 +3,23 @@
 /**
  * What the chord field shows under its text (FB-4.4, E-FB-1).
  */
-export type ChordFieldStatus = { "kind": "Empty" } | { "kind": "Valid", 
-/**
- * The canonical symbol.
- */
-symbol: string, } | { "kind": "Error", 
-/**
- * "Not a chord symbol I know: Hm7. Did you mean Bm7?"
- */
-message: string, 
-/**
- * A full replacement symbol, when one is close.
- */
-suggestion: string | null, };
+export type ChordFieldStatus =
+  | { kind: 'Empty' }
+  | {
+      kind: 'Valid';
+      /**
+       * The canonical symbol.
+       */
+      symbol: string;
+    }
+  | {
+      kind: 'Error';
+      /**
+       * "Not a chord symbol I know: Hm7. Did you mean Bm7?"
+       */
+      message: string;
+      /**
+       * A full replacement symbol, when one is close.
+       */
+      suggestion: string | null;
+    };

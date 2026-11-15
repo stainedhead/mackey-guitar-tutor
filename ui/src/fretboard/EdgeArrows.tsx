@@ -21,8 +21,9 @@ export function EdgeArrows({ offRange, visible, mirrored, onFit }: Props) {
   const arrows: { side: 'below' | 'above'; count: number; fret: number }[] = [];
   if (offRange.below > 0) arrows.push({ side: 'below', count: offRange.below, fret: visible.from });
   if (offRange.above > 0) arrows.push({ side: 'above', count: offRange.above, fret: visible.to });
+  // The bar reserves a row above the neck so an arrow never covers a string or a note.
   return (
-    <>
+    <div className="edge-bar" data-testid="edge-bar">
       {arrows.map((a) => {
         // Lower frets are on the left, except on a left-handed neck where the nut is right.
         const left = (a.side === 'below') !== mirrored;
@@ -39,6 +40,6 @@ export function EdgeArrows({ offRange, visible, mirrored, onFit }: Props) {
           </button>
         );
       })}
-    </>
+    </div>
   );
 }

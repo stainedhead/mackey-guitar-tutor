@@ -3,4 +3,4 @@
 /**
  * The play direction of an arpeggio (FB-7.3).
  */
-export type ArpeggioDirection = "Up" | "Down" | "UpDown";
+export type ArpeggioDirection = 'Up' | 'Down' | 'UpDown';

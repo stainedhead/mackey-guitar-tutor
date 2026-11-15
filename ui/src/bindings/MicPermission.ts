@@ -3,4 +3,4 @@
 /**
  * Whether the app may use the microphone.
  */
-export type MicPermission = "Unknown" | "Granted" | "Denied";
+export type MicPermission = 'Unknown' | 'Granted' | 'Denied';

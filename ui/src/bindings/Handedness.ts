@@ -3,12 +3,13 @@
 /**
  * Left-handed and flipped-string display options (LH-1); independent and saved.
  */
-export type Handedness = { 
-/**
- * Mirror the neck horizontally (nut on the right).
- */
-left_handed: boolean, 
-/**
- * Put string 6 at the top.
- */
-flip_strings: boolean, };
+export type Handedness = {
+  /**
+   * Mirror the neck horizontally (nut on the right).
+   */
+  left_handed: boolean;
+  /**
+   * Put string 6 at the top.
+   */
+  flip_strings: boolean;
+};

@@ -3,4 +3,15 @@
 /**
  * A scale or mode type.
  */
-export type Mode = "Major" | "NaturalMinor" | "HarmonicMinor" | "Dorian" | "Phrygian" | "Lydian" | "Mixolydian" | "Locrian" | "MajorPentatonic" | "MinorPentatonic" | "Blues";
+export type Mode =
+  | 'Major'
+  | 'NaturalMinor'
+  | 'HarmonicMinor'
+  | 'Dorian'
+  | 'Phrygian'
+  | 'Lydian'
+  | 'Mixolydian'
+  | 'Locrian'
+  | 'MajorPentatonic'
+  | 'MinorPentatonic'
+  | 'Blues';

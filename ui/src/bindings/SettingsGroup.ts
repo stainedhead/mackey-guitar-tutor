@@ -3,4 +3,4 @@
 /**
  * A settings group, for "Reset" buttons (AC-FR-028).
  */
-export type SettingsGroup = "Instrument" | "Display" | "Sound" | "Tuner";
+export type SettingsGroup = 'Instrument' | 'Display' | 'Sound' | 'Tuner';

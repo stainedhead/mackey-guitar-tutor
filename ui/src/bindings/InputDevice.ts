@@ -3,16 +3,17 @@
 /**
  * An audio input device as the settings screen lists it.
  */
-export type InputDevice = { 
-/**
- * Stable identifier (cpal's device id string, host and device); save this in settings.
- */
-id: string, 
-/**
- * Name to show.
- */
-name: string, 
-/**
- * True for the system default input.
- */
-is_default: boolean, };
+export type InputDevice = {
+  /**
+   * Stable identifier (cpal's device id string, host and device); save this in settings.
+   */
+  id: string;
+  /**
+   * Name to show.
+   */
+  name: string;
+  /**
+   * True for the system default input.
+   */
+  is_default: boolean;
+};

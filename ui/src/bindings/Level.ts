@@ -3,16 +3,17 @@
 /**
  * Level of one block of samples, linear `0.0..=1.0` (full scale = 1.0).
  */
-export type Level = { 
-/**
- * Root-mean-square amplitude.
- */
-rms: number, 
-/**
- * Largest absolute sample.
- */
-peak: number, 
-/**
- * True when the peak stayed at or above 0.99 for at least two consecutive samples.
- */
-clipping: boolean, };
+export type Level = {
+  /**
+   * Root-mean-square amplitude.
+   */
+  rms: number;
+  /**
+   * Largest absolute sample.
+   */
+  peak: number;
+  /**
+   * True when the peak stayed at or above 0.99 for at least two consecutive samples.
+   */
+  clipping: boolean;
+};

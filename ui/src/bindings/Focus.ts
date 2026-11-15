@@ -3,4 +3,4 @@
 /**
  * What is in focus (G-3.1).
  */
-export type Focus = "None" | "Chord" | "Scale" | "Note";
+export type Focus = 'None' | 'Chord' | 'Scale' | 'Note';

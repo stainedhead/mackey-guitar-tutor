@@ -3,4 +3,10 @@
 /**
  * A brief notice shown with a change (G-3.4, E-FB-4, FB-6.4).
  */
-export type Notice = "VoicingChangedForTuning" | "MovedAboveCapo" | "NoPlayableVoicing" | "TriadUnavailable" | "NoteBelowCapo" | "ChordKeptKeyChanged";
+export type Notice =
+  | 'VoicingChangedForTuning'
+  | 'MovedAboveCapo'
+  | 'NoPlayableVoicing'
+  | 'TriadUnavailable'
+  | 'NoteBelowCapo'
+  | 'ChordKeptKeyChanged';

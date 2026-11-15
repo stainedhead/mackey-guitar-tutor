@@ -3,4 +3,4 @@
 /**
  * What kind of thing is played.
  */
-export type PlanKind = "Strum" | "Arpeggio" | "Scale" | "SingleNote";
+export type PlanKind = 'Strum' | 'Arpeggio' | 'Scale' | 'SingleNote';

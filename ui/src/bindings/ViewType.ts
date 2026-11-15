@@ -3,4 +3,4 @@
 /**
  * The chord views (FB-4.6, FB-5, FB-6, FB-7).
  */
-export type ViewType = "AllTones" | "Voicing" | "Triad" | "Arpeggio";
+export type ViewType = 'AllTones' | 'Voicing' | 'Triad' | 'Arpeggio';

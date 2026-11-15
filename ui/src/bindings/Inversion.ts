@@ -3,4 +3,4 @@
 /**
  * The chord tone in the bass of a triad or voicing.
  */
-export type Inversion = "Root" | "First" | "Second" | "Third";
+export type Inversion = 'Root' | 'First' | 'Second' | 'Third';

@@ -3,4 +3,25 @@
 /**
  * The 21 chord qualities of the chord-symbol grammar (FB-4.3).
  */
-export type ChordQuality = "Major" | "Minor" | "Dominant7" | "Major7" | "Minor7" | "HalfDiminished7" | "Diminished" | "Diminished7" | "Augmented" | "Sus2" | "Sus4" | "Dominant7Sus4" | "Sixth" | "MinorSixth" | "Dominant9" | "Major9" | "Minor9" | "Add9" | "Dominant11" | "Dominant13" | "Power";
+export type ChordQuality =
+  | 'Major'
+  | 'Minor'
+  | 'Dominant7'
+  | 'Major7'
+  | 'Minor7'
+  | 'HalfDiminished7'
+  | 'Diminished'
+  | 'Diminished7'
+  | 'Augmented'
+  | 'Sus2'
+  | 'Sus4'
+  | 'Dominant7Sus4'
+  | 'Sixth'
+  | 'MinorSixth'
+  | 'Dominant9'
+  | 'Major9'
+  | 'Minor9'
+  | 'Add9'
+  | 'Dominant11'
+  | 'Dominant13'
+  | 'Power';

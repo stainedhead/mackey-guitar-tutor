@@ -3,4 +3,4 @@
 /**
  * How serious a diagnostic is.
  */
-export type Severity = "Error" | "Warning";
+export type Severity = 'Error' | 'Warning';

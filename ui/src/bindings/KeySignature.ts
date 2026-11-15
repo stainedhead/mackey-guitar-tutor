@@ -3,8 +3,9 @@
 /**
  * A key signature: `-7..=7`, sharps positive.
  */
-export type KeySignature = { 
-/**
- * Number of accidentals; positive for sharps, negative for flats.
- */
-accidentals: number, };
+export type KeySignature = {
+  /**
+   * Number of accidentals; positive for sharps, negative for flats.
+   */
+  accidentals: number;
+};

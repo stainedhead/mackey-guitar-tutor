@@ -3,8 +3,13 @@
 /**
  * Chromatic (any note) or string mode.
  */
-export type TunerMode = "Chromatic" | { "Strings": { 
-/**
- * The tapped string, if any.
- */
-locked: number | null, } };
+export type TunerMode =
+  | 'Chromatic'
+  | {
+      Strings: {
+        /**
+         * The tapped string, if any.
+         */
+        locked: number | null;
+      };
+    };

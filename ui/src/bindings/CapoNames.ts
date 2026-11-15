@@ -3,4 +3,4 @@
 /**
  * Which name leads under a capo (LH-5).
  */
-export type CapoNames = "ShapeFirst" | "SoundingFirst";
+export type CapoNames = 'ShapeFirst' | 'SoundingFirst';

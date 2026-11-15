@@ -3,12 +3,13 @@
 /**
  * Highlighted positions outside the visible range (E-FB-5).
  */
-export type OffRange = { 
-/**
- * How many are below the first visible fret (left of the range).
- */
-below: number, 
-/**
- * How many are above the last visible fret (right of the range).
- */
-above: number, };
+export type OffRange = {
+  /**
+   * How many are below the first visible fret (left of the range).
+   */
+  below: number;
+  /**
+   * How many are above the last visible fret (right of the range).
+   */
+  above: number;
+};

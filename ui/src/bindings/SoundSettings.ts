@@ -3,12 +3,13 @@
 /**
  * Sound options.
  */
-export type SoundSettings = { 
-/**
- * Output volume, 0 to 100 percent.
- */
-volume: number, 
-/**
- * Silence everything.
- */
-mute: boolean, };
+export type SoundSettings = {
+  /**
+   * Output volume, 0 to 100 percent.
+   */
+  volume: number;
+  /**
+   * Silence everything.
+   */
+  mute: boolean;
+};

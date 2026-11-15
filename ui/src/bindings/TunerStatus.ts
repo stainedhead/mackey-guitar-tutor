@@ -3,4 +3,5 @@
 /**
  * What the tuner screen should show.
  */
-export type TunerStatus = "Listening" | "Pitch" | "NoStablePitch" | "TooQuiet" | "TooLoud" | "LowConfidence";
+export type TunerStatus =
+  'Listening' | 'Pitch' | 'NoStablePitch' | 'TooQuiet' | 'TooLoud' | 'LowConfidence';

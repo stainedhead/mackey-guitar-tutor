@@ -3,24 +3,25 @@
 /**
  * The hover or tap text (FB-1.6).
  */
-export type Tooltip = { 
-/**
- * "G3".
- */
-note_octave: string, 
-/**
- * Scale degree in the key: "1".
- */
-degree: string, 
-/**
- * Interval to the chord root: "R"; `None` without a chord.
- */
-interval: string | null, 
-/**
- * "Root".
- */
-role: string, 
-/**
- * The double-accidental spelling when the label was simplified (G-1.6).
- */
-theory_spelling: string | null, };
+export type Tooltip = {
+  /**
+   * "G3".
+   */
+  note_octave: string;
+  /**
+   * Scale degree in the key: "1".
+   */
+  degree: string;
+  /**
+   * Interval to the chord root: "R"; `None` without a chord.
+   */
+  interval: string | null;
+  /**
+   * "Root".
+   */
+  role: string;
+  /**
+   * The double-accidental spelling when the label was simplified (G-1.6).
+   */
+  theory_spelling: string | null;
+};
