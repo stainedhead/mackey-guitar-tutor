@@ -54,4 +54,4 @@ One work session, P0 first, as stable commit groups.
 
 ## References
 
-Source PRD: [fretboard-foundation-auto-review-PRD.md](fretboard-foundation-auto-review-PRD.md). Original spec: [archive](../archive/261115-fretboard-foundation/spec.md).
+Source PRD: [fretboard-foundation-auto-review-PRD.md](fretboard-foundation-auto-review-PRD.md). Original spec: [archive](../spec.md).

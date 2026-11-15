@@ -16,8 +16,8 @@
 | 2 | Research and data modelling | Complete | [research.md](research.md) |
 | 3 | Architecture and planning | Complete | [architecture.md](architecture.md), [plan.md](plan.md) |
 | 4 | Task breakdown | Complete | 7 tasks, one per FR |
-| 5 | Implementation | In Progress | 6 of 7 tasks; FR-005 partial |
-| 6 | Completion and archival | Not Started | |
+| 5 | Implementation | Complete | 6 of 7 tasks done; FR-005 partly done (remainder deferred with rationale) |
+| 6 | Completion and archival | Complete | Archived inside the original spec (2026-11-15T22:37Z) |
 
 ## Blockers
 

@@ -1,8 +1,8 @@
-# specs/261115-fretboard-foundation-auto-review
+# specs/archive/261115-fretboard-foundation/261115-fretboard-foundation-auto-review
 
-Review-fix spec for the [fretboard foundation](../archive/261115-fretboard-foundation/README.md): seven findings (FR-001 to FR-007) from the Step 5 code and design review, three of them P0 blockers (wrong pattern box, tuner flooding the UI, wrong triad inversion label). Created 2026-11-15 from [fretboard-foundation-auto-review-PRD.md](fretboard-foundation-auto-review-PRD.md). Back to [specs/](../README.md) and the [root README](../../README.md).
+Review-fix spec for the [fretboard foundation](../README.md): seven findings (FR-001 to FR-007) from the Step 5 code and design review, three of them P0 blockers (wrong pattern box, tuner flooding the UI, wrong triad inversion label). Created 2026-11-15 from [fretboard-foundation-auto-review-PRD.md](fretboard-foundation-auto-review-PRD.md). Back to [specs/](../../README.md) and the [root README](../../../../README.md).
 
-Authority: [INTENT.md](../../INTENT.md) → [docs/prd/](../../docs/prd/README.md) → [docs/](../../docs/README.md) → this spec. Rules: [AGENTS.md](../../AGENTS.md).
+Authority: [INTENT.md](../../../../INTENT.md) → [docs/prd/](../../../../docs/prd/README.md) → [docs/](../../../../docs/README.md) → this spec. Rules: [AGENTS.md](../../../../AGENTS.md).
 
 ## Files
 

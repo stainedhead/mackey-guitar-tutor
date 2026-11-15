@@ -2,7 +2,7 @@
 
 **Created:** 2026-11-15
 
-Types that change (all in the original spec's [data dictionary](../archive/261115-fretboard-foundation/data-dictionary.md)):
+Types that change (all in the original spec's [data dictionary](../data-dictionary.md)):
 
 - Pattern list label: `"Box {number} of {count}"` for pentatonic boxes, `"Pattern {number} of {count}"` for seven-note patterns; numbering from `PatternKind`, never from the sort index.
 - Stepper state: `pattern_index` selects within the list ordered by pattern number.

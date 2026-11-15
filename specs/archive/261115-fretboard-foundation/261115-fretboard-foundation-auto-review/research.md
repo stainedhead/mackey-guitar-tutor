@@ -11,7 +11,7 @@
 
 ## Industry Standards, Existing Implementations, API Documentation, Best Practices
 
-Not applicable beyond the original spec's [research](../archive/261115-fretboard-foundation/research.md).
+Not applicable beyond the original spec's [research](../research.md).
 
 ## Open Questions
 
@@ -19,4 +19,4 @@ None blocking.
 
 ## References
 
-[PRD](fretboard-foundation-auto-review-PRD.md); [original spec](../archive/261115-fretboard-foundation/spec.md).
+[PRD](fretboard-foundation-auto-review-PRD.md); [original spec](../spec.md).

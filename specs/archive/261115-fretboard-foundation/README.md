@@ -26,3 +26,7 @@ Authority: [INTENT.md](../../../INTENT.md) → [docs/prd/](../../../docs/prd/REA
 3. [implementation-notes.md](implementation-notes.md) before changing anything the decisions cover.
 
 At 100% in `status.md`, run `/dev-flow:archive-spec` to move this directory to `specs/archive/`.
+
+## Review-fix spec
+
+[261115-fretboard-foundation-auto-review/](261115-fretboard-foundation-auto-review/README.md): the seven fixes (FR-001 to FR-007) from the Step 5 review, with its own PRD, spec, status and implementation notes.

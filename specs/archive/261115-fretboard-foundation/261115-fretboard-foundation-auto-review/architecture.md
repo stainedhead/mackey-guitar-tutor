@@ -4,7 +4,7 @@
 
 ## Architecture Overview
 
-No structural change. The layer rules in [docs/architecture.md](../../docs/architecture.md) hold: label and order logic stay in `mackey-voicing` (UI shows data); the tuner pacing policy is a pure, testable function in `mackey-audio` or `mackey-app` with an injected clock; `mackey-app` stays an adapter.
+No structural change. The layer rules in [docs/architecture.md](../../../../docs/architecture.md) hold: label and order logic stay in `mackey-voicing` (UI shows data); the tuner pacing policy is a pure, testable function in `mackey-audio` or `mackey-app` with an injected clock; `mackey-app` stays an adapter.
 
 ## Component Architecture and Layer Responsibilities
 

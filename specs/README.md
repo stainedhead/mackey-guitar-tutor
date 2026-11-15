@@ -8,9 +8,9 @@ Active feature specs live here; completed ones move to `specs/archive/` (via `/d
 
 | Spec | Covers | Status |
 |---|---|---|
-| [261115-fretboard-foundation-auto-review/](261115-fretboard-foundation-auto-review/README.md) | Review fixes FR-001 to FR-007 for the fretboard foundation: pattern stepper, tuner pacing, triad inversions, coverage, CSP, docs | In progress |
+| _None_ | | |
 
-Archived: [261115-fretboard-foundation](archive/261115-fretboard-foundation/README.md) (roadmap P0 and P1, built; see [specs/archive](archive/README.md)).
+Archived: [261115-fretboard-foundation](archive/261115-fretboard-foundation/README.md) (roadmap P0 and P1, built) with its review-fix spec [261115-fretboard-foundation-auto-review](archive/261115-fretboard-foundation/261115-fretboard-foundation-auto-review/README.md) nested inside; see [specs/archive](archive/README.md).
 
 The product PRD lives in `docs/prd/` (with `INTENT.md` at the root). Each roadmap phase becomes a spec: run `/dev-flow:create-spec` on the relevant PRD file to create its `YYMMDD-<feature>/` directory here.
 

@@ -4,7 +4,7 @@
 **Spec:** specs/archive/261115-fretboard-foundation/ (archived in Step 7; originally specs/261115-fretboard-foundation/)
 **Branch:** claude/project-thread-e8va25
 **Review PRD:** fretboard-foundation-auto-review-PRD.md (now in the review spec)
-**Review spec:** specs/261115-fretboard-foundation-auto-review/
+**Review spec:** specs/archive/261115-fretboard-foundation/261115-fretboard-foundation-auto-review/
 **Process Start:** 2026-11-15T19:24:00Z
 **Process End:** —
 **Total Runtime:** —
@@ -23,8 +23,8 @@ Notes: run in a cloud container (Linux). The PRD was created by adapting docs/pr
 | 6  | Prepare Review PRD              | ✅ Complete | 2026-11-15T22:24Z | 2026-11-15T22:24Z | 1 |
 | 7  | Archive Original Spec           | ✅ Complete | 2026-11-15T22:24Z | 2026-11-15T22:24Z | 1 |
 | 8  | Spec Review Fixes               | ✅ Complete | 2026-11-15T22:25Z | 2026-11-15T22:25Z | 1 |
-| 9  | Implement Review Fixes          | 🔄 In progress | 2026-11-15T22:52Z | — | — |
-| 10 | Archive Fixes Spec              | ⬜ Pending | — | — | — |
+| 9  | Implement Review Fixes          | ✅ Complete | 2026-11-15T22:52Z | 2026-11-15T22:37Z | — |
+| 10 | Archive Fixes Spec              | ✅ Complete | 2026-11-15T22:37Z | 2026-11-15T22:37Z | 1 |
 | 11 | Final Quality Pass              | ⬜ Pending | — | — | — |
 | 12 | Process Analysis Report         | ⬜ Pending | — | — | — |
 | 13 | Archive Spec                    | ⬜ Pending | — | — | — |
