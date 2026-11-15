@@ -3,7 +3,7 @@ resolver = "3"
 # Domain crates live in crates/<name>/ (mackey-theory, mackey-voicing, ...) and the Tauri
 # shell in src-tauri/ (crate mackey-app). Add each one here when you create it, and to the
 # layer table in xtask/src/archcheck.rs and AGENTS.md.
-members = ["xtask"]
+members = ["crates/mackey-audio", "crates/mackey-theory", "crates/mackey-voicing", "src-tauri", "xtask"]
 
 [workspace.package]
 edition = "2024"
@@ -17,7 +17,23 @@ publish = false
 # Every third-party version is declared once here; crates use `dep = { workspace = true }`.
 # Add an entry when the first crate needs it (cargo warns about unused ones). Standard
 # picks (AGENTS.md): thiserror 2, serde 1 (derive), proptest 1, insta 1 (yaml), criterion.
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+thiserror = "2"
+ts-rs = "12"
+proptest = "1"
+insta = { version = "1", features = ["yaml"] }
+criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "std", "registry", "env-filter"] }
+tracing-appender = "0.2"
+tempfile = "3"
+cpal = "0.18"
+rtrb = "0.4"
+assert_no_alloc = "1"
+# Tauri 2 stable line (3.x is alpha); tauri-build must match tauri's major.
+tauri = { version = "2", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
@@ -45,6 +61,16 @@ print_stderr = "warn"
 lto = "thin"
 codegen-units = 1
 
-# When proptest and insta join the workspace, add `[profile.dev.package.proptest]`,
-# `[profile.dev.package.insta]` and `[profile.dev.package.similar]` with `opt-level = 3`:
-# property tests and snapshot diffs run much faster with optimised dependencies.
+# Property tests and snapshot diffs run much faster with optimised dependencies.
+# The pitch detector and synth are number crunching; unoptimised they make the audio tests slow.
+[profile.dev.package.mackey-audio]
+opt-level = 3
+
+[profile.dev.package.proptest]
+opt-level = 3
+
+[profile.dev.package.insta]
+opt-level = 3
+
+[profile.dev.package.similar]
+opt-level = 3

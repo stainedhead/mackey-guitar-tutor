@@ -46,6 +46,30 @@ Test types: **U** unit, **P** property (proptest), **G** golden file (insta), **
 | UX-1 to UX-10 | [07](07-ux-flows.md) | [platforms §3](../platforms.md#3-ipad) | ui | UI, M | P1 to P4 |
 | NF-1 to NF-24 | [08](08-nfr.md) | [architecture §6, §7](../architecture.md#6-real-time-audio-design), [platforms](../platforms.md) | all | B, R, UI, M | All |
 
+## Tests that exist today (fretboard foundation, 2026-11-15)
+
+Test names carry the requirement or acceptance-criterion ID (`fb_5_1_...`, `ac_fb_6_2_...`). The table lists where they live; it covers the rows built so far. Paths are under the repository root; `ui/e2e` runs through `make e2e`, the rest through `make test`, `make ui-test` or `make props`.
+
+| Requirement | Test files |
+|---|---|
+| G-1 note spelling | `crates/mackey-theory/tests/spelling.rs`, `chord_spelling.rs` (252-row AC-P0-1 table), `chord_parser.rs`, `properties.rs`; `crates/mackey-theory/src/{pitch,key}.rs`; `crates/mackey-voicing/tests/view.rs` |
+| G-2 visual language | `crates/mackey-voicing/tests/view.rs` (shape and role per marker); `ui/src/App.test.tsx`; `ui/src/theme/tokens.test.ts` (palette contrast); `ui/src/fretboard/EdgeArrows.test.tsx` |
+| G-3 selection model | `crates/mackey-voicing/tests/selection.rs`; `src-tauri/tests/state.rs` |
+| FB-1 neck rendering | `crates/mackey-voicing/tests/view.rs`, `playback.rs`, `properties.rs`; `ui/src/fretboard/geometry.test.ts`; `ui/e2e/explore.spec.ts` (AC-P0-5, AC-FB-1.6, AC-FB-9.1b), `ui/e2e/layouts.spec.ts` |
+| FB-2, FB-3 key and notes | `crates/mackey-theory/src/scale.rs`; `crates/mackey-voicing/tests/view.rs`; `src-tauri/tests/state.rs` (AC-FB-2.2) |
+| FB-4 chord selection | `crates/mackey-theory/tests/analysis.rs`, `roman.rs`, `chord_parser.rs`; `crates/mackey-voicing/tests/selection.rs`, `view.rs`; `ui/e2e/explore.spec.ts` (E-FB-1, UX-6) |
+| FB-5 voicings | `crates/mackey-voicing/tests/voicings.rs`, `curated_shapes.rs`, `properties.rs` (FB-5.4 invariants), `perf_budget.rs`, `view.rs` |
+| FB-6 triads, FB-7 arpeggios | `crates/mackey-voicing/tests/triads.rs`, `arpeggios.rs`, `tunings.rs`, `properties.rs`, `view.rs` |
+| FB-8 sound | `crates/mackey-voicing/tests/playback.rs`; `crates/mackey-audio/tests/synth.rs`, `synth_noalloc.rs`; `src-tauri/tests/state.rs` (E-FB-8); `ui/e2e/explore.spec.ts` (AC-E-FB-8). FB-8.2 (instrument choice) not built |
+| FB-9 cycling | `crates/mackey-voicing/tests/selection.rs`; `ui/src/shortcuts.test.ts`; `ui/e2e/explore.spec.ts` (AC-FB-9.1b, 9.1c) |
+| SC-1 to SC-5 scales | `crates/mackey-voicing/tests/patterns.rs`, `properties.rs` |
+| LH-1 to LH-5 handedness, tunings, capo | `crates/mackey-voicing/tests/tunings.rs`, `curated_shapes.rs`, `voicings.rs`, `view.rs`; `ui/e2e/explore.spec.ts` (AC-LH-1.1) |
+| TU-1 to TU-7 tuner | `crates/mackey-audio/tests/tuner_fixtures.rs`, `tuner_strings.rs`, `src/dsp/cents.rs`; `crates/mackey-voicing/tests/tunings.rs`; `src-tauri/tests/state.rs`; `ui/src/tuner/describe.test.ts`; `ui/e2e/tuner.spec.ts` (mocked readings). Accuracy on a real guitar: manual, not yet done |
+| SC-3 (pattern stepper, box numbering) | `crates/mackey-voicing/tests/pattern_stepper.rs`, `patterns.rs` |
+| FB-6 (triad inversion label) | `crates/mackey-voicing/tests/properties.rs` (`fr003_*`) |
+| TU (tuner pacing) | `src-tauri/src/tuner.rs` and `crates/mackey-audio/src/io/pump.rs` unit tests (`fr002_*`) |
+| NF-23, NF-24 (settings, panics) | `src-tauri/src/settings.rs` and `guard.rs` unit tests; `src-tauri/tests/state.rs` |
+
 ## Earlier IDs
 
 The earlier product spec's IDs are all kept: FB-1 to FB-9, PS-1 to PS-8, SG-1 to SG-10, RH-1 to RH-7, DR-1 to DR-7, ST-1 to ST-5, TU, SC, LH, CG, TT, PR, ET, LP, MR and NF-1 to NF-11. New IDs: G-1 to G-6, TR-1 to TR-7, RH-8, SG-0, SG-11, UX-1 to UX-10, NF-12 to NF-24.
@@ -57,3 +81,5 @@ The earlier product spec's IDs are all kept: FB-1 to FB-9, PS-1 to PS-8, SG-1 to
 | Teacher-to-student sharing: files only, or a service? | J | Before any sharing work (not planned for v1) |
 | Legal review of web import | J | Start of P5 |
 | Confirm each sound asset's licence at source | Build | P1b |
+| FB-8.2 instrument choice deferred to P1b; v1 foundation ships one synthesised voice (default, pending J) | J | P1b |
+| Follow-up (auto-review FR-005): `crates/mackey-audio/src/io/input.rs` stays in `COVER_IGNORE`; its loop decision logic is tested in `pump.rs`, but command handling and stream-loss fallback need a live cpal session. Narrow the exclusion once they sit behind a fake stream | Build | P1b |

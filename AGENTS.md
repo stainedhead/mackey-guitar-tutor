@@ -61,14 +61,25 @@ Use the `Makefile`; do not invent ad-hoc invocations. The toolchain comes from `
 | `make lint` | `cargo clippy --workspace --all-targets --all-features -- -D warnings` (lint levels in `[workspace.lints]`, test allowances in `clippy.toml`) |
 | `make fmt` | `cargo fmt --all` (config in `rustfmt.toml`) |
 | `make fmt-check` | `cargo fmt --all --check`, as CI runs it |
-| `make cover` | Line coverage with `cargo llvm-cov`; target **≥ 80%** overall, new code fully covered |
+| `make cover` | Line coverage with `cargo llvm-cov`; target **≥ 80%** overall, new code fully covered. Excludes only thin glue that needs a window system, the Tauri runtime or a sound card (`src-tauri/src/main.rs`, `src-tauri/src/runtime.rs`, `src-tauri/build.rs`, `crates/mackey-audio/src/io/{devices,input,output}.rs`; regex `COVER_IGNORE` in the `Makefile`) |
 | `make archcheck` | Check the crate layer rules above (`cargo xtask archcheck`) |
 | `make doccheck` | Check that every `.PHONY` target has a row in this table and every folder has a `README.md` (`cargo xtask doccheck`) |
 | `make deny` | `cargo deny check`: licences (permissive only), advisories, bans, sources (`deny.toml`) |
 | `make tools` | One-time install of `cargo-deny` and `cargo-llvm-cov` |
-| `make check` | fmt + lint + archcheck + doccheck + deny + test: must pass before every commit |
+| `make check` | fmt + lint + archcheck + doccheck + deny + test + ui-lint + ui-test + bindings-check: must pass before every commit |
 
-UI and app targets (`ui-lint`, `ui-test`, `e2e`, `bindings`, `app`, `ios-sim`) are added with the Tauri scaffold in roadmap phase P0; add each to this table when it lands.
+UI and app targets (they need Node 22 and, for `e2e`, WebKit via `npx --prefix ui playwright install --with-deps webkit`; the Rust targets create a stub `ui/dist/index.html` when the UI is unbuilt):
+
+| Command | Purpose |
+|---|---|
+| `make ui-lint` | `ui/`: ESLint (flat config, typed, strict), `prettier --check` and `tsc --noEmit` |
+| `make ui-test` | `ui/`: Vitest unit tests (jsdom, mocked command layer) |
+| `make e2e` | `ui/`: Playwright in WebKit, projects `desktop` (1280×800), `ipad` (1180×820), `ipad-portrait` and `narrow`, against the mocked command layer. `PW_CHANNEL=chrome` runs the same specs in an installed Chrome when WebKit cannot be downloaded |
+| `make bindings` | Regenerate the TypeScript types in `ui/src/bindings/` from the Rust types (`ts-rs`) |
+| `make bindings-check` | Regenerate, then fail if `ui/src/bindings/` differs from what is committed (stale bindings) |
+| `make app` | `tauri build`: universal (arm64 + x86_64) ad-hoc signed `.app`/`.dmg` on macOS; a host binary without a bundle elsewhere |
+| `make ios-sim` | `tauri ios init` (first run) then an unsigned debug build for the iOS Simulator (`aarch64-sim`); macOS with Xcode only |
+| `make screenshots` | Linux only, optional (not in `make check` or CI): builds the UI and the app, runs it under Xvfb and captures the real Explore, Tuner and Settings screens to `docs/images/real-*.png` (`scripts/screenshots/`; needs `xvfb xdotool imagemagick openbox`) |
 
 ## Development: TDD
 
@@ -148,14 +159,14 @@ Every push to `main` and every pull request runs the pipeline.
 
 | Trigger | Workflow | What it does |
 |---|---|---|
-| Pull request, push to `main` | `.github/workflows/ci.yml` | On Linux and macOS: `make fmt-check`, `make lint`, `make archcheck`, `make doccheck`, `make test`, `make cover`; on Linux also `make deny` and `make props` |
+| Pull request, push to `main` | `.github/workflows/ci.yml` | `rust` (Linux and macOS): `make fmt-check`, `make lint`, `make archcheck`, `make doccheck`, `make test`, `make cover`; on Linux also `make deny` and `make props`. Plus `ui` (`make ui-lint ui-test`), `e2e` (Playwright WebKit), `bindings` (`make bindings-check`), `mac-app` (`make app`, universal) and `ios-sim` (`make ios-sim`) |
 
 Rules:
 
 - **CI must be green.** A red `main` is fixed before any other work.
 - **CI mirrors `make check`.** Anything CI enforces must also be runnable locally through the `Makefile`; when you add a CI step, add or extend a make target.
 - **macOS is the real target.** Linux runs only because the pure crates are portable and Linux runners are cheap; it is not platform support.
-- **Not yet in place** (added in roadmap phase P0 with the Tauri scaffold): UI lint, type check, Vitest and Playwright; the stale-bindings check; `tauri build` for a universal Mac binary; `tauri ios build` for the iOS Simulator (unsigned compile check); and `release.yml`, which on a `v*` tag attaches an ad-hoc signed `.dmg` to a GitHub Release. Releases are annotated semver tags; never build or publish release artifacts by hand. Record signing or notarisation changes in an ADR.
+- **Not yet in place**: `release.yml`, which on a `v*` tag attaches an ad-hoc signed `.dmg` to a GitHub Release (releases are annotated semver tags; never build or publish release artifacts by hand; record signing or notarisation changes in an ADR). The UI, e2e, stale-bindings, universal-Mac-build and iOS-Simulator jobs are in `ci.yml`.
 - Keep workflow files documented in `.github/README.md`, and update it when they change.
 
 ## Git workflow

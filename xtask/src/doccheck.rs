@@ -13,13 +13,20 @@ const SKIP_DIRS: &[&str] = &[
     "target",
     "node_modules",
     "dist",
+    "dist-mock",
     "gen",
+    "playwright-report",
+    "test-results",
+    "coverage",
     "src",
     "tests",
     "benches",
     "examples",
     "snapshots",
     "proptest-regressions",
+    // Generated TypeScript bindings and agent worktrees are tool output, not documentation.
+    "bindings",
+    "worktrees",
     "workflows",
     "adr",
 ];
@@ -138,6 +145,13 @@ mod tests {
             ".git/objects",
             "docs/adr",
             "target/debug",
+            "ui/node_modules/pkg",
+            "ui/dist",
+            "ui/dist-mock",
+            "ui/playwright-report",
+            "ui/test-results",
+            "ui/coverage",
+            "src-tauri/gen/apple",
         ] {
             fs::create_dir_all(root.join(dir)).unwrap();
         }
@@ -145,6 +159,8 @@ mod tests {
             "crates/README.md",
             "crates/mackey-theory/README.md",
             "specs/README.md",
+            "ui/README.md",
+            "src-tauri/README.md",
         ] {
             fs::write(root.join(file), "# x\n").unwrap();
         }

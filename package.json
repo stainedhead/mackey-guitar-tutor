@@ -1,0 +1,8 @@
+{
+  "name": "mackey-guitar-tutor-root",
+  "private": true,
+  "description": "Runs the Tauri CLI from the repo root (where src-tauri/ is). The UI package and its dependencies live in ui/. Used by make app and make ios-sim; see README.md.",
+  "scripts": {
+    "tauri": "node ui/node_modules/@tauri-apps/cli/tauri.js"
+  }
+}

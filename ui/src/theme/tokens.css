@@ -1,0 +1,92 @@
+/* Design tokens (G-2). Role colours are Okabe-Ito; every role also has a shape.
+   Each role has a fill and the text colour that reaches 4.5:1 on it (tested in tokens.test.ts). */
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #595959;
+  --surface: #f3f3f3;
+  --border: #c8c8c8;
+  --accent: #0072b2;
+  --accent-fg: #ffffff;
+  --error: #b00020;
+  --focus: #0050a0;
+  --neck-wood: #ede3cf;
+  --neck-edge: #6b5a3c;
+  --string: #6b6b6b;
+  --fret-wire: #8a8a8a;
+  --inlay: #c9bb9c;
+  --dim: rgb(0 0 0 / 0.12);
+  --marker-edge: #1a1a1a;
+  --role-root: #d55e00;
+  --role-root-text: #000000;
+  --role-third: #0072b2;
+  --role-third-text: #ffffff;
+  --role-fifth: #009e73;
+  --role-fifth-text: #000000;
+  --role-seventh: #e69f00;
+  --role-seventh-text: #000000;
+  --role-extension: #cc79a7;
+  --role-extension-text: #000000;
+  --role-scale: #1a1a1a;
+  --role-scale-text: #1a1a1a;
+  --role-single: #f0e442;
+  --role-single-text: #000000;
+  --tune-good: #006b4a;
+  --tune-flat: #0072b2;
+  --tune-sharp: #b34700;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #1b1b1b;
+    --fg: #f0f0f0;
+    --muted: #b5b5b5;
+    --surface: #262626;
+    --border: #4a4a4a;
+    --accent: #56b4e9;
+    --accent-fg: #000000;
+    --error: #ff8a80;
+    --focus: #7cc4f0;
+    --neck-wood: #2a2724;
+    --neck-edge: #8a7a5c;
+    --string: #b0b0b0;
+    --fret-wire: #7a7a7a;
+    --inlay: #4a4439;
+    --dim: rgb(0 0 0 / 0.35);
+    --marker-edge: #f0f0f0;
+    --role-scale: #f0f0f0;
+    --role-scale-text: #f0f0f0;
+    --tune-good: #4fd1a1;
+    --tune-flat: #56b4e9;
+    --tune-sharp: #f0a060;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #1b1b1b;
+  --fg: #f0f0f0;
+  --muted: #b5b5b5;
+  --surface: #262626;
+  --border: #4a4a4a;
+  --accent: #56b4e9;
+  --accent-fg: #000000;
+  --error: #ff8a80;
+  --focus: #7cc4f0;
+  --neck-wood: #2a2724;
+  --neck-edge: #8a7a5c;
+  --string: #b0b0b0;
+  --fret-wire: #7a7a7a;
+  --inlay: #4a4439;
+  --dim: rgb(0 0 0 / 0.35);
+  --marker-edge: #f0f0f0;
+  --role-scale: #f0f0f0;
+  --role-scale-text: #f0f0f0;
+  --tune-good: #4fd1a1;
+  --tune-flat: #56b4e9;
+  --tune-sharp: #f0a060;
+}

@@ -9,14 +9,14 @@ Status: Draft v0.2 (2026-11-15). Stack: Rust core, Tauri 2 shell, web UI. Target
 | Core language | Rust (stable, 2024 edition) in a Cargo workspace | Strong types for music theory, safe and predictable real-time audio, portable if other platforms are added later | [0001](adr/0001-rust-core-tauri-shell.md) |
 | App shell | Tauri 2 | One app for Mac (desktop) and iPad (iOS target) with the Rust backend in-process | 0001, [0008](adr/0008-ipad-via-tauri-ios.md) |
 | UI | TypeScript, React, Vite; fretboard drawn in SVG | Mainstream skills, crisp scalable neck, built-in hit-testing and accessibility | [0007](adr/0007-web-ui-and-ipc-boundary.md) |
-| UI to core boundary | Tauri commands and events with generated TypeScript types (tauri-specta or ts-rs) | One source of truth for types, compile-time checked on both sides | 0007 |
+| UI to core boundary | Tauri commands and events; TypeScript types generated with ts-rs, command wrappers generated from an in-repo manifest | One source of truth for types, compile-time checked on both sides | 0007 |
 | Modularity | One crate per domain; pure core crates with no I/O | Testable, reusable on mobile and in a CLI | [0002](adr/0002-pure-music-theory-core.md) |
 | Persistence | SQLite (rusqlite, bundled) in the app container (`~/Library/Application Support/` on Mac, the app sandbox on iPad); plain text is the source of truth for sessions and songs | Portable data, zero setup | [0003](adr/0003-text-first-persistence.md) |
 | Audio output and rhythm | cpal on CoreAudio (Mac and iPad) + rustysynth for guitar tones + a small one-shot sampler for CC0 drum kits ([sound-assets.md](sound-assets.md)); a Swift plugin sets up `AVAudioSession` on iPad; one sample-accurate transport clock | Native low latency without a web audio dependency; clean sound at any tempo | [0005](adr/0005-sequenced-drums.md) |
 | Audio input | cpal input stream; McLeod/YIN pitch, onsets, chroma verification; ONNX Runtime (ort) model later | Offline, private, no backend | [0006](adr/0006-on-device-audio-analysis.md) |
 | Song content | Local-only, user-initiated import; no scraping service | Legal and store-review risk | [0004](adr/0004-user-initiated-song-import.md) |
 | Distribution | Mac: unsigned (ad-hoc signed) universal `.dmg` on GitHub Releases, no updater. iPad: Xcode install (free Apple ID or Developer Program). App Store later | Personal use for now | |
-| Testing | `cargo test` with proptest (properties) and insta (golden files), criterion benchmarks; Vitest for UI logic; Playwright (WebKit, desktop and iPad viewports) against the UI with a mocked command layer; a short manual smoke checklist on Mac and iPad per release (tauri-driver cannot drive WKWebView) | | |
+| Testing | `cargo test` with proptest (properties) and insta (golden files), criterion benchmarks; Vitest for UI logic; Playwright (WebKit; desktop, iPad landscape and portrait, and narrow viewports) against the UI with a mocked command layer that replays states recorded from the real Rust core (`src-tauri/src/bindings.rs` writes `ui/src/mocks/scenarios.json`, so the mocked UI shows real voicings and the UI never needs theory); a short manual smoke checklist on Mac and iPad per release (tauri-driver cannot drive WKWebView) | | |
 
 ## 2. Module layout
 
@@ -74,7 +74,7 @@ pub struct Key { pub scale: Scale }                           // diatonic_chord(
 pub struct ChordQuality { pub intervals: Vec<Interval>, pub symbol: &'static str }  // "m7b5"
 pub struct Chord { pub root: Note, pub quality: ChordQuality, pub bass: Option<Note> }  // D/F#
 pub fn parse_chord_symbol(s: &str) -> Result<Chord, ChordParseError>;
-pub fn roman_to_chord(s: &str, key: &Key) -> Option<Chord>;   // "vi" in G -> Em
+pub fn roman_to_chord(s: &str, key: &Key) -> Result<Chord, RomanParseError>;   // "vi" in G -> Em
 ```
 
 Spelling matters: a beginner in F should see Bb, not A#. Keys own the spelling rules and every displayed note is spelled from its key.
@@ -212,3 +212,48 @@ flowchart LR
 - Criterion benchmarks guard the voicing search and parsers against regressions in the NF-1/NF-2 budgets.
 - CI on GitHub Actions on `macos-latest`: `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test --workspace`, UI lint, type check, Vitest and Playwright, then `tauri build` for a universal Mac binary and `tauri ios build` for the iOS simulator (an unsigned compile check). Tagged commits attach an ad-hoc signed `.dmg` to a GitHub Release. (The pure core crates can also run on a cheap Linux runner for speed; that is a CI convenience, not platform support.)
 - A `CLAUDE.md` at the repo root with build/test commands and the crate rules above, so agentic contributors respect the layer boundaries.
+
+## 8. As built: the fretboard foundation
+
+Status: built 2026-11-15 on branch `claude/project-thread-e8va25` ([spec](../specs/archive/261115-fretboard-foundation/spec.md), decisions D-01 to D-76+ in its [implementation notes](../specs/archive/261115-fretboard-foundation/implementation-notes.md)). This section records what exists; sections 1 to 7 remain the design for the whole product.
+
+### 8.1 Crates present
+
+| Crate | Contents |
+|---|---|
+| `mackey-theory` | Notes, intervals, scales and modes, keys, chord qualities and the chord-symbol parser with diagnostics, Roman numerals and diatonic analysis, key-aware spelling. 99% line coverage; 30 properties |
+| `mackey-voicing` | Tunings (nine presets and custom), capo, curated open and CAGED shapes, voicing search and scoring, fingering, triads, arpeggios, scale patterns (pentatonic boxes, three-notes-per-string), the selection model and cycling, `FretboardView`, the playback plan. Search about 0.3 ms, view under 1 ms |
+| `mackey-audio` | MPM pitch detector, tuner state machine, Karplus-Strong synth (16 preallocated voices, allocation-free render), cpal glue for output and input |
+| `mackey-app` (`src-tauri`) | State, 32 commands, one event, settings, logging |
+| `xtask` | `archcheck`, `doccheck` |
+
+`mackey-rhythm`, `mackey-practice`, `mackey-songs`, `mackey-store`, `mackey-progress` and `mackey-sources` do not exist yet; `src-tauri/plugins/audio-session` (Swift) is not written.
+
+### 8.2 Commands and events
+
+`src-tauri/src/commands.rs` has 32 thin commands; every body is an `AppState` method that runs without Tauri (so integration tests use a `FakeAudio`). Groups:
+
+| Group | Commands |
+|---|---|
+| Explorer (return an `ExplorerSnapshot`) | `get_snapshot`, `select_key`, `select_diatonic_chord`, `select_chord`, `select_note`, `select_tuning`, `set_capo`, `set_view_type`, `set_labels_mode`, `set_scale_overlay`, `set_option`, `cycle` |
+| Queries | `app_info`, `fretboard_view`, `parse_chord`, `voicings_for`, `fit_selection` |
+| Audio | `play_selection`, `play_note`, `stop_playback` |
+| Tuner | `list_input_devices`, `tuner_targets`, `tuner_start`, `tuner_stop`, `tuner_set_mode`, `tuner_reference_tone`, `open_system_settings` |
+| Settings | `get_settings`, `set_settings`, `reset_settings`, `take_settings_notice` |
+
+Commands take an optional `visible` fret range so the core can count notes beyond the view. One event, `tuner_reading` (about 30 Hz, from the analysis thread through a throttle that limits on stream and wall-clock time; an unpaced input gets an `InputNotPaced` notice and analysis stops), carries a `TunerReading`. Each snapshot has a revision number; the UI drops a response older than the last one it applied, so out-of-order replies never show a stale neck.
+
+State: the explorer (selection, instrument, handedness, voicing cache), settings and audio sit behind three mutexes, always locked in that order and never by the audio thread. Every command body runs under `catch_unwind`; a panic becomes an `AppError` and the app keeps running.
+
+### 8.3 Bindings
+
+The types that cross the boundary derive `ts_rs::TS` in the core crates behind a `ts` feature. `tauri-specta` for Tauri 2 is still a release candidate, and `ts-rs` does not describe commands, so `src-tauri/src/manifest.rs` lists each command's argument names and TypeScript types once; `make bindings` turns it into `ui/src/bindings/commands.ts` (plus `events.ts` and the types), and a unit test keeps the manifest, the registered commands and the capability permissions in step. The same step records `ui/src/mocks/scenarios.json`: a state graph produced by driving the real `AppState` through scripted scenarios, which the mocked UI replays. `make bindings-check` fails when any generated file is stale. See [ADR 0007](adr/0007-web-ui-and-ipc-boundary.md).
+
+### 8.4 Settings storage (a stopgap)
+
+`mackey-store` does not exist yet, so settings are one `settings.json` in the app data folder (`~/Library/Application Support/dev.stainedhead.mackey/` on a Mac): a `version` field, `#[serde(default)]` groups so older files load, unknown fields ignored, an atomic write (temp file then rename), a corrupt file moved aside as `settings.json.bak-<time>` with a one-time notice, and values clamped on load. It moves into SQLite when `mackey-store` lands ([ADR 0003](adr/0003-text-first-persistence.md)); the group layout is the migration source. Logs go to `logs/mackey.log` beside it, rotated daily, three kept.
+
+### 8.5 UI
+
+`ui/src` holds the layout shell (sidebar on wide windows, tabs on iPad portrait), the Explore screen (toolbar, chord strip and field, view controls, voicing list with mini diagrams), the shared SVG `Fretboard` with `FretboardPanel` (scroll frame, range controls, gestures, and an edge-arrow bar above the neck for notes beyond the view), the Tuner and Settings screens, an `ipc/` layer that picks the real or mocked commands, and `state/` (a store with last-revision-wins). It computes no music. Tests: Vitest (jsdom) and Playwright in WebKit against the mocked layer; screenshots of the real app come from `make screenshots` (Linux, optional).
+

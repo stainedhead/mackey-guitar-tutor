@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Minimal openbox config for capture.sh: windows at 0,0 with no frame, so a window is its client area. -->
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+  <applications>
+    <application name="*">
+      <decor>no</decor>
+      <position force="yes">
+        <x>0</x>
+        <y>0</y>
+      </position>
+    </application>
+  </applications>
+</openbox_config>

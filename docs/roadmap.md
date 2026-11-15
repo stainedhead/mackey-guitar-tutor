@@ -1,6 +1,6 @@
 # Roadmap
 
-Status: Draft v0.2 (2026-11-15). Targets macOS and iPad; every exit criterion applies to both (the iPad in the iOS Simulator until device validation). Windows, Linux, iPhone and Android are deferred to "Later". Phases are sized for one developer working with coding agents; each phase ends in a usable build. Each phase is done when the PRD requirements for that phase pass their acceptance criteria ([PRD traceability](prd/09-traceability.md)), in addition to the exit criteria below.
+Status: Draft v0.3 (2026-11-15; P0 and P1 built, see below). Targets macOS and iPad; every exit criterion applies to both (the iPad in the iOS Simulator until device validation). Windows, Linux, iPhone and Android are deferred to "Later". Phases are sized for one developer working with coding agents; each phase ends in a usable build. Each phase is done when the PRD requirements for that phase pass their acceptance criteria ([PRD traceability](prd/09-traceability.md)), in addition to the exit criteria below.
 
 ```mermaid
 gantt
@@ -23,6 +23,18 @@ gantt
 ```
 
 P1b (rhythm) needs only the P0 scaffold, so it runs alongside P1. P2 and P3 can run in parallel once P1 is done; they share the theory, voicing and rhythm layers.
+
+## Status (2026-11-15)
+
+The [fretboard foundation spec](../specs/archive/261115-fretboard-foundation/spec.md) delivered most of P0 and P1 in one branch. Done means built, tested and merged-ready; "deferred" means a known gap with an owner.
+
+| Phase | State | Done | Deferred |
+|---|---|---|---|
+| P0 | Mostly done | Cargo workspace; `mackey-theory` complete with the 252-row chord table, parser, Roman numerals; Tauri 2 app and React UI with generated bindings (ts-rs, command manifest); macOS and iOS-Simulator CI (`make app` universal, `make ios-sim`); ad-hoc signing in the bundle config | `release.yml` (ad-hoc signed `.dmg` on a `v*` tag); the Swift `audio-session` plugin; the walking skeleton's test tone has been replaced by the real synth but has not been heard on a Mac or iPad |
+| P1 | Mostly done | `mackey-voicing` (shapes, search, triads, arpeggios, patterns, selection, `FretboardView`); fretboard SVG, Explore, cycling and shortcuts; scales and pentatonic boxes; left-handed, nine tunings plus custom, capo; `mackey-audio` tuner (MPM, string and chromatic modes) with the microphone flow; synth playback of chords and notes; Settings; touch layout for iPad | FB-8.2 instrument choice (SoundFont guitar voice; v1 ships one synthesised voice); microphone and playback checks on real Mac and iPad hardware (task D16); the "iPad device validation" step below; tuner accuracy on a real guitar; follow-up: `io/input.rs` stays excluded from `make cover` (command handling and device-loss fallback need a fake stream) |
+| P1b onward | Not started | | |
+
+Open decisions for J that did not block the work are listed in the spec ([open questions](../specs/archive/261115-fretboard-foundation/spec.md#open-questions)).
 
 ## P0: Scaffold, walking skeleton and theory core (3 weeks)
 

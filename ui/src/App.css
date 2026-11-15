@@ -1,0 +1,705 @@
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+button[aria-pressed='true'],
+button[aria-checked='true'],
+button.selected {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+}
+
+button.link {
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+  min-height: 0;
+}
+
+input,
+select {
+  max-width: 100%;
+  min-height: 32px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+input.invalid {
+  border-color: var(--error);
+}
+
+.layout-ipad-landscape button,
+.layout-ipad-portrait button,
+.layout-ipad-landscape input,
+.layout-ipad-portrait input {
+  min-height: 44px;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar {
+  width: 180px;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar li button {
+  width: 100%;
+  margin-bottom: 4px;
+  border-color: transparent;
+  background: transparent;
+  text-align: left;
+}
+
+.sidebar button[aria-current='page'],
+.narrow-nav button[aria-current='page'] {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.sidebar.tabs {
+  order: 2;
+  width: auto;
+  padding: 4px 8px;
+}
+
+.sidebar.tabs .brand {
+  display: none;
+}
+
+.sidebar.tabs ul {
+  display: flex;
+  justify-content: space-around;
+}
+
+.layout-ipad-portrait {
+  flex-direction: column;
+}
+
+.narrow-nav {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px 0;
+}
+
+.brand {
+  font-size: 1.1rem;
+  margin: 0 0 16px;
+}
+
+.content {
+  flex: 1;
+  padding: 16px 24px;
+}
+
+.layout-narrow .content {
+  padding: 12px 16px;
+}
+
+.notice {
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.loading,
+.hint,
+.muted {
+  color: var(--muted);
+}
+
+/* Explore */
+.explore {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.explore-main {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.layout-narrow .explore-main,
+.layout-ipad-portrait .explore-main {
+  flex-direction: column;
+}
+
+.explore-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toolbar,
+.view-controls,
+.range-controls,
+.play-row,
+.triad-controls,
+.arpeggio-controls,
+.overlay-controls,
+.strip-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.tool-group {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 4px;
+  align-items: center;
+}
+
+.stepper,
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+.segmented button:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.segmented button:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.chord-strip .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+}
+
+.chip.selected .chip-roman,
+.chip.selected .chip-symbol {
+  color: inherit;
+}
+
+.chip-roman {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.chip-symbol {
+  font-weight: 600;
+}
+
+.chord-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.field-error,
+.mic-denied {
+  color: var(--error);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+.warnings {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.voicing-list {
+  width: 280px;
+  flex-shrink: 0;
+  /* The list scrolls inside, so the neck below always stays on screen. */
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.layout-narrow .voicing-list,
+.layout-ipad-portrait .voicing-list {
+  width: 100%;
+  max-height: 14rem;
+}
+
+.voicing-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.voicing-item {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  align-items: center;
+  text-align: left;
+}
+
+.voicing-name {
+  font-weight: 600;
+}
+
+.voicing-tag,
+.voicing-capo,
+.capo-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.voicing-item.selected .voicing-tag,
+.voicing-item.selected .voicing-capo {
+  color: inherit;
+}
+
+.mini-diagram {
+  width: 48px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.mini-line,
+.mini-nut,
+.mini-fret {
+  stroke: currentcolor;
+  stroke-width: 1;
+}
+
+.mini-nut {
+  stroke-width: 3;
+}
+
+.mini-dot {
+  fill: currentcolor;
+}
+
+.mini-open,
+.mini-mute {
+  fill: none;
+  stroke: currentcolor;
+}
+
+.mini-barre {
+  fill: currentcolor;
+}
+
+.mini-finger {
+  fill: var(--bg);
+  font-size: 7px;
+}
+
+.no-voicing {
+  color: var(--muted);
+}
+
+/* Fretboard */
+.neck-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.neck-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.neck-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--neck-edge);
+  border-radius: 6px;
+  background: var(--neck-wood);
+}
+
+.neck-touch {
+  touch-action: pan-x pinch-zoom;
+  -webkit-overflow-scrolling: touch;
+}
+
+.neck {
+  display: block;
+  max-width: none;
+}
+
+.neck-wood {
+  fill: var(--neck-wood);
+}
+
+.nut {
+  stroke: var(--fret-wire);
+  stroke-width: 6;
+}
+
+.fret-wire {
+  stroke: var(--fret-wire);
+  stroke-width: 2;
+}
+
+.string {
+  stroke: var(--string);
+}
+
+.string-label,
+.fret-number {
+  fill: var(--fg);
+}
+
+.inlay {
+  fill: var(--inlay);
+}
+
+.dimmed {
+  fill: var(--dim);
+  pointer-events: none;
+}
+
+.capo {
+  fill: var(--fg);
+  opacity: 0.85;
+}
+
+.barre {
+  fill: var(--fg);
+  opacity: 0.3;
+}
+
+.muted-marker {
+  fill: var(--fg);
+}
+
+.position {
+  cursor: pointer;
+  outline: none;
+}
+
+.position:focus-visible .marker-shape {
+  stroke: var(--focus);
+  stroke-width: 4;
+}
+
+.marker-shape {
+  stroke: var(--marker-edge);
+  stroke-width: 1.5;
+}
+
+.marker-label {
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.marker-order circle {
+  fill: var(--bg);
+  stroke: var(--fg);
+}
+
+.marker-order text {
+  fill: var(--fg);
+}
+
+.note-root .marker-shape {
+  fill: var(--role-root);
+}
+.note-root .marker-label {
+  fill: var(--role-root-text);
+}
+.note-third .marker-shape {
+  fill: var(--role-third);
+}
+.note-third .marker-label {
+  fill: var(--role-third-text);
+}
+.note-fifth .marker-shape {
+  fill: var(--role-fifth);
+}
+.note-fifth .marker-label {
+  fill: var(--role-fifth-text);
+}
+.note-seventh .marker-shape {
+  fill: var(--role-seventh);
+}
+.note-seventh .marker-label {
+  fill: var(--role-seventh-text);
+}
+.note-extension .marker-shape {
+  fill: var(--role-extension);
+}
+.note-extension .marker-label {
+  fill: var(--role-extension-text);
+}
+.note-singlenote .marker-shape {
+  fill: var(--role-single);
+}
+.note-singlenote .marker-label {
+  fill: var(--role-single-text);
+}
+.note-scaletone .marker-shape {
+  fill: var(--neck-wood);
+  stroke: var(--role-scale);
+  stroke-width: 3;
+}
+.note-scaletone .marker-label {
+  fill: var(--role-scale-text);
+}
+
+.tooltip rect {
+  fill: var(--bg);
+  stroke: var(--fg);
+}
+
+.tooltip text {
+  fill: var(--fg);
+}
+
+/* A fixed row above the neck: arrows sit outside the strings and never cover a note. */
+.edge-bar {
+  order: -1;
+  display: flex;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.edge-left {
+  margin-right: auto;
+}
+
+.edge-right {
+  margin-left: auto;
+}
+
+/* Tuner */
+.tuner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+}
+
+.readout {
+  text-align: center;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+}
+
+.note-big {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.readout.tone-good {
+  border-color: var(--tune-good);
+}
+.readout.tone-good .note-big {
+  color: var(--tune-good);
+}
+.readout.tone-near .detail {
+  color: var(--tune-flat);
+}
+.readout.tone-warn .detail {
+  color: var(--tune-sharp);
+}
+
+.hz {
+  color: var(--muted);
+}
+
+.needle {
+  width: 100%;
+  max-width: 320px;
+}
+
+.needle-arc,
+.needle-tick {
+  stroke: var(--fg);
+  stroke-width: 2;
+}
+
+.needle-tick.centre {
+  stroke: var(--tune-good);
+  stroke-width: 4;
+}
+
+.needle-scale {
+  fill: var(--muted);
+}
+
+.needle-hand line {
+  stroke: var(--fg);
+  stroke-width: 3;
+}
+
+.needle-hand circle {
+  fill: var(--fg);
+}
+
+.needle-hand {
+  transition: transform 80ms linear;
+}
+
+.needle.in-tune .needle-hand line {
+  stroke: var(--tune-good);
+}
+
+.level {
+  height: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.level-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.targets ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.targets li {
+  display: flex;
+  gap: 6px;
+}
+
+.target {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+}
+
+.target.current {
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+.target-string {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.tick {
+  margin-left: auto;
+  color: var(--tune-good);
+}
+
+/* Settings */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 640px;
+}
+
+.settings-group {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+label.check {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}

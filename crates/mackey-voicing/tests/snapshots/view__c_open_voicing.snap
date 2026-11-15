@@ -1,0 +1,13 @@
+---
+source: crates/mackey-voicing/tests/view.rs
+expression: render(view)
+---
+C major, Open C | C major, Open C, 1 of 24
+fit 0..4 off 0/0
+1 *E  .   .   .   .   .   .   .   .   .   .   .   .   .   .
+2 .   #C  .   .   .   .   .   .   .   .   .   .   .   .   .
+3 *G  .   .   .   .   .   .   .   .   .   .   .   .   .   .
+4 .   .   *E  .   .   .   .   .   .   .   .   .   .   .   .
+5 .   .   .   #C  .   .   .   .   .   .   .   .   .   .   .
+6 .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+muted: 6
