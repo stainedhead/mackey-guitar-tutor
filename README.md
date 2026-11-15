@@ -27,6 +27,6 @@ Rules for people and AI agents are in [AGENTS.md](AGENTS.md): crate layer rules,
 
 ### Quick start
 
-You need the pinned Rust toolchain (rustup handles it), Node 22 and, on Linux, the WebKitGTK and ALSA dev packages listed in [.github/README.md](.github/README.md). Run `make tools` once, then `npm ci --prefix ui`, `make check` and `make e2e` (first `npx --prefix ui playwright install --with-deps webkit`). `make build` and `make test` work without building the UI. For the app with hot reload: `ui/node_modules/.bin/tauri dev` from the repo root.
+You need the pinned Rust toolchain (rustup handles it), Node 22 and, on Linux, the WebKitGTK and ALSA dev packages listed in [.github/README.md](.github/README.md). Run `make tools` once, then `npm ci --prefix ui`, `make check` and `make e2e` (first `npx --prefix ui playwright install --with-deps webkit`). `make build` and `make test` work without building the UI. For the app with hot reload: `npm run tauri dev` from the repo root.
 
 The toolchain is pinned in `rust-toolchain.toml` (rustup installs it on first use). Folder guides: [src-tauri/](src-tauri/README.md) (Tauri shell), [ui/](ui/README.md) (React UI), [crates/](crates/README.md), [xtask/](xtask/README.md), [specs/](specs/README.md), [user-docs/](user-docs/README.md), [.github/](.github/README.md), [.claude/](.claude/README.md).

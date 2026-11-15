@@ -21,7 +21,7 @@ Repository automation and agent instructions.
 ### Assumptions about the macOS jobs (not verifiable from Linux)
 
 - `macos-latest` is Apple silicon with Xcode and iOS Simulator runtimes installed; the `ios-sim` job prints them. XcodeGen is installed with Homebrew because `tauri ios init` needs it.
-- The Tauri CLI (invoked from the repo root as `ui/node_modules/.bin/tauri`) runs the `beforeBuildCommand` (`npm run build`) inside `ui/`, as the Linux smoke build of `make app` showed.
+- The Tauri CLI runs from the repo root as `npm run tauri --` (root `package.json`), and its hooks are `npm --prefix ui run build`/`dev`. Started by npm, it records `npm run tauri` in the Xcode build phase, which works from `src-tauri/gen/apple`.
 - The iOS Simulator build is `tauri ios build --debug --target aarch64-sim --ci` with no development team. The Tauri CLI path in the Makefile must be absolute, because `tauri ios init` writes it into the Xcode "Build Rust Code" phase, which runs from `src-tauri/gen/apple` (first CI run failed on the relative path).
 - Action major versions (`setup-node@v6`, `upload-artifact@v5`) were chosen without registry access; bump them if a job reports a missing tag.
 
