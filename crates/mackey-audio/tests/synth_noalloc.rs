@@ -5,7 +5,9 @@
 //! The guard is active in debug builds only (`cargo test`); `make props` runs release builds,
 //! where the test still exercises the same calls without the guard.
 
-use assert_no_alloc::{AllocDisabler, assert_no_alloc};
+#[cfg(debug_assertions)]
+use assert_no_alloc::AllocDisabler;
+use assert_no_alloc::assert_no_alloc;
 use mackey_audio::dsp::{PlaybackPlan, Synth, SynthCommand};
 use mackey_theory::ReferencePitch;
 
