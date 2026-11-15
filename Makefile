@@ -78,14 +78,16 @@ e2e: ui/node_modules
 	npm --prefix ui run e2e
 
 # Regenerate the TypeScript bindings (ts-rs) into ui/src/bindings.
+# ts-rs writes one file per type (core crates enable their `ts` feature through mackey-app);
+# the same run writes commands.ts, events.ts and the recorded mock scenarios (D6, D14).
 bindings: $(UI_STUB)
-	cargo test -p mackey-app export_bindings
+	cargo test -p mackey-app -p mackey-theory -p mackey-voicing -p mackey-audio --lib export_bindings
 
 # Fails when the committed bindings differ from what the Rust types generate.
 bindings-check: bindings
-	@if [ -n "$$(git status --porcelain -- ui/src/bindings)" ]; then \
-		echo "ui/src/bindings is stale: run 'make bindings' and commit the result"; \
-		git status --short -- ui/src/bindings; \
+	@if [ -n "$$(git status --porcelain -- ui/src/bindings ui/src/mocks/scenarios.json)" ]; then \
+		echo "ui/src/bindings or ui/src/mocks/scenarios.json is stale: run 'make bindings' and commit the result"; \
+		git status --short -- ui/src/bindings ui/src/mocks/scenarios.json; \
 		exit 1; \
 	fi
 

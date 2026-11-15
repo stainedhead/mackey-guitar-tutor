@@ -25,6 +25,9 @@ proptest = "1"
 insta = { version = "1", features = ["yaml"] }
 criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
 tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "std", "registry", "env-filter"] }
+tracing-appender = "0.2"
+tempfile = "3"
 cpal = "0.18"
 rtrb = "0.4"
 assert_no_alloc = "1"

@@ -25,9 +25,17 @@ workspace = true
 tauri-build = { workspace = true }
 
 [dependencies]
+mackey-theory = { path = "../crates/mackey-theory", features = ["ts"] }
+mackey-voicing = { path = "../crates/mackey-voicing", features = ["ts"] }
+mackey-audio = { path = "../crates/mackey-audio", features = ["ts"] }
+tracing-subscriber = { workspace = true }
+tracing-appender = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tauri = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 ts-rs = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
