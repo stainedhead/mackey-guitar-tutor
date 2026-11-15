@@ -157,4 +157,4 @@ Tracked with owners in [spec.md](spec.md#open-questions) (Q-1 to Q-8). Research-
 - Karplus, K. and Strong, A., "Digital synthesis of plucked-string and drum timbres", Computer Music Journal 1983; Jaffe, D. and Smith, J., "Extensions of the Karplus-Strong plucked-string algorithm", CMJ 1983.
 - Okabe, M. and Ito, K., "Color Universal Design" palette; WCAG 2.2.
 - Tauri 2 docs (tauri.app), `ts-rs` README, Playwright docs (browsers, touch, accessibility testing), `cpal`/`rtrb` docs.
-- Repository: [ADR 0006](../../docs/adr/0006-on-device-audio-analysis.md), [ADR 0007](../../docs/adr/0007-web-ui-and-ipc-boundary.md), [ADR 0008](../../docs/adr/0008-ipad-via-tauri-ios.md), [docs/platforms.md](../../docs/platforms.md), [docs/learning-features.md](../../docs/learning-features.md).
+- Repository: [ADR 0006](../../../docs/adr/0006-on-device-audio-analysis.md), [ADR 0007](../../../docs/adr/0007-web-ui-and-ipc-boundary.md), [ADR 0008](../../../docs/adr/0008-ipad-via-tauri-ios.md), [docs/platforms.md](../../../docs/platforms.md), [docs/learning-features.md](../../../docs/learning-features.md).

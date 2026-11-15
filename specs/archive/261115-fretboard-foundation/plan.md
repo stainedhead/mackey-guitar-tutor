@@ -63,7 +63,7 @@ Not tested here, by design: real guitar recordings (follow-up), real iPad device
 
 ## Rollout Strategy
 
-- Branch `claude/project-thread-e8va25` (named by the orchestrator); implementation commits per task or small group; each commit message references `specs/261115-fretboard-foundation/`.
+- Branch `claude/project-thread-e8va25` (named by the orchestrator); implementation commits per task or small group; each commit message references `specs/archive/261115-fretboard-foundation/`.
 - A draft PR is opened once D1 builds (or at the latest at the end of Phase D) so the macOS and iOS jobs run on real runners. Fixes to workflow files are made on the same branch.
 - Merge when CI is green (AC-P0-4); no feature flags; no data migration (settings JSON is new and versioned from 1).
 - After merge the roadmap marks P0 done and P1 done except FB-8.2, recorded fixtures and the audio-session plugin (carried in `docs/prd/09-traceability.md` open items).

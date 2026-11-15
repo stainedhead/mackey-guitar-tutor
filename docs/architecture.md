@@ -215,7 +215,7 @@ flowchart LR
 
 ## 8. As built: the fretboard foundation
 
-Status: built 2026-11-15 on branch `claude/project-thread-e8va25` ([spec](../specs/261115-fretboard-foundation/spec.md), decisions D-01 to D-76+ in its [implementation notes](../specs/261115-fretboard-foundation/implementation-notes.md)). This section records what exists; sections 1 to 7 remain the design for the whole product.
+Status: built 2026-11-15 on branch `claude/project-thread-e8va25` ([spec](../specs/archive/261115-fretboard-foundation/spec.md), decisions D-01 to D-76+ in its [implementation notes](../specs/archive/261115-fretboard-foundation/implementation-notes.md)). This section records what exists; sections 1 to 7 remain the design for the whole product.
 
 ### 8.1 Crates present
 

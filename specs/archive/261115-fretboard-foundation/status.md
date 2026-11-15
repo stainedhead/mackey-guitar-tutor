@@ -16,29 +16,26 @@
 | 2 | Research and data modelling ([research.md](research.md), [data-dictionary.md](data-dictionary.md)) | Complete | VERIFY items assigned to tasks |
 | 3 | Architecture and planning ([architecture.md](architecture.md), [plan.md](plan.md)) | Complete | |
 | 4 | Task breakdown ([tasks.md](tasks.md)) | Complete | 61 tasks in phases A to E |
-| 5 | Implementation (code and [implementation-notes.md](implementation-notes.md)) | In Progress | Phases A and B complete |
-| 6 | Completion and archival | Not Started | Needs 100% here, then `/dev-flow:archive-spec` |
+| 5 | Implementation (code and [implementation-notes.md](implementation-notes.md)) | Complete | 60 of 61 tasks; D16 (manual Mac and iPad checklist) needs a device and is deferred |
+| 6 | Completion and archival | Complete | Archived 2026-11-15 by the orchestrator (Step 7) with D16 outstanding; review fixes are in `261115-fretboard-foundation-auto-review/` |
 
 Spec review (Step 2): done 2026-11-15, verdict **Implementation-ready** after fixes; findings in [implementation-notes.md](implementation-notes.md#spec-review-step-2).
 
 ## Implementation Progress (Phase 5)
 
-27 of 61 tasks complete. Per-phase detail is in [tasks.md](tasks.md#progress-summary).
-20 of 61 tasks complete (Phase C counted from the mackey-audio worktree; the integrating step reconciles with the other workers). Per-phase detail is in [tasks.md](tasks.md#progress-summary).
+60 of 61 tasks complete (D16 needs a device). Per-phase detail is in [tasks.md](tasks.md#progress-summary).
 
 | Implementation phase | Tasks | Done | Status |
 |----------------------|-------|------|--------|
 | A Workspace scaffold and `mackey-theory` | 11 | 11 | Complete |
 | B `mackey-voicing` | 16 | 16 | Complete |
-| C `mackey-audio` | 9 | 0 | Not Started |
-| B `mackey-voicing` | 16 | 0 | Not Started |
 | C `mackey-audio` | 9 | 9 | Complete |
 | D `src-tauri` and `ui/` | 16 | 15 | In Progress (D16, the manual Mac and iPad checklist, needs a device) |
-| E Makefile, AGENTS.md, CI, docs | 9 | 0 | Not Started |
+| E Makefile, AGENTS.md, CI, docs | 9 | 9 | Complete |
 
 ## Phase 0 checklist
 
-- [x] Spec directory created (`specs/261115-fretboard-foundation/`)
+- [x] Spec directory created (`specs/archive/261115-fretboard-foundation/`)
 - [x] Research questions identified (research.md Q1 to Q9)
 - [x] Phase files initialised and populated (spec, research, data dictionary, architecture, plan, tasks, implementation notes)
 - [x] PRD and orchestration dashboard moved into the spec directory

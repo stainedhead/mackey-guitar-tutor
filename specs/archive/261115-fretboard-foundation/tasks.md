@@ -7,7 +7,7 @@
 
 ## Progress Summary
 
-36/61 tasks complete. Update this file and `status.md` after every task (mandatory).
+60/61 tasks complete (D16 needs a device). Update this file and `status.md` after every task (mandatory).
 
 | Phase | Tasks | Done |
 |-------|-------|------|
@@ -15,15 +15,15 @@
 | B `mackey-voicing` | B1 to B16 (16) | 16 |
 | C `mackey-audio` | C1 to C9 (9) | 9 |
 | D `src-tauri` and `ui/` | D1 to D16 (16) | 15 |
-| E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
-| Total | 61 | 36 |
+| E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 9 |
+| Total | 61 | 60 |
 
 ## Conventions
 
 - **Estimate:** S = under 2 hours, M = half a day, L = a day, XL = more than a day (split if you can).
 - **TDD:** each task starts with failing tests (names carry the requirement ID, for example `fb_5_4_no_voicing_exceeds_span`, `ac_fb_6_1_c_234_first_inversion`). Table-driven (`const CASES`), proptest for invariants, insta for parser and view snapshots; `cargo insta review`, never accept blindly.
 - **Done means:** `make check` green (and `make ui-lint ui-test` once they exist), docs and READMEs updated in the same commit, tasks and status updated, no `#[allow]` without a reason (prefer `#[expect]`).
-- **Branch and commits:** work on the run's branch; small imperative commits referencing `specs/261115-fretboard-foundation/`.
+- **Branch and commits:** work on the run's branch; small imperative commits referencing `specs/archive/261115-fretboard-foundation/`.
 - "AC-..." are the product PRD's criteria listed in [spec.md](spec.md#acceptance-criteria).
 
 ---

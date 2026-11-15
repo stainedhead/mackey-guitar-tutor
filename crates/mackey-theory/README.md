@@ -36,4 +36,4 @@ Spelling is the top-severity bug class here ([INTENT.md](../../INTENT.md), PRD r
 
 Depends on: nothing in the workspace (`serde`, `thiserror`, optional `ts-rs`). Depended on by: `mackey-voicing`, `mackey-rhythm`, `mackey-audio`, `mackey-practice`, `mackey-songs`, `mackey-store`, `mackey-progress`, `mackey-sources` and `mackey-app` (see the layer table in [AGENTS.md](../../AGENTS.md#architecture-pure-core-thin-shell)).
 
-Related docs: [docs/architecture.md §3.1](../../docs/architecture.md), [PRD G-1](../../docs/prd/README.md), [spec data dictionary](../../specs/261115-fretboard-foundation/data-dictionary.md), [crates/README.md](../README.md).
+Related docs: [docs/architecture.md §3.1](../../docs/architecture.md), [PRD G-1](../../docs/prd/README.md), [spec data dictionary](../../specs/archive/261115-fretboard-foundation/data-dictionary.md), [crates/README.md](../README.md).

@@ -1,7 +1,7 @@
 # Dev-Flow Implementation Status
 
 **PRD:** fretboard-foundation-PRD.md
-**Spec:** specs/261115-fretboard-foundation/
+**Spec:** specs/archive/261115-fretboard-foundation/ (archived in Step 7; originally specs/261115-fretboard-foundation/)
 **Branch:** claude/project-thread-e8va25
 **Review PRD:** fretboard-foundation-auto-review-PRD.md
 **Process Start:** 2026-11-15T19:24:00Z
@@ -20,7 +20,7 @@ Notes: run in a cloud container (Linux). The PRD was created by adapting docs/pr
 | 4  | Documentation and User Docs     | ✅ Complete | 2026-11-15T22:02Z | 2026-11-15T22:20Z | 18 |
 | 5  | Code and Design Review          | ✅ Complete | 2026-11-15T22:21Z | 2026-11-15T22:24Z | 3 |
 | 6  | Prepare Review PRD              | ✅ Complete | 2026-11-15T22:24Z | 2026-11-15T22:24Z | 1 |
-| 7  | Archive Original Spec           | ⬜ Pending | — | — | — |
+| 7  | Archive Original Spec           | ✅ Complete | 2026-11-15T22:24Z | 2026-11-15T22:24Z | 1 |
 | 8  | Spec Review Fixes               | ⬜ Pending | — | — | — |
 | 9  | Implement Review Fixes          | ⬜ Pending | — | — | — |
 | 10 | Archive Fixes Spec              | ⬜ Pending | — | — | — |

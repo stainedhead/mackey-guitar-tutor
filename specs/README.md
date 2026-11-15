@@ -8,7 +8,9 @@ Active feature specs live here; completed ones move to `specs/archive/` (via `/d
 
 | Spec | Covers | Status |
 |---|---|---|
-| [261115-fretboard-foundation/](261115-fretboard-foundation/README.md) | Roadmap P0 and P1: scaffold, `mackey-theory`, `mackey-voicing`, `mackey-audio` (tuner, synth), Tauri app and SVG fretboard UI, CI | Specified and reviewed; implementation not started |
+| _None yet; the review-fix spec is created next_ | | |
+
+Archived: [261115-fretboard-foundation](archive/261115-fretboard-foundation/README.md) (roadmap P0 and P1, built; see [specs/archive](archive/README.md)).
 
 The product PRD lives in `docs/prd/` (with `INTENT.md` at the root). Each roadmap phase becomes a spec: run `/dev-flow:create-spec` on the relevant PRD file to create its `YYMMDD-<feature>/` directory here.
 

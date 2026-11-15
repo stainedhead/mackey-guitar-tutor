@@ -3,9 +3,9 @@
 **Feature:** fretboard-foundation
 **Created:** 2026-11-15
 **Status:** Draft (reviewed in Step 2)
-**Spec:** [spec.md](spec.md) · **Types:** [data-dictionary.md](data-dictionary.md) · **Product architecture:** [docs/architecture.md](../../docs/architecture.md)
+**Spec:** [spec.md](spec.md) · **Types:** [data-dictionary.md](data-dictionary.md) · **Product architecture:** [docs/architecture.md](../../../docs/architecture.md)
 
-This document narrows [docs/architecture.md](../../docs/architecture.md) to the crates and folders touched in this run. If they disagree, `docs/architecture.md` is the design authority and the difference is recorded as a decision in [implementation-notes.md](implementation-notes.md).
+This document narrows [docs/architecture.md](../../../docs/architecture.md) to the crates and folders touched in this run. If they disagree, `docs/architecture.md` is the design authority and the difference is recorded as a decision in [implementation-notes.md](implementation-notes.md).
 
 ## Architecture Overview
 

@@ -2,7 +2,7 @@
 
 Audio for Mackey Guitar Tutor: a McLeod pitch detector and the tuner state machine, a plucked-string synth with a playback-plan builder, and the cpal glue that runs them. It is the only crate that opens audio devices or the microphone. It depends on `mackey-theory` only (`Pitch`, `Note`, `ReferencePitch`); `mackey-app` depends on it. The app converts the instrument (tuning plus capo) into `TunerTarget`s and chord voicings or scale patterns into MIDI-note lists, so this crate never sees `mackey-voicing` (D-08).
 
-Design: [specs/261115-fretboard-foundation/architecture.md](../../specs/261115-fretboard-foundation/architecture.md) (Audio), [docs/prd/02-tuner.md](../../docs/prd/02-tuner.md), [docs/learning-features.md](../../docs/learning-features.md), [ADR 0006](../../docs/adr/0006-on-device-audio-analysis.md) (all analysis stays on the device).
+Design: [specs/archive/261115-fretboard-foundation/architecture.md](../../specs/archive/261115-fretboard-foundation/architecture.md) (Audio), [docs/prd/02-tuner.md](../../docs/prd/02-tuner.md), [docs/learning-features.md](../../docs/learning-features.md), [ADR 0006](../../docs/adr/0006-on-device-audio-analysis.md) (all analysis stays on the device).
 
 ## Modules (`src/`)
 

@@ -210,7 +210,7 @@ Seeded from the PRD (E-FB-*, E-TU-*) and from design analysis. Implementers add 
 - **Exact crate and package versions** (`ts-rs`, `cpal`, Tauri, Playwright) were not verified online in this step; each task that adds one verifies the API and pins the version (research.md, VERIFY items).
 - **Q-1, Q-2, Q-4, Q-7, Q-9, Q-10, Q-11 need J's confirmation**; defaults are chosen so work is never blocked.
 
-Next step: Step 3 of the orchestration, `/dev-flow:implm-from-spec specs/261115-fretboard-foundation/` (implementation by phase A to E in tasks.md).
+Next step: Step 3 of the orchestration, `/dev-flow:implm-from-spec specs/archive/261115-fretboard-foundation/` (implementation by phase A to E in tasks.md).
 
 ## B15: acceptance criterion to test (Phases A and B voicing side)
 

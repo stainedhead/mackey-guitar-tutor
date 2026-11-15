@@ -1,8 +1,8 @@
-# specs/261115-fretboard-foundation
+# specs/archive/261115-fretboard-foundation
 
-Spec for the **fretboard foundation** (roadmap P0 and P1): the Cargo and Tauri scaffold, `mackey-theory`, `mackey-voicing`, `mackey-audio` (tuner and synth), the `src-tauri` app and the React/SVG fretboard UI, with CI for macOS, Linux, the universal Mac build and the iOS Simulator. Created 2026-11-15 from [fretboard-foundation-PRD.md](fretboard-foundation-PRD.md). Back to [specs/](../README.md) and the [root README](../../README.md).
+Spec for the **fretboard foundation** (roadmap P0 and P1): the Cargo and Tauri scaffold, `mackey-theory`, `mackey-voicing`, `mackey-audio` (tuner and synth), the `src-tauri` app and the React/SVG fretboard UI, with CI for macOS, Linux, the universal Mac build and the iOS Simulator. Created 2026-11-15 from [fretboard-foundation-PRD.md](fretboard-foundation-PRD.md). Back to [specs/](../README.md) and the [root README](../../../README.md).
 
-Authority: [INTENT.md](../../INTENT.md) → [docs/prd/](../../docs/prd/README.md) → [docs/](../../docs/README.md) → this spec. Rules: [AGENTS.md](../../AGENTS.md).
+Authority: [INTENT.md](../../../INTENT.md) → [docs/prd/](../../../docs/prd/README.md) → [docs/](../../../docs/README.md) → this spec. Rules: [AGENTS.md](../../../AGENTS.md).
 
 ## Files
 

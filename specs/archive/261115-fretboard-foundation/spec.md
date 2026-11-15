@@ -3,7 +3,7 @@
 **Feature:** fretboard-foundation
 **Created:** 2026-11-15
 **Status:** Specified (reviewed in Step 2, see [implementation-notes.md](implementation-notes.md#spec-review-step-2))
-**Source PRD:** [`specs/261115-fretboard-foundation/fretboard-foundation-PRD.md`](fretboard-foundation-PRD.md)
+**Source PRD:** [`specs/archive/261115-fretboard-foundation/fretboard-foundation-PRD.md`](fretboard-foundation-PRD.md)
 **Authority:** `INTENT.md` → `docs/prd/` → `docs/` → this spec. Where this spec and `docs/prd/` differ, `docs/prd/` wins and this spec is fixed. FR numbers are the dev-flow working PRD's; AC numbers are the product PRD's.
 
 ## Executive Summary
@@ -43,7 +43,7 @@ Taken from the PRD and kept binding:
 
 ## User Requirements
 
-Stories are `US-FB-1..9` and `US-TU-1..3` in [docs/prd/01-fretboard.md §2](../../docs/prd/01-fretboard.md) and [02-tuner.md §2](../../docs/prd/02-tuner.md). Personas: J (primary), Bea (beginner), Ivan (improver).
+Stories are `US-FB-1..9` and `US-TU-1..3` in [docs/prd/01-fretboard.md §2](../../../docs/prd/01-fretboard.md) and [02-tuner.md §2](../../../docs/prd/02-tuner.md). Personas: J (primary), Bea (beginner), Ivan (improver).
 
 ### Functional Requirements
 
@@ -151,7 +151,7 @@ Files to create:
 - `crates/mackey-audio/{Cargo.toml,README.md,src/**,tests/**,benches/**}`
 - `src-tauri/{Cargo.toml,build.rs,tauri.conf.json,Info.plist,capabilities/default.json,icons/**,README.md,src/**}`
 - `ui/{package.json,package-lock.json,tsconfig.json,vite.config.ts,eslint.config.js,.prettierrc,index.html,playwright.config.ts,README.md,src/**,tests/**,e2e/**}`; `ui/src/**` and `src-tauri/src/**` are skipped by `doccheck` (it skips `src`, `tests`, `benches`, `node_modules`, `dist`, `gen`, ...), but `ui/e2e/`, `src-tauri/capabilities/` and `src-tauri/icons/` are not and each needs a `README.md`; `ui/src/bindings/README.md` is added anyway to say the folder is generated
-- `specs/261115-fretboard-foundation/*` (this spec)
+- `specs/archive/261115-fretboard-foundation/*` (this spec)
 
 Files to modify:
 
@@ -308,8 +308,8 @@ Phase E task E3 (Linux jobs) can start as soon as the first workspace member bui
 
 ## References
 
-- Source PRD: [`specs/261115-fretboard-foundation/fretboard-foundation-PRD.md`](fretboard-foundation-PRD.md)
-- [INTENT.md](../../INTENT.md), [AGENTS.md](../../AGENTS.md), [docs/architecture.md](../../docs/architecture.md), [docs/roadmap.md](../../docs/roadmap.md)
-- Product PRD: [README](../../docs/prd/README.md) (G-1..G-6), [01-fretboard](../../docs/prd/01-fretboard.md), [02-tuner](../../docs/prd/02-tuner.md), [07-ux-flows](../../docs/prd/07-ux-flows.md), [08-nfr](../../docs/prd/08-nfr.md), [09-traceability](../../docs/prd/09-traceability.md)
-- [ADR 0006](../../docs/adr/0006-on-device-audio-analysis.md), [ADR 0007](../../docs/adr/0007-web-ui-and-ipc-boundary.md), [ADR 0008](../../docs/adr/0008-ipad-via-tauri-ios.md)
-- [docs/learning-features.md §1 to §3](../../docs/learning-features.md), [docs/platforms.md](../../docs/platforms.md)
+- Source PRD: [`specs/archive/261115-fretboard-foundation/fretboard-foundation-PRD.md`](fretboard-foundation-PRD.md)
+- [INTENT.md](../../../INTENT.md), [AGENTS.md](../../../AGENTS.md), [docs/architecture.md](../../../docs/architecture.md), [docs/roadmap.md](../../../docs/roadmap.md)
+- Product PRD: [README](../../../docs/prd/README.md) (G-1..G-6), [01-fretboard](../../../docs/prd/01-fretboard.md), [02-tuner](../../../docs/prd/02-tuner.md), [07-ux-flows](../../../docs/prd/07-ux-flows.md), [08-nfr](../../../docs/prd/08-nfr.md), [09-traceability](../../../docs/prd/09-traceability.md)
+- [ADR 0006](../../../docs/adr/0006-on-device-audio-analysis.md), [ADR 0007](../../../docs/adr/0007-web-ui-and-ipc-boundary.md), [ADR 0008](../../../docs/adr/0008-ipad-via-tauri-ios.md)
+- [docs/learning-features.md §1 to §3](../../../docs/learning-features.md), [docs/platforms.md](../../../docs/platforms.md)

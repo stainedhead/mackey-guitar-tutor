@@ -4,7 +4,7 @@ An app for macOS and iPad that helps beginner and intermediate guitarists learn 
 
 ## What works now
 
-The first feature, the **fretboard foundation** ([spec](specs/261115-fretboard-foundation/spec.md)), is built: three screens, backed by the Rust core.
+The first feature, the **fretboard foundation** ([spec](specs/archive/261115-fretboard-foundation/spec.md)), is built: three screens, backed by the Rust core.
 
 - **Explore.** Pick a key and mode; see every note on a 19 to 24 fret neck; pick a chord from the key or type any chord symbol; see voicings (open, barre and position shapes), triads on every string set and inversion, arpeggios by position, and scale overlays including the five pentatonic boxes. Cycle everything from the keyboard. Nine tunings, custom tunings, capo, left-handed and flipped views. Notes carry a shape as well as a colour (root square, chord tone circle, scale tone ring).
 - **Tuner.** Chromatic and per-string modes with reference tones; pitch detection runs on the device.

@@ -37,4 +37,4 @@ Conventions: string numbers run 1 to 6 with 1 the high E; arrays are low to high
 
 Depends on: `mackey-theory` (plus `serde`, `thiserror`, optional `ts-rs`). Depended on by: `mackey-practice`, `mackey-songs`, `mackey-store`, `mackey-progress`, `mackey-sources` and `mackey-app` (see the layer table in [AGENTS.md](../../AGENTS.md#architecture-pure-core-thin-shell)).
 
-Related docs: [docs/architecture.md](../../docs/architecture.md), [PRD fretboard](../../docs/prd/01-fretboard.md), [spec](../../specs/261115-fretboard-foundation/spec.md), [crates/README.md](../README.md).
+Related docs: [docs/architecture.md](../../docs/architecture.md), [PRD fretboard](../../docs/prd/01-fretboard.md), [spec](../../specs/archive/261115-fretboard-foundation/spec.md), [crates/README.md](../README.md).

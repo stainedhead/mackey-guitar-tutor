@@ -26,7 +26,7 @@ P1b (rhythm) needs only the P0 scaffold, so it runs alongside P1. P2 and P3 can 
 
 ## Status (2026-11-15)
 
-The [fretboard foundation spec](../specs/261115-fretboard-foundation/spec.md) delivered most of P0 and P1 in one branch. Done means built, tested and merged-ready; "deferred" means a known gap with an owner.
+The [fretboard foundation spec](../specs/archive/261115-fretboard-foundation/spec.md) delivered most of P0 and P1 in one branch. Done means built, tested and merged-ready; "deferred" means a known gap with an owner.
 
 | Phase | State | Done | Deferred |
 |---|---|---|---|
@@ -34,7 +34,7 @@ The [fretboard foundation spec](../specs/261115-fretboard-foundation/spec.md) de
 | P1 | Mostly done | `mackey-voicing` (shapes, search, triads, arpeggios, patterns, selection, `FretboardView`); fretboard SVG, Explore, cycling and shortcuts; scales and pentatonic boxes; left-handed, nine tunings plus custom, capo; `mackey-audio` tuner (MPM, string and chromatic modes) with the microphone flow; synth playback of chords and notes; Settings; touch layout for iPad | FB-8.2 instrument choice (SoundFont guitar voice; v1 ships one synthesised voice); microphone and playback checks on real Mac and iPad hardware (task D16); the "iPad device validation" step below; tuner accuracy on a real guitar |
 | P1b onward | Not started | | |
 
-Open decisions for J that did not block the work are listed in the spec ([open questions](../specs/261115-fretboard-foundation/spec.md#open-questions)).
+Open decisions for J that did not block the work are listed in the spec ([open questions](../specs/archive/261115-fretboard-foundation/spec.md#open-questions)).
 
 ## P0: Scaffold, walking skeleton and theory core (3 weeks)
 
