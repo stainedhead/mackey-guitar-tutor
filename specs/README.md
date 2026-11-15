@@ -8,7 +8,7 @@ Active feature specs live here; completed ones move to `specs/archive/` (via `/d
 
 | Spec | Covers | Status |
 |---|---|---|
-| _None yet; the review-fix spec is created next_ | | |
+| [261115-fretboard-foundation-auto-review/](261115-fretboard-foundation-auto-review/README.md) | Review fixes FR-001 to FR-007 for the fretboard foundation: pattern stepper, tuner pacing, triad inversions, coverage, CSP, docs | In progress |
 
 Archived: [261115-fretboard-foundation](archive/261115-fretboard-foundation/README.md) (roadmap P0 and P1, built; see [specs/archive](archive/README.md)).
 
