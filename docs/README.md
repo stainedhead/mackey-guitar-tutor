@@ -6,6 +6,7 @@ Mackey Guitar Tutor is an app for macOS and iPad (Rust core, Tauri shell) that h
 |-----|----------------|
 | [../INTENT.md](../INTENT.md) | Why the product exists, who it is for, principles, what success looks like |
 | [prd/](prd/README.md) | **Product requirements in full detail:** user stories, functional requirements, edge cases, acceptance criteria, UX flows, NFRs, traceability |
+| [images/](images/README.md) | Screenshots of the Explore, Tuner and Settings screens, generated from the mocked UI |
 | [architecture.md](architecture.md) | Module layout, domain model, persistence, key algorithms |
 | [practice-sessions.md](practice-sessions.md) | Practice session design and the quick-entry notation |
 | [rhythm.md](rhythm.md) | Metronome, drum backing and the speed trainer |

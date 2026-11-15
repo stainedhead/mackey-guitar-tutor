@@ -74,7 +74,7 @@ UI and app targets (they need Node 22 and, for `e2e`, WebKit via `npx --prefix u
 |---|---|
 | `make ui-lint` | `ui/`: ESLint (flat config, typed, strict), `prettier --check` and `tsc --noEmit` |
 | `make ui-test` | `ui/`: Vitest unit tests (jsdom, mocked command layer) |
-| `make e2e` | `ui/`: Playwright in WebKit, projects `desktop` (1280×800) and `ipad` (1180×820), against the mocked command layer. `PW_CHANNEL=chrome` runs the same specs in an installed Chrome when WebKit cannot be downloaded |
+| `make e2e` | `ui/`: Playwright in WebKit, projects `desktop` (1280×800), `ipad` (1180×820), `ipad-portrait` and `narrow`, against the mocked command layer. `PW_CHANNEL=chrome` runs the same specs in an installed Chrome when WebKit cannot be downloaded |
 | `make bindings` | Regenerate the TypeScript types in `ui/src/bindings/` from the Rust types (`ts-rs`) |
 | `make bindings-check` | Regenerate, then fail if `ui/src/bindings/` differs from what is committed (stale bindings) |
 | `make app` | `tauri build`: universal (arm64 + x86_64) ad-hoc signed `.app`/`.dmg` on macOS; a host binary without a bundle elsewhere |

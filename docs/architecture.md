@@ -16,7 +16,7 @@ Status: Draft v0.2 (2026-11-15). Stack: Rust core, Tauri 2 shell, web UI. Target
 | Audio input | cpal input stream; McLeod/YIN pitch, onsets, chroma verification; ONNX Runtime (ort) model later | Offline, private, no backend | [0006](adr/0006-on-device-audio-analysis.md) |
 | Song content | Local-only, user-initiated import; no scraping service | Legal and store-review risk | [0004](adr/0004-user-initiated-song-import.md) |
 | Distribution | Mac: unsigned (ad-hoc signed) universal `.dmg` on GitHub Releases, no updater. iPad: Xcode install (free Apple ID or Developer Program). App Store later | Personal use for now | |
-| Testing | `cargo test` with proptest (properties) and insta (golden files), criterion benchmarks; Vitest for UI logic; Playwright (WebKit, desktop and iPad viewports) against the UI with a mocked command layer; a short manual smoke checklist on Mac and iPad per release (tauri-driver cannot drive WKWebView) | | |
+| Testing | `cargo test` with proptest (properties) and insta (golden files), criterion benchmarks; Vitest for UI logic; Playwright (WebKit; desktop, iPad landscape and portrait, and narrow viewports) against the UI with a mocked command layer that replays states recorded from the real Rust core (`src-tauri/src/bindings.rs` writes `ui/src/mocks/scenarios.json`, so the mocked UI shows real voicings and the UI never needs theory); a short manual smoke checklist on Mac and iPad per release (tauri-driver cannot drive WKWebView) | | |
 
 ## 2. Module layout
 

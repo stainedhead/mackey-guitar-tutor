@@ -14,7 +14,7 @@
 | A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 11 |
 | B `mackey-voicing` | B1 to B16 (16) | 16 |
 | C `mackey-audio` | C1 to C9 (9) | 9 |
-| D `src-tauri` and `ui/` | D1 to D16 (16) | 0 |
+| D `src-tauri` and `ui/` | D1 to D16 (16) | 15 |
 | E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
 | Total | 61 | 36 |
 
@@ -289,95 +289,105 @@
 ## Phase D: `src-tauri` and `ui/`
 
 ### D1. Tauri 2 scaffold, config, capabilities, command registry
-- **Progress:** Scaffold done (infrastructure worker): `mackey-app` builds on Linux, config, capabilities, plists, icons, `app_info` command; the command registry is the `COMMAND_NAMES` list and its tests. Pending: `fretboard_view`, the capability/permission-per-command test, logging.
+- **Progress:** Done: scaffold, config, capabilities, 32-command registry (x-macro) with a manifest test. Per-command ACL entries are left (D-70).
 - **Depends on:** B14, C9 · **Est:** L · **FR:** FR-002, FR-003, FR-004 (partly)
 - **Files:** `src-tauri/{Cargo.toml,build.rs,tauri.conf.json,Info.plist,capabilities/default.json,icons/**,README.md,src/{main.rs,lib.rs,commands_list.rs,commands/mod.rs}}`, root `Cargo.toml` (add `src-tauri` to `members`, add `tauri`, `tauri-build`, `tracing-subscriber`, `tracing-appender` to `[workspace.dependencies]`), `Makefile` `ui/dist` stub rule (D-15), `ui/package.json` minimal so `tauri.conf.json`'s `beforeBuildCommand` works, `ui/.nvmrc` (22) and `engines`, `src-tauri/capabilities/README.md`, `src-tauri/icons/README.md` (doccheck does not skip these folders).
 - **Acceptance (SAC-02):** `cargo build -p mackey-app` succeeds on Linux with WebKitGTK and ALSA dev packages; window 1280×800, min 900×600; CSP per the architecture; capabilities list only app command permissions; `NSMicrophoneUsageDescription` in `Info.plist`; one command `fretboard_view` returning an empty-selection view works (walking skeleton); archcheck passes (`tauri` only in `mackey-app`); `make deny` passes or `deny.toml` is extended for permissive licences only (Q-6).
 - **Tests:** unit test that `COMMAND_NAMES` has no duplicates and that `capabilities/default.json` mentions exactly the permissions `allow-<name>` for each name (parse the JSON in the test).
 
 ### D2. `AppError`, panic guard, logging
-- **Progress:** Partly done: `AppError { message, details }`, `guard` with tests (AC-NF-24). Pending: `AppErrorKind`, core-error `From` conversions, mutex poisoning, `tracing` file logging.
+- **Progress:** Done: `AppErrorKind`, `From` conversions for every core error, mutex-poison recovery, tracing to a rolling log file.
 - **Depends on:** D1 · **Est:** M · **FR:** FR-004 · **SAC-03**
 - **Files:** `src-tauri/src/{error.rs,guard.rs,logging.rs}`.
 - **Acceptance:** `AppError`/`AppErrorKind` with `From` conversions mapping each core error to a plain message (E-FB-1 text for chord parse errors, "No audio output" for `NoOutputDevice`, "Microphone access is off" for `PermissionDenied`); `guard(|| ...)` wraps a closure in `catch_unwind(AssertUnwindSafe)` and returns `AppError { kind: Internal, message: "Something went wrong", details: Some(panic message) }`, logging the full chain with `tracing`; poisoned mutex handled (recover with `into_inner`, log); logging layer writes to `app_data_dir/logs/mackey.log` (rotating daily, 3 kept) with a test using a temp dir.
 - **Tests:** AC-NF-24 (a command closure that panics returns `AppError` "Something went wrong"); mutex poisoning test; table of error → message mappings; no panic payload text leaks into `message`.
 
 ### D3. Settings: types, JSON store, reset per group
+- **Progress:** Done: `settings.rs` with atomic save, corrupt-file backup and notice, reset per group, `get_settings`, `set_settings`, `reset_settings`.
 - **Depends on:** D2 · **Est:** M · **FR:** FR-028
 - **Files:** `src-tauri/src/settings.rs`, `commands/settings.rs`.
 - **Acceptance:** the types in the data dictionary with G-4/08 §6 defaults; `load(dir)`, `save(dir, &Settings)` (atomic temp + rename), `reset(group)`, `apply(patch)` with clamping and validation (frets 19..=24, A4 415..=466, volume 0..=100); corrupt file renamed `.bak-<ts>` and defaults used with a one-time notice; unknown fields ignored; missing file → defaults; version field.
 - **Tests:** AC-FR-028 (save, reload, "reset Display" restores only Display to defaults while Instrument stays changed); corrupt-file and out-of-range tests; round trip property for arbitrary valid settings; commands `get_settings`, `set_settings`, `reset_settings`.
 
 ### D4. Explorer state and commands
+- **Progress:** Done: `Explorer` and the explorer commands, revision counter, chord field with diagnostics; 25 integration tests in `src-tauri/tests/state.rs`.
 - **Depends on:** D2, D3, B14 · **Est:** L · **FR:** FR-019, FR-020, FR-022 · **SAC-18**
 - **Files:** `src-tauri/src/{state.rs,explorer.rs,commands/explorer.rs}`.
 - **Acceptance:** `Explorer` owns `Selection`, `Instrument`, `Handedness`, last `VoicingResult` cache; commands from the architecture table (`get_snapshot`, `fretboard_view`, `select_key`, `select_diatonic_chord`, `select_chord`, `parse_chord`, `select_note`, `select_tuning`, `set_capo`, `set_view_type`, `set_labels_mode`, `set_scale_overlay`, `set_option`, `cycle`, `voicings_for`, `fit_selection`); panel assembly (key label, tonic and mode choices, diatonic chips, chord field status, instrument panel, scale choices); invalid chord text returns `Ok(snapshot)` with `ChordFieldStatus::Error` and the selection unchanged (FB-4.4, NF-23); settings feed handedness, fret count, default tuning, labels default and allow stretches into the explorer; every snapshot carries an incrementing `revision` (SAC-18, D-31); commands take the explorer mutex for the whole read-modify-snapshot step so concurrent calls serialise; invalid arguments (string 0 or 7, fret above the fret count, capo 13) return `AppError { kind: Invalid }` without changing state.
 - **Tests:** integration tests via the `Explorer` type (no Tauri runtime): AC-FB-2.2 through the command path, AC-E-FB-4, `select_chord("Hm7")` returns the E-FB-1 message with suggestion and unchanged selection, Roman numeral `vi` in G selects Em; no music logic in this crate (review checklist item: grep for theory math).
 
 ### D5. Audio commands, `AudioPort`, tuner commands and event emitter
+- **Progress:** Done: `AudioPort` with `RealAudio` (lazy) and `FakeAudio`, play, tuner start, stop, mode, reference tone, `tuner_reading` at about 30 Hz, `tuner_targets`.
 - **Depends on:** D4, C9 · **Est:** L · **FR:** FR-024, FR-027 · **SAC-13, SAC-16**
 - **Files:** `src-tauri/src/{ports.rs,commands/audio.rs,commands/tuner.rs}`.
 - **Acceptance:** `AudioPort` trait with `RealAudio` and `FakeAudio`; `play_selection`, `play_note`, `stop_playback`, `list_input_devices`, `tuner_start`, `tuner_stop`, `tuner_set_mode`, `tuner_reference_tone`, `open_system_settings`; Play on a machine with no output returns `AppErrorKind::NoAudioOutput` and every explorer command still works (AC-E-FB-8); mute and volume from settings applied via `SetMute`/`SetVolume`; opening the tuner stops selection playback (TU-7); tuner targets built from the instrument with the capo (AC-TU-5.1) and A4 from settings; `tuner_reading` emitted at about 30 Hz (throttle on the analysis callback using the reading's `t_ms`); the explorer mutex is never locked from the audio or analysis thread; `tuner_start` while running restarts, `tuner_stop` without start is a no-op, and the window-close event stops the tuner.
 - **Tests:** with `FakeAudio::NoDevice`: AC-E-FB-8; with `Recording`: strum order and delays for a C voicing (6 notes → 5 with the muted low E, 30 ms spacing in samples at 48 kHz = 1,440), `play_note` frequency for string 3 fret 0 = 196.0 Hz; target list for capo 2 equals F#2 B2 E3 A3 C#4 F#4; throttle unit test.
 
 ### D6. Bindings generator, fixtures and stale-bindings check
-- **Progress:** Skeleton done: `ts-rs` export of `AppInfo` and `AppError` into `ui/src/bindings/`, `make bindings`, `make bindings-check`, CI `bindings` job (D-44). Pending: command-wrapper generator, `events.ts`, `scenarios.json`.
+- **Progress:** Done: ts-rs types, generated `commands.ts` and `events.ts`, recorded `scenarios.json`; `make bindings-check` covers all three.
 - **Depends on:** D4, D5 · **Est:** L · **FR:** FR-003
 - **Files:** `src-tauri/src/{commands/manifest.rs,bindings.rs}`, `ui/src/bindings/{README.md,*.ts (generated)}`, `ui/src/mocks/scenarios.json` (generated), `Makefile` (`bindings`, `bindings-check` in E1).
 - **Acceptance:** all boundary types export with `ts-rs`; `commands.ts` has one typed async wrapper per command and `events.ts` the `tuner_reading` subscription helper; generated files carry a "GENERATED, do not edit" header; `scenarios.json` produced by driving the real `Explorer` through the scripted sequences listed in D14; running the generator twice yields identical bytes; `COMMAND_NAMES` equals the manifest names (test).
 - **Tests:** the generator tests themselves (run only with `--features ts`). Staleness cannot be checked inside a normal `cargo test`, so it is checked by `make bindings-check` (E1), which regenerates and runs `git diff --exit-code`.
 
 ### D7. UI scaffold: Vite, TS strict, lint, test runners, tokens, command layer
-- **Progress:** Scaffold done: Vite 7, React 18, TS strict, typed ESLint + Prettier, Vitest, `src/ipc/` command layer with mock selection (D-43, D-45). Pending: tokens, store, contrast tests.
+- **Progress:** Done: tokens (light, dark, Okabe-Ito with text colours), contrast test, command-layer selection test.
 - **Depends on:** D1 · **Est:** L · **FR:** FR-002, FR-021
 - **Files:** `ui/package.json`, `ui/package-lock.json` (committed), `ui/tsconfig.json` (`strict`, `noUncheckedIndexedAccess`), `ui/vite.config.ts` (port 1420, `build.target: 'safari16'`, mock mode), `ui/eslint.config.js` (typescript-eslint strict, react-hooks, jsx-a11y), `ui/.prettierrc`, `ui/index.html`, `ui/src/{main.tsx,App.tsx,commands/index.ts,state/store.ts,theme/tokens.css}`, READMEs in `ui/` and `ui/src/bindings/` (`ui/src/**` is skipped by doccheck; `ui/e2e/` gets its README in D15).
 - **Acceptance:** `npm ci && npm run lint && npm run typecheck && npm test` pass; tokens define the Okabe-Ito colours of G-2 (`--note-root #D55E00`, `--note-third #0072B2`, `--note-fifth #009E73`, `--note-seventh #E69F00`, `--note-ext #CC79A7`, scale grey, `--anchor`, `--muted`) in light and dark with `prefers-color-scheme` and `data-theme`; text contrast tests (WCAG AA 4.5:1; note dots 3:1 on the neck) computed in a Vitest test from the token values; command layer selects real or mock implementation; pinned exact versions.
 - **Tests:** token contrast unit test; command-layer selection test.
 
 ### D8. Fretboard SVG component
+- **Progress:** Done: geometry, `Fretboard`, `NoteMarker`, formatting; geometry tests and component tests.
 - **Depends on:** D6, D7 · **Est:** XL (split: geometry + neck; markers + barres; tooltip) · **FR:** FR-021
 - **Files:** `ui/src/fretboard/*` (see architecture).
 - **Acceptance:** draws from `FretboardView` only: 6 strings, `fret_count` frets, nut, inlays, fret numbers, string labels, 12th-root-of-2 spacing with minimum fret width (24 px Mac, 28 pt iPad) and horizontal scroll when the visible range cannot fit; markers by role (root rounded square, third/fifth/seventh/extension filled circle, scale ring, single-note diamond) with Okabe-Ito tokens; open-string rings above the nut; muted "×"; barres as bars; capo dimming and capo bar; left-handed mirroring (nut on the right) and string flip as SVG transforms of the same geometry; every `ViewPosition` an element with `role="img"`/`button`, `aria-label` = `a11y_label`, `tabIndex` roving, visible focus ring; click calls `play_note`; AC-P0-5 (6 strings and 22 frets with defaults); labels ≥ 11 pt.
 - **Tests:** Vitest on `geometry.ts` (fret x-positions for 22 frets sum to the scale length ratios, minimum width rule, mirror maths); component tests with Testing Library on fixtures from `scenarios.json`: every position has an aria-label; shapes by role; mirrored layout puts the nut on the right.
 
 ### D9. Tooltip, edge arrows, range controls, fit selection
+- **Progress:** Done: `Tooltip`, `EdgeArrows`, `RangeControls`, fit selection; the tooltip e2e spec.
 - **Depends on:** D8 · **Est:** M · **FR:** FR-021
 - **Files:** `Tooltip.tsx`, `EdgeArrows.tsx`, `RangeControls.tsx`.
 - **Acceptance:** hover (Mac) and tap/long-press (iPad) show the tooltip from `ViewPosition.tooltip` (AC-FB-1.6: "G3", "1", "R", "Root"; theory spelling when present); range handles (drag and keyboard) and a "Fit selection" button that sets the visible range from `view.fit_range`; edge arrows when `view.off_range.below/above > 0` (E-FB-5) with an accessible name ("3 highlighted notes beyond fret 12"); visible range default by layout (0–15 Mac, 0–12 iPad landscape, 0–7 iPad portrait); pinch zoom 5 to 24 frets on iPad.
 - **Tests:** Vitest component tests; Playwright `tooltip.spec.ts` for AC-FB-1.6.
 
 ### D10. Explore screen controls
+- **Progress:** Done: toolbar, chord strip, chord field, voicing list with mini diagrams, view controls. Narrow widths wrap instead of collapsing the toolbar (D-73).
 - **Depends on:** D8, D4 · **Est:** XL (split by panel) · **FR:** FR-022 · **SAC-12**
 - **Files:** `ui/src/explore/*`.
 - **Acceptance:** toolbar (key picker with tonic + mode and the F#/Gb choice, key always shown as text; tuning and capo picker with custom tuning entry and the unusual-tension warning; labels mode; view type); diatonic chord strip with Roman numerals and a sevenths toggle; chord field with inline error "Not a chord symbol I know: Hm7. Did you mean Bm7?" in red with a text icon (not colour alone) and a "use suggestion" button, selection unchanged; voicing list grouped Open / Barre and CAGED / Other with mini diagrams and "Found by search"; triad string-set and inversion controls and "Show all on string set"; arpeggio position control, direction and "Show order"; scale overlay toggle and scale picker with "Follow the chords"; counters "3 of 7"; "Not in key" badge; capo shape/sounding names with the emphasis toggle; "No playable voicing in this tuning" with "Allow stretches" and "Allow omitted fifth" buttons; all controls call commands and render the snapshot; every control has a label and 44 pt targets on iPad.
 - **Tests:** Vitest component tests per panel against fixtures; Playwright smoke (G major → chord strip → voicings).
 
 ### D11. Shortcuts, live region, iPad gestures
+- **Progress:** Done: shortcut table with the AC-UX-7 test, `useShortcuts`, live region, swipe and pinch gestures, queue.
 - **Depends on:** D10 · **Est:** M · **FR:** FR-023
 - **Files:** `ui/src/{shortcuts.ts,useShortcuts.ts,gestures.ts,a11y/*}`, `ui/src/commands/queue.ts` (a single promise queue so commands reach Rust in key order; stale snapshots are dropped by `revision`).
 - **Acceptance:** the shortcut table covers FB-9 and 07 §4 Explore rows (`↑ ↓ ← →`, `I`/`Shift-I`, `S`/`Shift-S`, `P`/`Shift-P`, `V`, `L`, `O`, `[`, `]`, `R`, `Space`) and `Cmd-T`; disabled while an input, textarea, select or contenteditable has focus (UX-6); `Space` activates Play only when focus is not on a button (otherwise the button's own activation) (UX-6 refinement, D-28); each cycling change writes `view.announcement` to an `aria-live="polite"` region (AC-FB-9.1c); iPad: swipe left/right on the neck → voicing prev/next, two-finger swipe → position, swipe up/down on the chord strip → chord prev/next, buttons for every FB-9 action, 44 pt targets; Reduce Motion respected (no animated transitions).
 - **Tests:** AC-UX-7 (no two commands in one area share a key; table-driven over `shortcuts.ts`); Vitest: shortcut ignored in a text field; announcement written for each action; gesture classifier unit tests (thresholds, direction, two-finger).
 
 ### D12. Tuner screen
+- **Progress:** Done: tuner screen with explainer, denied and no-device states, strings mode with lock and reference tones; Vitest and Playwright specs.
 - **Depends on:** D5, D7 · **Est:** L · **FR:** FR-027
 - **Files:** `ui/src/tuner/*`.
 - **Acceptance:** `Cmd-T` and sidebar entry; MicExplainer (E-TU-1 text: "Mackey uses the microphone only to hear your guitar. Nothing is recorded or sent anywhere." + Continue) shown until `settings.tuner.mic_explained`; MicDenied state (E-TU-2: "Microphone access is off", Open Settings button, reference tones still work); chromatic display (note, octave, cents needle −50..+50, Hz small), in-tune state by colour **and** check mark **and** "In tune" text, "Play a single string" when `NoStablePitch`, "Too quiet: move closer or turn up your input", "Too loud: turn down your input", string mode with six targets, auto-selected string, Tighten/Loosen arrows with cents, tap-to-lock, per-string ticks, "Far from any string: check the tuning setting", reference tone buttons (3 s, toggle), device picker, level meter, disconnect notice; tuner announcements throttled to once per second to the live region (NF-5); subscribes to `tuner_reading` on mount and unsubscribes on unmount calling `tuner_stop`; also calls `tuner_stop` when `document.visibilityState` becomes `hidden` and restarts on `visible` (iPad backgrounding; SAC-16); shows "The tuner stopped unexpectedly. Close and reopen it." on `AnalysisStopped`.
 - **Tests:** Vitest with `mockTuner` series for each state; Playwright `tuner.spec.ts` (explainer → readings → in-tune state → too quiet; denied state).
 
 ### D13. Sidebar, layouts, narrow behaviour, settings screen
+- **Progress:** Done: sidebar, tab bar, narrow nav, settings screen, layouts; `useLayout` tests and Playwright specs.
 - **Depends on:** D10, D12, D3 · **Est:** L · **FR:** FR-025, FR-028 · **SAC-14, SAC-17**
 - **Files:** `ui/src/layout/*`, `ui/src/settings/SettingsScreen.tsx`.
 - **Acceptance:** sidebar with Explore, Tools (Tuner) and Settings; `Cmd-0` toggles it; Mac layout: toolbar, main, neck below main (default); iPad landscape: sidebar, main, neck across the bottom 40%; iPad portrait: tab bar, main top half, neck bottom half showing 7 frets and scrolling; narrow window (< 700 px or Split View one-third): sidebar hidden, panels collapse into a menu, the neck scrolls and never shrinks below the FB-1.4 minimums (E-FB-9); settings screen for the FR-028 settings with per-group reset buttons, applied immediately, theme applied via `data-theme`, `Cmd-,` opens it.
 - **Tests:** Playwright `ipad-layouts.spec.ts` at 1180×820 and 820×1180 and `narrow.spec.ts` at 680×800; Vitest for `useLayout`.
 
 ### D14. Vitest suite, mock command layer, recorded scenarios
+- **Progress:** Done: `createMockCommands` over the recorded graph; 91 Vitest tests.
 - **Depends on:** D6, D8..D13 · **Est:** M · **FR:** FR-021..027 · **SAC-18**
 - **Files:** `ui/src/mocks/{mockCommands.ts,mockTuner.ts}`, tests next to sources.
 - **Acceptance:** `mockCommands` replays `scenarios.json` (sequences recorded from the real core): `g-major-notes`, `chord-strip-walk` (I..vii), `c-voicings-cycle` (≥ 20 voicing steps with wrap), `triads-234-cycle`, `am-arpeggio-position-5`, `a-minor-pent-boxes`, `left-handed-g`, `capo-5-moved`, `hm7-error`, `no-voicing`; mock never contains theory; `mockTuner` emits a scripted `TunerReading` series (listening → pitch flat → in tune → too quiet → no stable pitch); Vitest coverage on `ui/src` reported (`vitest --coverage`), target ≥ 80% lines on non-generated files.
 - **Tests:** the Vitest suite; a test that every scenario step deserialises into the generated types (type-level check via `satisfies`).
 
 ### D15. Playwright suite (WebKit, desktop and iPad)
-- **Progress:** Scaffold done: Playwright config (WebKit; `desktop` and `ipad` projects, mock web server), `e2e/README.md`, one skeleton spec. Pending: the feature specs, portrait project, axe.
+- **Progress:** Done: specs for AC-P0-5, AC-LH-1.1, AC-FB-9.1b/c, tooltip, chord flow, E-FB-1, UX-6, E-FB-8, tuner states, layouts; projects desktop, ipad, ipad-portrait and narrow; run locally with `PW_CHANNEL=chrome`.
 - **Depends on:** D14 · **Est:** L · **FR:** FR-006, FR-021..027
 - **Files:** `ui/e2e/README.md` (doccheck does not skip `e2e`), `ui/playwright.config.ts` (projects `desktop` 1280×800 and `ipad` 1180×820 with `hasTouch`, a third `ipad-portrait` 820×1180; webServer `vite --mode mock`), `ui/e2e/*.spec.ts`.
 - **Acceptance:** AC-P0-5 (neck draws 6 strings and 22 frets), AC-FB-9.1b (each cycling key pressed 100 times, each redraw ≤ 16 ms measured from `keydown` dispatch to the next `requestAnimationFrame` after the DOM update, p100 ≤ 16 ms on the mock layer, with the first 5 warm-up presses discarded and the budget stated in the test), AC-FB-9.1c (announcements for each cycling action), AC-FB-1.6 (tooltip), AC-LH-1.1 (nut on the right, frets mirrored, tooltips unchanged), shortcut tests (key ignored in the chord field), tuner states, iPad layouts, axe accessibility scan (`@axe-core/playwright`, no serious violations on Explore and Tuner in light and dark), colour-blind check is the token test in D7.

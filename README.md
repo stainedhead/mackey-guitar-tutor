@@ -1,6 +1,16 @@
 # mackey-guitar-tutor
 macos application that helps guitarists learn the neck and play songs (Rust core, Tauri shell; macOS and iPad)
 
+## Screens
+
+![Explore: the G major scale on the neck](docs/images/explore-g-major-desktop.png)
+
+![A C chord, voicing view](docs/images/explore-c-voicings-desktop.png)
+
+![The tuner reading a flat A](docs/images/tuner-flat-desktop.png)
+
+These are generated from the UI with the mocked command layer; see [docs/images](docs/images/README.md) and the [user guide](user-docs/getting-started.md).
+
 ## Design
 
 Product spec, architecture and roadmap live in [docs/](docs/README.md): a fretboard explorer for keys, chords, triads and arpeggios; quick-entry practice sessions; and song chord/lyric import with fretboard help.

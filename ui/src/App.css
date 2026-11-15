@@ -290,11 +290,15 @@ input.invalid {
 .voicing-list {
   width: 280px;
   flex-shrink: 0;
+  /* The list scrolls inside, so the neck below always stays on screen. */
+  max-height: 20rem;
+  overflow-y: auto;
 }
 
 .layout-narrow .voicing-list,
 .layout-ipad-portrait .voicing-list {
   width: 100%;
+  max-height: 14rem;
 }
 
 .voicing-list ul {
