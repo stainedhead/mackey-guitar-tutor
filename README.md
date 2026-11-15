@@ -9,7 +9,7 @@ Start with [INTENT.md](INTENT.md) for purpose and scope, then the PRD in [docs/p
 
 ## Core crates
 
-The Rust core is built crate by crate ([crates/](crates/README.md)). So far: `mackey-theory` (notes, intervals, scales, keys, chords, chord-symbol parser, Roman numerals and analysis, spelling).
+The Rust core is built crate by crate ([crates/](crates/README.md)). So far: `mackey-theory` (notes, intervals, scales, keys, chords, chord-symbol parser, Roman numerals and analysis, spelling) and `mackey-voicing` (tunings and capo, voicing search, fingering, triads, arpeggios, scale patterns, selection model, `FretboardView`, playback plan).
 
 ## Contributing
 

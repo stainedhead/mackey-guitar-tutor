@@ -58,6 +58,20 @@
 | D-47 | `src-tauri/gen/` is git-ignored entirely; `tauri ios init --ci` regenerates the Xcode project in `make ios-sim` and CI. Icons: placeholder set generated with `tauri icon`; Windows, Android and iOS icon folders removed (deferred platforms; iOS init generates its own). `Info.plist` (macOS) and `Info.ios.plist` (iOS) both hold `NSMicrophoneUsageDescription`; Tauri merges both automatically by name, so no `bundle.iOS.infoPlist` key is needed (amends D-30). | Generated files are never hand-edited; doccheck does not want READMEs in generated folders. | The Swift audio-session plugin needs a committed Xcode project. |
 | D-48 | `src-tauri/src/runtime.rs` (the `tauri::Builder` call) is the coverage-excluded glue instead of a `bindings.rs`; exclusion regex is `COVER_IGNORE` in the Makefile: `main.rs`, `runtime.rs`, `build.rs` of `src-tauri`. `make cover` passes locally (93% lines). | Amends D-16. | Glue grows logic. |
 | D-49 | Playwright WebKit cannot be downloaded in the sandbox that built this (proxy blocks the CDN), so the specs were verified locally in Chrome via `PW_CHANNEL=chrome make e2e`; CI uses WebKit only. | Environment limit; the escape hatch is documented in `ui/playwright.config.ts`. | WebKit-specific failures in CI: fix there. |
+| D-50 | Fingering rank rule (`assign_fingering`): barre detection first (the lowest pressed fret held by two or more distinct pitches with no open string between them is one barre by finger 1), then remaining pressed notes get fingers 2 to 4 in order of ascending fret, then string. More than four distinct fingers rejects the shape. Identical open strings (E-FB-6) count once. Teaching choice: the small F (`xx3211`) is a barre of kind Barre (strings 2 to 1 at fret 1). |
+| D-51 | Group rule: Open = every pressed fret at most 4 and an open string sounds (or curated open shape); Barre = a barre is drawn; Position = otherwise. `lowest_fret` is the lowest pressed fret, or the capo fret when nothing is pressed. List groups are capped `[ceil(max/3), ceil(max/2), max]` so CAGED forms are never cut by open-position variants. |
+| D-52 | Root-bass is a hard rule: the lowest sounding pitch is the chord's bass (root, or the slash bass). Essential tones: root plus third (or the sus tone); the fifth may be omitted only with `allow_omitted_fifth`. Power chords need 2 sounding strings, everything else 4. |
+| D-53 | Score weights (`rules::weights`): span -3, finger -2, open string +2, root bass +4, skipped string -12, extra mute -2, high position -1, sounding string +3, complete chord +2, curated +50. First calibration; 32 (chord, tuning, capo) first-voicing rows are pinned by `fb_5_1_first_voicing_table_over_tunings_and_capos`. |
+| D-54 | Curated shapes (open tables, CAGED templates, Drop D) are re-verified against the real tuning and capo before they are offered, so a half-step-down or capo never shows a wrong note. The movable C7 C-shape needs five fingers, so it is not a template (documented in `shapes/caged.rs`). |
+| D-55 | Triad placements are ordered by the lowest sounding fret counting an open string as the capo fret; seventh chords use their root triad (D-12); a third inversion of a triad is "unavailable" with a reason. `triad_ladder` gives root, 1st, 2nd for AC-FB-6.2. |
+| D-56 | `scale_patterns` excludes the full neck (`full_neck` is separate); harmonic minor and blues have no patterns. A pattern that runs off the neck (high capo, 19 frets) is not offered; found by the property test (regression file committed). Patterns are ordered by lowest fret. |
+| D-57 | The overlay in follow mode: a minor or minor-7 chord gets the minor pentatonic of its root (SC-1), everything else the SC-4 choice (`scale_for_chord`: diatonic -> key scale; dominant -> Mixolydian; major -> Ionian; minor -> Dorian; diminished -> Locrian; sus, power and augmented fall back to the key scale). |
+| D-58 | `Selection.position` has a dual meaning: the triad placement index in Triad view, the arpeggio start fret in Arpeggio view. The first VoicingNext from another view switches to Voicing view and shows index 0; P in Voicing view moves to the next voicing with a higher lowest fret. |
+| D-59 | G-3.3 key change: a diatonic chord moves to the same degree (sevenths stay sevenths); a chord outside the key is kept with the notice "Chord is not in the new key; kept as it was". |
+| D-60 | Wire format: `StringState` is internally tagged (`kind`, snake_case); `VoicingResult` is adjacently tagged; checked newtypes (`StringNumber`, `Fret`, `Capo`, `FretCount`, `Bpm`) serialise as numbers and validate on deserialise; ts-rs exports them as `number`. |
+| D-61 | Out-of-scale degree labels are spelled from the note: F# in C is `#4`, Bb is `b7` (the PRD examples G-2.2 say "1, b3, 5"); labels never carry double accidentals (G-1.6), the theory spelling goes to the tooltip. |
+| D-62 | Playback (B11): eighth = `30000 / bpm` truncated (428 ms at 70 bpm, as the spec says), the n-th start is `n * 30000 / bpm` truncated once (so 428, 857, 1285...). Strum: 30 ms apart, each string rings 1500 ms. All Tones view plays the selected voicing; Triad plays the selected placement; a clicked note is a quarter note. Scale plays the overlay scale if one is chosen, else the key scale, one octave plus the tonic from the lowest tonic in the visible range. |
+| D-63 | Library code indexes `[T; 6]` arrays directly only where the index comes from a `0..6` loop or a `StringNumber`; everything else uses `get`. `unsafe`, `unwrap`, `expect` and `panic` are absent from `src/`; the two `#[expect]` allowances carry reasons (a flat FB-9 action dispatch, a fret-cell helper in the shape tables). |
 
 ## Edge Cases and Solutions
 
@@ -171,6 +185,30 @@ Seeded from the PRD (E-FB-*, E-TU-*) and from design analysis. Implementers add 
 - **Q-1, Q-2, Q-4, Q-7, Q-9, Q-10, Q-11 need J's confirmation**; defaults are chosen so work is never blocked.
 
 Next step: Step 3 of the orchestration, `/dev-flow:implm-from-spec specs/261115-fretboard-foundation/` (implementation by phase A to E in tasks.md).
+
+## B15: acceptance criterion to test (Phases A and B voicing side)
+
+| AC | Test (crates/mackey-voicing/tests) |
+|----|-----|
+| AC-FB-2.1 | `view::ac_fb_2_1_f_major_notes_view_has_bb_and_no_sharps` |
+| AC-FB-2.2 | `selection::ac_fb_2_2_changing_key_keeps_the_degree_g_iv_becomes_d_iv_is_g` |
+| AC-FB-4.1 (view) | `view::ac_fb_4_1_d7_in_c_shows_d_fsharp_a_c_with_the_badge` |
+| AC-FB-1.6 | `view::ac_fb_1_6_tooltip_has_note_octave_degree_interval_and_role` |
+| AC-FB-5.1 | `voicings::ac_fb_5_1_c_voicing_view_starts_with_open_c_and_its_fingers` |
+| AC-FB-5.2 | `voicings::ac_fb_5_2_f_list_has_small_f_and_the_full_barre_and_both_obey_fb_5_4` |
+| AC-FB-5.3 | `curated_shapes::fb_5_3_*` (26 shapes note by note), `properties::ac_fb_5_3_every_voicing_found_obeys_fb_5_4` (all presets, custom tunings, capo 0 to 12, 19 to 24 frets) |
+| AC-FB-5.6 / E-FB-3 | `voicings::ac_fb_5_6_no_playable_voicing_offers_both_relaxations_and_never_breaks_fb_5_4`, `view::e_fb_3_no_playable_voicing_is_reported_never_drawn` |
+| AC-FB-6.1 / 6.2 | `triads::ac_fb_6_1_c_major_string_set_234_first_inversion_is_e_g_c`, `triads::ac_fb_6_2_g_on_string_set_123_lists_root_first_second_in_fret_order` |
+| AC-FB-7.1 | `arpeggios::ac_fb_7_1_am_position_5_holds_every_a_c_e_between_frets_4_and_9` |
+| AC-SC-3.1 / 4.1 | `patterns::ac_sc_3_1_a_minor_pentatonic_box_1`, `patterns::ac_sc_4_1_song_in_c_a7_follows_to_a_mixolydian` |
+| AC-LH-4.1 | `curated_shapes::ac_lh_4_1_drop_d_d_chord_uses_all_six_strings_with_string_six_open` |
+| AC-LH-5.1 | `view::ac_lh_5_1_capo_2_chord_shape_g_reads_g_shape_sounds_a` |
+| AC-TU-5.1 | `tunings::ac_tu_5_1_open_strings_with_capo_two` |
+| E-FB-4 | `selection::e_fb_4_a_capo_above_the_position_moves_it_up_with_a_notice` |
+| E-FB-6 | `voicings::e_fb_6_identical_open_strings_are_not_double_counted_in_fingering` |
+| NF-2 budgets | `perf_budget::nf_2_*` (release only), `benches/search.rs`, `benches/view.rs` |
+
+Benchmarks (criterion, this sandbox): twelve chords of every shape searched in 3.6 ms (about 0.3 ms per search, one F#m7b5 search 0.13 ms); `fretboard_view` 50 to 70 microseconds warm, 0.8 to 0.95 ms with a cold voicing search (budget 2 ms); release timing test p95 within both budgets.
 
 ## Manual checklist (AC-MAN-1, device-only checks)
 

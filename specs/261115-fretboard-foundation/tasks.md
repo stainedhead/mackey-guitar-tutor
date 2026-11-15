@@ -7,16 +7,16 @@
 
 ## Progress Summary
 
-11/61 tasks complete. Update this file and `status.md` after every task (mandatory).
+27/61 tasks complete. Update this file and `status.md` after every task (mandatory).
 
 | Phase | Tasks | Done |
 |-------|-------|------|
 | A Workspace scaffold and `mackey-theory` | A1 to A11 (11) | 11 |
-| B `mackey-voicing` | B1 to B16 (16) | 0 |
+| B `mackey-voicing` | B1 to B16 (16) | 16 |
 | C `mackey-audio` | C1 to C9 (9) | 0 |
 | D `src-tauri` and `ui/` | D1 to D16 (16) | 0 |
 | E Makefile, AGENTS.md, CI, docs | E1 to E9 (9) | 0 |
-| Total | 61 | 11 |
+| Total | 61 | 27 |
 
 ## Conventions
 
@@ -111,30 +111,35 @@
 ## Phase B: `mackey-voicing`
 
 ### B1. Instrument: strings, frets, tunings, capo, handedness
+- **Status:** Done
 - **Depends on:** A11 · **Est:** M · **FR:** FR-013 · **SAC-07**
 - **Files:** `crates/mackey-voicing/src/instrument.rs`, `tests/tunings.rs`.
 - **Acceptance:** `StringNumber`, `Fret`, `Capo` (0..=12), `FretCount` (19..=24), nine presets with the exact pitches of LH-2 (Open D = D2 A2 D3 F#3 A3 D4, Open E = E2 B2 E3 G#3 B3 E4, Half-step down = Eb2 Ab2 Db3 Gb3 Bb3 Eb4, etc.), `Tuning::custom` with `UnusualTension` warnings outside "minor third below to whole tone above" the standard pitch of that string (boundaries inclusive: -3 and +2 semitones are fine, -4 and +3 warn), duplicate open strings allowed, `shift_from_standard`, `Instrument::pitch_at` (error below capo), `open_sounding_pitch` with capo.
 - **Tests:** table of every preset's six pitches; open-string sounding names with capo 2 (AC-TU-5.1 data F#2 B2 E3 A3 C#4 F#4); proptest: `pitch_at(s, f+1) == pitch_at(s, f)` + 1 semitone; boundary cases for warnings.
 
 ### B2. Curated open-shape library (FB-5.3)
+- **Status:** Done
 - **Depends on:** B1 · **Est:** L · **FR:** FR-014 · **SAC-08**
 - **Files:** `src/shapes/open.rs`, `src/shapes/mod.rs`.
 - **Acceptance:** `const` tables for C, A, G, E, D, Am, Em, Dm, A7, B7, C7, D7, E7, G7, Amaj7, Cmaj7, Dmaj7, Fmaj7, Am7, Dm7, Em7, Asus2, Asus4, Dsus2, Dsus4, Esus4 and F (small `xx3211` and full barre `133211`) with strings, fingers, names ("Open C"). Hand-written from teaching charts (C `x32010` fingers `x-3-2-0-1-0`).
 - **Tests:** `fb_5_3_curated_shapes_exact` (hand-written expected fret strings for all 27 shapes + 2 F); consistency test that each shape's sounding pitch classes equal its chord's tones and the shape obeys FB-5.4 (root and third or sus note present, span ≤ 4, ≤ 4 fingers); where a standard teaching shape legitimately omits the fifth the test allows it (fifth optional).
 
 ### B3. CAGED barre shapes, Half/Whole-step-down reuse, Drop D entries
+- **Status:** Done
 - **Depends on:** B2 · **Est:** L · **FR:** FR-014
 - **Files:** `src/shapes/caged.rs`, `src/shapes/drop_d.rs`, `src/shapes/mod.rs` (lookup by chord, tuning shift, capo).
 - **Acceptance:** movable C, A, G, E, D barre shapes (major and minor where a standard form exists: E-shape, A-shape, C-shape and D-shape forms, G-shape) transposable up the neck to any root with its fret; Half-step down and Whole-step down reuse the standard shapes with the chord transposed by the tuning shift (Eb in Half-step down = the open E shape); Drop D entries (six-string D `000232`... verify pitch classes in test; Dm, D7, Dsus2, Dsus4, Dmaj7 with string 6 open) for AC-LH-4.1; capo translation (relative → absolute).
 - **Tests:** property over all roots and shapes: transposed shape pitch classes equal the chord's; table for AC-LH-4.1 (Drop D, D: list includes a six-string D with string 6 open (D), every pitch correct for D A D G B E); Half-step-down table (Eb, Ab, Db open shapes).
 
 ### B4. Fingering assignment and barre detection
+- **Status:** Done
 - **Depends on:** B1 · **Est:** M · **FR:** FR-015
 - **Files:** `src/fingering.rs`.
 - **Acceptance:** finger numbers 1..=4 by ascending fret; barre detection (lowest fretted fret repeated on 2+ strings; 133211 → barre at fret 1 over strings 6..1... verify); a barre counts as one finger; more than 4 fingers → `None` (candidate rejected); identical open strings (E-FB-6) never double-counted; open strings → finger 0; muted → `None`; hand-written fingerings for the curated shapes are used as-is when present.
 - **Tests:** table of (frets, expected fingers, expected barres) including `x32010` → `x-3-2-0-1-0`, `133211`, `xx3211`, `x02220` (A), a custom tuning with two identical open strings; property: result never exceeds 4 fingers.
 
 ### B5. Voicing search, scoring, grouping, no-voicing result
+- **Status:** Done
 - **Depends on:** B2, B3, B4 · **Est:** XL (split search core / scoring and grouping / curated merge if needed) · **FR:** FR-015 · **SAC-09**
 - **Files:** `src/search.rs`, `tests/voicings_standard.rs`, `tests/no_voicing.rs`, `tests/capo.rs`, `tests/properties.rs`.
 - **Acceptance:** `voicings_for(chord, instrument, options) -> VoicingResult` per the architecture: curated first, search fills gaps, grouped Open / Barre and CAGED / Other, sorted by score, capped; obeys FB-5.4 everywhere (root and third, sus note, root and fifth for `Power`, span ≤ 4 or 5 with stretches, ≤ 4 fingers, required bass for slash chords); `Origin::Search` marked in non-curated tunings; capo applied (frets absolute, open = capo); `NoneFound` with both relax options when no voicing exists, never a voicing that breaks FB-5.4 (AC-FB-5.6); AC-FB-5.1 (C voicing view first is `x32010`, fingers `x-3-2-0-1-0`); AC-FB-5.2 (F list contains `xx3211` and `133211`); AC-LH-5.1 labels via `CapoLabel`.
@@ -142,24 +147,28 @@
 - **Notes:** write the benchmark harness skeleton here (B13 finishes it).
 
 ### B6. Triads on string sets
+- **Status:** Done
 - **Depends on:** B1, A6 · **Est:** M · **FR:** FR-016
 - **Files:** `src/triads.rs`, `tests/triads.rs`.
 - **Acceptance:** `triads(chord, instrument, set, inversion) -> TriadResult`: placements in fret order, one note per string on three adjacent strings; seventh chords use the root triad with a note ("Triad of Cmaj7: C E G"); `Third` inversion only for sevenths (and not in triad view; the view clamps); `Unavailable` with a reason when no placement within span 4 (FB-6.4); "show all on string set" returns the three inversions in fret order, labelled root, 1st, 2nd (AC-FB-6.2: G, set 123).
 - **Tests:** AC-FB-6.1 (C, set 234, first inversion lowest placement: E s4 f2, G s3 f0, C s2 f1); AC-FB-6.2; table of all 12 roots × major/minor × 4 sets × 3 inversions in standard tuning, with pitch-class and bass checks; proptest across all presets: every returned triad has exactly the three chord tones, on adjacent strings, bass tone = the inversion's tone, span ≤ 4.
 
 ### B7. Arpeggio in position
+- **Status:** Done
 - **Depends on:** B1, A6 · **Est:** M · **FR:** FR-017
 - **Files:** `src/arpeggio.rs`, `tests/arpeggios.rs`.
 - **Acceptance:** window start `0..=20` (clamped to the fret count and capo), notes for every chord tone in `start-1..=start+4`, fingers per FB-7.2, valid positions (windows containing all required tones), default position per FB-7.4, play order for Up, Down, UpDown (UpDown does not repeat the top note), `show order` numbering. AC-FB-7.1: Am position 5 has every A, C, E between frets 4 and 9 inclusive, finger 1 on fret 5.
 - **Tests:** AC-FB-7.1; table for C, G, Am, Em, Dm7 in several positions; property: every returned note is a chord tone within the window; fingers ∈ 1..=4 (0 for open); order is a permutation of the notes.
 
 ### B8. Scale patterns and follow-the-chords
+- **Status:** Done
 - **Depends on:** B1, A5 · **Est:** L · **FR:** FR-018
 - **Files:** `src/patterns.rs`, `tests/scale_patterns.rs`.
 - **Acceptance:** `scale_patterns(scale, instrument)` returns FullNeck plus five pentatonic boxes (for the two pentatonics and, as a bonus, blues returns FullNeck only) or seven 3nps patterns for the major-family modes (Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian; harmonic minor and blues: FullNeck only, documented), ordered by lowest fret from the first pattern at or above the capo; box 1 has the root on string 6 under the first finger; AC-SC-3.1 (A minor pentatonic box 1: frets 5 and 8 on strings 6, 2 and 1; frets 5 and 7 on strings 5, 4 and 3; roots at s6 f5, s4 f7, s1 f5); all boxes use only scale tones and fit within 4 frets (pentatonic) or 5 (3nps); `scale_for_chord` per SC-4 (AC-SC-4.1: C → A7 in key C gives A Mixolydian; Dm in C gives C major since diatonic; Bm in C gives B Dorian... check the table in the data dictionary) and the SC-1 default for minor chords in follow mode.
 - **Tests:** AC-SC-3.1, AC-SC-4.1; every box of every pentatonic root in standard tuning checked against a hand-written table for 3 roots (A, G, E open-position case); property across tunings: notes ⊆ scale pitch classes; each string has 2 (pentatonic) or 3 (3nps) notes except at the neck's ends; no duplicates.
 
 ### B9. Selection model and cycling
+- **Status:** Done
 - **Depends on:** B5, B6, B7, B8, A9 · **Est:** XL · **FR:** FR-020 · **SAC-11**
 - **Also:** selecting a chord from focus None sets the view type to All tones; selecting a chord while a chord is already focused keeps the current view type (D-32). A change of fret count (settings) clamps `position`, `voicing_index` and the visible selection to valid values (no stale index after 24 → 19 frets).
 - **Files:** `src/selection.rs`, `tests/selection.rs`.
@@ -167,39 +176,46 @@
 - **Tests:** table-driven action sequences with expected selections and announcements; property: any sequence of up to 50 random actions never panics and keeps the selection valid (indexes in range); applying `Next` n times (n = list length) returns to the start for every cycling action.
 
 ### B10. `FretboardView` builder
+- **Status:** Done
 - **Depends on:** B9, A7 · **Est:** XL · **FR:** FR-019 · **SAC-10**
 - **Files:** `src/view.rs`, `tests/view_key_notes.rs`, `tests/view_tooltips.rs`, insta snapshots.
 - **Acceptance:** all fields in the data dictionary: positions with role, labels for every mode, finger, order, tooltip, a11y label ("String 3, fret 2, A, third of F"); key-notes view for focus None (tonic Root, degrees 1/3/5/7 coloured roles, 2/4/6 ScaleTone; AC-FB-2.1: F major shows F G A Bb C D E, no A#); chord views; voicing view with open ring markers and muted markers and barres; triad and arpeggio views; overlay with chord tones solid and other scale tones `ScaleTone` (SC-2); dimmed frets below the capo and no highlights there; inlays and fret numbers (FB-1.1, FB-1.2); string labels with capo (FB-1.3); off-range counts and `fit_range` (FB-1.5, E-FB-5); `list_position` "3 of 7"; notices; badge ("Not in key (V/V)"); capo label (AC-LH-5.1); tooltip contents (AC-FB-1.6: string 3 fret 0, key G chord G → "G3", "1", "R", "Root"); no double accidentals in labels (G-1.6) with `theory_spelling` in the tooltip; `mirrored`/`flipped` echoed.
 - **Tests:** AC-FB-2.1, AC-FB-4.1 (view side: tones D F# A C, badge), AC-FB-1.6, AC-LH-5.1; insta JSON snapshots for 8 named scenarios (G major notes, C open voicing, F barre, C triad 234 first inversion, Am arpeggio pos 5, A minor pentatonic box 1, Drop D D, capo 2 G shape); property: every position's fret ≥ capo and ≤ fret count, pitch of the position equals `Instrument::pitch_at`, labels never contain "x" or double accidentals.
 
 ### B11. Playback plan
+- **Status:** Done
 - **Depends on:** B10 · **Est:** S · **FR:** FR-024
 - **Files:** `src/playback.rs`.
 - **Acceptance:** strum: low to high, 30 ms apart, only sounding strings; arpeggio: view order, eighths at 70 bpm (428 ms, rounded from 428.57; delays cumulative from exact arithmetic then rounded once); key notes (focus None): ascending scale from the lowest tonic in the visible range (one octave plus tonic, 8 notes); single note; empty plan for nothing to play.
 - **Tests:** table for each kind; property: delays are non-decreasing; every pitch's frequency is within 20 to 20,000 Hz.
 
 ### B12. Property-test sweep over all tunings
+- **Status:** Done
 - **Depends on:** B5, B6, B7, B8, B10 · **Est:** M · **FR:** FR-013..019
 - **Files:** `tests/properties.rs`; strategies in a `#[cfg(test)] mod strategies` (or `proptest` feature if other crates need them).
 - **Acceptance:** one proptest each for: voicings (AC-FB-5.3), triads, arpeggios, patterns, `FretboardView` consistency, for random chord × random preset × random custom tunings within allowed ranges × capo 0..=12 × frets 19..=24 × both handedness; custom tunings with two identical open strings do not double-count fingers (E-FB-6); commit `proptest-regressions/` if any appear; `make props` passes in release.
 
 ### B13. Criterion benchmarks and release-mode timing tests (AC-FB-9.1a)
+- **Status:** Done
 - **Depends on:** B5, B10 · **Est:** M · **FR:** FR-015, FR-019
 - **Files:** `benches/search.rs`, `benches/view.rs`, `tests/perf_budget.rs`.
 - **Acceptance:** benches for voicing search (one chord, full neck, standard tuning, 22 frets) and `fretboard_view` (all view types); `tests/perf_budget.rs` runs each 200 times with `std::time::Instant` and asserts p95 ≤ 5 ms and ≤ 2 ms **only when `cfg!(not(debug_assertions))`** (so `make props`, which uses `--release`, enforces it; the debug `make test` skips it with a comment). If the budget fails, optimise before continuing (see the risk table in spec.md).
 - **Tests:** the timing test itself; bench results recorded in `implementation-notes.md`.
 
 ### B14. `mackey-voicing`: ts feature, README, docs, coverage
+- **Status:** Done
 - **Depends on:** B10, B11 · **Est:** S · **FR:** FR-003, FR-019
 - **Files:** `#[cfg_attr(feature = "ts", derive(ts_rs::TS))]` on every boundary type; `README.md`; doc examples on public functions.
 - **Acceptance:** `cargo test -p mackey-voicing --features ts` exports without error; coverage of new code at or near 100% by `cargo llvm-cov -p mackey-voicing`.
 
 ### B15. Traceability: test names carry requirement IDs
+- **Status:** Done
 - **Depends on:** B14 · **Est:** S · **FR:** all
 - **Files:** `docs/prd/09-traceability.md` rows (Step 4 finalises); a grep check in the task notes that every AC in spec.md has at least one test whose name contains its ID in snake_case (`ac_fb_6_1`, `ac_sc_3_1`).
 - **Acceptance:** a script-free check recorded in `implementation-notes.md` listing AC → test name for Phases A and B.
 
 ### B16. Spelling-in-views regression table (INTENT top-severity bug class)
+- **Status:** Done
 - **Depends on:** B10 · **Est:** M · **FR:** FR-012, FR-019
 - **Files:** `tests/view_spelling.rs`.
 - **Acceptance:** hand-written table: for 12 keys × 3 views (key notes, chord, scale overlay) the full set of expected labels per string-fret on strings 6 and 1 over frets 0..=12 (open-position and 12-fret check), proving no `A#` in F, no `Gb` in D, `F#` third of D7 in C, `Bb` root of bVII in C.

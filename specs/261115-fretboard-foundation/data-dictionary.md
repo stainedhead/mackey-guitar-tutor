@@ -186,6 +186,13 @@ The crate follows the tables above except for these changes (reasons in [impleme
 
 `VoicingError` (`thiserror`): `StringOutOfRange(u8)`, `FretOutOfRange(u8)`, `BelowCapo { fret: Fret, capo: Capo }`, `FretCountOutOfRange(u8)`, `CapoOutOfRange(u8)`, `Theory(TheoryError)` (`#[from]`), `InvalidRange`, `NoteDoesNotFit`. Search and view functions that cannot fail return plain values (an empty list or `VoicingResult::NoneFound`), not errors (FB-5.6).
 
+### 2.8 Refinements made while building (Phase B)
+
+- `StringState` is `Muted | Open | Fretted { fret }` (tagged `kind`); `Voicing` carries `fingering`, `kind`, `group`, `origin` and a name; `VoicingResult` is `Found { voicings }` or `NoneFound { options }`.
+- `Bpm` lives with the instrument newtypes and is exported as `Bpm` (30..=250, default 70); `PlannedNote.pitch` is a `Pitch` (serialise only).
+- `Selection` is a plain public struct (key, focus, chord, view, voicing_index, inversion, string_set, show_all_on_set, position, overlay, labels, capo_names, show_sevenths, show_order, arpeggio_direction, options, note); `apply` and `instrument_changed` are pure and take a `Context`.
+- Entry points the app calls: `fretboard_view_cached`, `apply_cached`, `instrument_changed_cached`, `playback_plan_cached`, with one caller-owned `VoicingCache` per explorer. See decisions D-50 to D-63 in [implementation-notes.md](implementation-notes.md).
+
 ## 3. `mackey-audio`
 
 ### 3.1 Tuner (pure `dsp`)

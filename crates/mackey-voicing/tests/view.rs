@@ -136,6 +136,25 @@ fn ac_fb_1_6_tooltip_has_note_octave_degree_interval_and_role() {
     assert_eq!(e5.tooltip.degree, "3");
     assert_eq!(e5.tooltip.interval.as_deref(), Some("5"));
     assert_eq!(e5.tooltip.role, "5th");
+    // Key G, chord G: string 3 open is G3, degree 1, interval R, role Root.
+    let g = build(
+        &sel("G", Mode::Major, Some("G"), ViewType::AllTones),
+        &Instrument::default(),
+    );
+    let open_g = g
+        .positions
+        .iter()
+        .find(|p| p.string.number() == 3 && p.fret.value() == 0)
+        .unwrap();
+    assert_eq!(
+        (
+            open_g.tooltip.note_octave.as_str(),
+            open_g.tooltip.degree.as_str(),
+            open_g.tooltip.interval.as_deref(),
+            open_g.tooltip.role.as_str()
+        ),
+        ("G3", "1", Some("R"), "Root")
+    );
     // Without a chord there is no interval.
     let plain = build(
         &sel("C", Mode::Major, None, ViewType::AllTones),
